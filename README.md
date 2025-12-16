@@ -9,3 +9,4 @@ Team : PASSERON Adrien, AYIVI Credo, GRUAU Elyan
 - .Net
 - 2 Joueurs reels
 - 0-N viewers
+- Jouable sur PC
