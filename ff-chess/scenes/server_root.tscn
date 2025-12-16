@@ -1,0 +1,57 @@
+[gd_scene load_steps=14 format=3 uid="uid://cyk6bj06qnj5"]
+
+[ext_resource type="Script" uid="uid://c6vr3pd2vob6t" path="res://scripts/server/NetworkServer.cs" id="1_bav36"]
+[ext_resource type="Script" uid="uid://rbfqglm83pnt" path="res://scripts/server/LobbyService.cs" id="1_i0cep"]
+[ext_resource type="Script" uid="uid://btvpikvwo0oea" path="res://scripts/server/Lobby.cs" id="1_v7sgl"]
+[ext_resource type="Script" uid="uid://dv6v6wi65k8d6" path="res://scripts/server/MachService.cs" id="4_sq82y"]
+[ext_resource type="Script" uid="uid://cxqfglkgtb0q6" path="res://scripts/server/MatchSessions.cs" id="5_f1qyi"]
+[ext_resource type="Script" uid="uid://c41bw87eb0ns0" path="res://scripts/server/MatchSession.cs" id="6_anu1o"]
+[ext_resource type="Script" uid="uid://dyvwwibqdxbll" path="res://scripts/server/ChessGame.cs" id="7_qnq70"]
+[ext_resource type="Script" uid="uid://il3vieu2y0an" path="res://scripts/server/BoardState.cs" id="8_j5jjp"]
+[ext_resource type="Script" uid="uid://ymp6lfm8jka6" path="res://scripts/server/RulesEngine.cs" id="9_adm8h"]
+[ext_resource type="Script" uid="uid://bf2p40cephy20" path="res://scripts/server/TurnManager.cs" id="10_rqkv5"]
+[ext_resource type="Script" uid="uid://b54k1lwmu5him" path="res://scripts/server/GameStateManagerr.cs" id="11_gs0dj"]
+[ext_resource type="Script" uid="uid://bj52kco3rx1by" path="res://scripts/server/PlayerRegistry.cs" id="12_hela8"]
+[ext_resource type="Script" uid="uid://dqvskfdjnvbm3" path="res://scripts/server/SpectatorRegistry.cs" id="13_si14y"]
+
+[node name="ServerRoot" type="Node2D"]
+position = Vector2(-1, 0)
+
+[node name="NetworkServer" type="Node" parent="."]
+script = ExtResource("1_bav36")
+
+[node name="LobbyService" type="Node" parent="."]
+script = ExtResource("1_i0cep")
+
+[node name="Lobby" type="Node" parent="LobbyService"]
+script = ExtResource("1_v7sgl")
+
+[node name="MachService" type="Node" parent="."]
+script = ExtResource("4_sq82y")
+
+[node name="MatchSessions" type="Node" parent="."]
+script = ExtResource("5_f1qyi")
+
+[node name="MatchSession" type="Node" parent="MatchSessions"]
+script = ExtResource("6_anu1o")
+
+[node name="ChessGame" type="Node" parent="MatchSessions/MatchSession"]
+script = ExtResource("7_qnq70")
+
+[node name="BoardState" type="Node" parent="MatchSessions/MatchSession/ChessGame"]
+script = ExtResource("8_j5jjp")
+
+[node name="RulesEngine" type="Node" parent="MatchSessions/MatchSession/ChessGame"]
+script = ExtResource("9_adm8h")
+
+[node name="TurnManager" type="Node" parent="MatchSessions/MatchSession/ChessGame"]
+script = ExtResource("10_rqkv5")
+
+[node name="GameStateManagerr" type="Node" parent="MatchSessions/MatchSession/ChessGame"]
+script = ExtResource("11_gs0dj")
+
+[node name="PlayerRegistry" type="Node" parent="MatchSessions/MatchSession"]
+script = ExtResource("12_hela8")
+
+[node name="SpectatorRegistry" type="Node" parent="MatchSessions/MatchSession"]
+script = ExtResource("13_si14y")
