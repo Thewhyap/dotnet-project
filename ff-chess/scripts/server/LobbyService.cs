@@ -1,11 +1,12 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 // Gestion des lobbies (avant match)
 public partial class LobbyService : Node
 {
-	private int _nextLobbyId = 1;
-	private Dictionary<int, Lobby> _lobbies = new();
+	public int _nextLobbyId = 1;
+	public Dictionary<int, Lobby> _lobbies = new();
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
 	public void CreateLobby(string name)
@@ -29,7 +30,17 @@ public partial class LobbyService : Node
 
 	private string SerializeLobbies()
 	{
-		return Json.Stringify(_lobbies.Values);
+		var arr = new Godot.Collections.Array();
+		foreach (var lobby in _lobbies.Values)
+		{
+			var dict = new Godot.Collections.Dictionary
+			{
+				["id"] = lobby.Id,
+				["name"] = lobby.Name
+			};
+			arr.Add(dict);
+		}
+		return Json.Stringify(arr);
 	}
 	
 	

@@ -1,14 +1,16 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+using DefaultNamespace;
 
 public partial class Lobby : Node
 {
-	private long Id;
-	private string Name;
-	private long? White;
-	private long? Black;
-	private List<long> Spectators = new();
-	private LobbyState State;
+	public long Id;
+	public string Name;
+	public long? White;
+	public long? Black;
+	public List<long> Spectators = new();
+	public LobbyState State;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
