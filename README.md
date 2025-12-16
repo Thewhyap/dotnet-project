@@ -1,4 +1,4 @@
-# dotnet-project - Chess.Net
+# Chess.Net
 
 Team : PASSERON Adrien, AYIVI Credo, GRUAU Elyan
 
