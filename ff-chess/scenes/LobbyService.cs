@@ -1,16 +1,9 @@
 using Godot;
 using System;
 
-public partial class Lobby : Node
+// Gestion des lobbies (avant match)
+public partial class LobbyService : Node
 {
-	
-	private Long LobbyId
-	private String Nom
-	private Player White;
-	private Player Black
-	private List<Spectator> Spectators;
-	private LobbyState State;
-	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
