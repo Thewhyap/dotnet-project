@@ -1,9 +1,14 @@
-[gd_scene format=3 uid="uid://l2wbpyi5gqym"]
+[gd_scene load_steps=3 format=3 uid="uid://l2wbpyi5gqym"]
+
+[ext_resource type="Script" uid="uid://b8wwlla4ndlvj" path="res://scripts/client/NetworkClient.cs" id="1_g724g"]
+[ext_resource type="Script" uid="uid://d3h1ln80noudr" path="res://scripts/client/SceneRouter.cs" id="2_1wvkc"]
 
 [node name="ClientRoot" type="Node2D"]
 
 [node name="NetworkClient" type="Node" parent="."]
+script = ExtResource("1_g724g")
 
 [node name="SceneRouter" type="Node" parent="."]
+script = ExtResource("2_1wvkc")
 
 [node name="UI" type="CanvasLayer" parent="."]
