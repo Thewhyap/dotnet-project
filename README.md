@@ -21,5 +21,14 @@ Le jeu doit mettre en place les IHM permettant aux joueurs de jouer
 - 2+n clients peuvent se connecter au serveur 
 - Un lobby pour choisir une partie ou en créer une
 
+
+1. On lance le jeu
+2. On arrive sur le lobby
+3. On attend que quelqu'un d'autre se connecte
+4. La partie commence
+5. On joue
+6. Les personnes suivantes sont des spectateurs (Observer)
+7. La partie se termine
+
 ### Marketplace (Steam)
 - TODO
