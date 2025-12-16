@@ -21,5 +21,5 @@ Le jeu doit mettre en place les IHM permettant aux joueurs de jouer
 - 2+n clients peuvent se connecter au serveur 
 - Un lobby pour choisir une partie ou en créer une
 
-### Marketplace
+### Marketplace (Steam)
 - TODO
