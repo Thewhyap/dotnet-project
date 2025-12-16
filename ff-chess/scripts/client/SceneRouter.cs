@@ -14,16 +14,16 @@ public partial class SceneRouter : Node
 	{
 	}
 	
-	public loadMainMenu(){
+	public void loadMainMenu(){
 		
 	}
-	public loadLobby(){
+	public void loadLobby(){
 		
 	}
-	public loadGame(){
+	public void loadGame(){
 		
 	}
-	public loadSpectator(){
+	public void loadSpectator(){
 		
 	}
 }

@@ -2,7 +2,7 @@ namespace DefaultNamespace;
 
 public enum LobbyState
 {
-    WAITING,
-    STARTING, 
-    IN_GAME;
+	WAITING,
+	STARTING, 
+	IN_GAME
 }

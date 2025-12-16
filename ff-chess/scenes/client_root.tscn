@@ -12,3 +12,88 @@ script = ExtResource("1_g724g")
 script = ExtResource("2_1wvkc")
 
 [node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MainMenuScreen" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LobbyScreen" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LobbyList" type="VBoxContainer" parent="UI/LobbyScreen"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CreateLobbyPanel" type="Control" parent="UI/LobbyScreen"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LobbyDetailsPanel" type="Control" parent="UI/LobbyScreen"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ActionButtons" type="Control" parent="UI/LobbyScreen"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="GameScreen" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ChessBoardView" type="Node2D" parent="UI/GameScreen"]
+
+[node name="BoardVisual" type="Control" parent="UI/GameScreen/ChessBoardView"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PiecesVisual" type="Control" parent="UI/GameScreen/ChessBoardView"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PlayerHud" type="Control" parent="UI/GameScreen"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MoveHistoryPanel" type="Control" parent="UI/GameScreen"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="StatusPanel" type="Control" parent="UI/GameScreen"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="SpectatorScreen" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ChessBoardView" type="Node2D" parent="UI/SpectatorScreen"]
+
+[node name="SpecatorHUD" type="Control" parent="UI/SpectatorScreen"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MatchInfoPanel" type="Control" parent="UI/SpectatorScreen"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0

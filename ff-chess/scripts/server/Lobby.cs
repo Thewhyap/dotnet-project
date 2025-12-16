@@ -3,11 +3,11 @@ using System;
 
 public partial class Lobby : Node
 {
-	private Long LobbyId
-	private String Nom
-	private Player White;
-	private Player Black
-	private List<Spectator> Spectators;
+	private long Id;
+	private string Name;
+	private long? White;
+	private long? Black;
+	private List<long> Spectators = new();
 	private LobbyState State;
 	
 	// Called when the node enters the scene tree for the first time.

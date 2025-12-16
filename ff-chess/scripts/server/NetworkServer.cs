@@ -3,13 +3,29 @@ using System;
 
 public partial class NetworkServer : Node
 {
-	// Called when the node enters the scene tree for the first time.
+	private ENetMultiplayerPeer _peer;
+
 	public override void _Ready()
 	{
+		_peer = new ENetMultiplayerPeer();
+		_peer.CreateServer(7777, 100);
+
+		Multiplayer.MultiplayerPeer = _peer;
+
+		Multiplayer.PeerConnected += OnPeerConnected;
+		Multiplayer.PeerDisconnected += OnPeerDisconnected;
+
+		GD.Print("Server started on port 7777");
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
+	private void OnPeerConnected(long id)
 	{
+		GD.Print($"Client connected: {id}");
 	}
+
+	private void OnPeerDisconnected(long id)
+	{
+		GD.Print($"Client disconnected: {id}");
+	}
+	
 }
