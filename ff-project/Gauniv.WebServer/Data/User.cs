@@ -34,9 +34,9 @@ namespace Gauniv.WebServer.Data
 {
     public class User : IdentityUser {
         
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [Key]
-        public int Id { get; set; }
+        // [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        // [Key]
+        // public int Id { get; set; }
         
         [Required]
         public string FirstName { get; set; }
