@@ -28,10 +28,29 @@
 #endregion
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gauniv.WebServer.Data
 {
-    public class User : IdentityUser
-    {
+    public class User : IdentityUser {
+        
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        public int Id { get; set; }
+        
+        [Required]
+        public string FirstName { get; set; }
+        
+        [Required]
+        public string LastName { get; set; }
+        
+        [Required]
+        public string Password { get; set; }
+        
+        public IEnumerable<Game> UserGames { get; set; }
+        
+        public DateTime CreatedAt { get; set; }
+        public DateTime LastUpdatedAt { get; set; }
+        
     }
 }
