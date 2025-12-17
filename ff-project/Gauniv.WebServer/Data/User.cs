@@ -44,9 +44,6 @@ namespace Gauniv.WebServer.Data
         [Required]
         public string LastName { get; set; }
         
-        [Required]
-        public string Password { get; set; }
-        
         public IEnumerable<Game> UserGames { get; set; }
         
         public DateTime CreatedAt { get; set; }

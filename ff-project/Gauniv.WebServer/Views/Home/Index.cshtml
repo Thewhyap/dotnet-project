@@ -5,19 +5,211 @@
     ViewData["Title"] = "View";
 }
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
-<h1>View</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .filter-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .game-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        height: 100%;
+    }
+    
+    .game-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    }
+    
+    .game-card img {
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+        width: 100%;
+    }
+    
+    .game-card:hover img {
+        transform: scale(1.05);
+    }
+    
+    .game-title {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 1rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-bottom: 0.5rem;
+    }
+    
+    .game-price {
+        color: #667eea;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    .filter-btn {
+        transition: all 0.3s ease;
+    }
+    
+    .filter-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .badge-new {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #48bb78;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 1;
+    }
+    
+    .card-body-custom {
+        padding: 15px;
+    }
+    
+    .img-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+</style>
+
+
+<!-- Hero Section -->
+<div class="hero-section text-center text-white p-5 my-4">
+    <h1 class="display-4 fw-bold mb-3">Game Catalog</h1>
+    <p class="lead mb-0">Discover amazing games at great prices</p>
+</div>
+
+<!-- Filter Section -->
+<div class="container filter-section">
+    <form asp-action="Index" method="get" class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label for="searchTerm" class="form-label fw-semibold">Search</label>
+            <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
+                   placeholder="Game name..." value="@ViewBag.SearchTerm">
+        </div>
+        
+        <div class="col-md-2">
+            <label for="category" class="form-label fw-semibold">Category</label>
+            <select class="form-select" id="category" name="category">
+                <option value="">All Categories</option>
+                <option value="action">Action</option>
+                <option value="adventure">Adventure</option>
+                <option value="rpg">RPG</option>
+                <option value="sports">Sports</option>
+                <option value="strategy">Strategy</option>
+            </select>
+        </div>
+        
+        <div class="col-md-2">
+            <label for="minPrice" class="form-label fw-semibold">Min Price (€)</label>
+            <input type="number" class="form-control" id="minPrice" name="minPrice" 
+                   placeholder="0" step="0.01" value="@ViewBag.MinPrice">
+        </div>
+        
+        <div class="col-md-2">
+            <label for="maxPrice" class="form-label fw-semibold">Max Price (€)</label>
+            <input type="number" class="form-control" id="maxPrice" name="maxPrice" 
+                   placeholder="100" step="0.01" value="@ViewBag.MaxPrice">
+        </div>
+        
+        <div class="col-md-2">
+            <label for="sortBy" class="form-label fw-semibold">Sort By</label>
+            <select class="form-select" id="sortBy" name="sortBy">
+                <option value="name">Name</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="newest">Newest First</option>
+            </select>
+        </div>
+        
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary w-100 filter-btn">Filter</button>
+        </div>
+    </form>
+</div>
+
+<!-- Game Grid -->
+<div class="container">
+    @* @if (Model != null && Model.Any()) *@
+    @if (true)
+    {
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="text-muted mb-0">
+                Showing @Model.Count of 50 games
+            </h5>
+        </div>
+        
+        <div class="row g-4">
+            @foreach (var game in Enumerable.Range(15,20))
+            {
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="card game-card">
+                        <div class="img-wrapper">
+                            <img src="@("https://picsum.photos/300/200?random=" + Enumerable.Range(1,5))" 
+                                 class="card-img-top">
+                        </div>
+                        <div class="card-body card-body-custom">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="game-title">Dragon Ball</h6>
+                                <span class="game-price">5.5 €</span>
+                            </div>
+                            
+                            @if (false)
+                            {
+                                <span class="badge bg-secondary mb-2">game category</span>
+                            }
+                            
+                            <div class="d-flex gap-2 mt-3">
+                                <a asp-action="Details" class="btn btn-sm btn-outline-primary flex-grow-1">Details</a>
+                                <a asp-action="AddToCart" class="btn btn-sm btn-primary">Add</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        
+        <!-- Pagination -->
+        @* <div class="d-flex justify-content-center mt-5 mb-4"> *@
+        @*     @Html.PagedListPager(Model, page => Url.Action("Index",  *@
+        @*         new {  *@
+        @*             page,  *@
+        @*             searchTerm = ViewBag.SearchTerm, *@
+        @*             category = ViewBag.Category, *@
+        @*             minPrice = ViewBag.MinPrice, *@
+        @*             maxPrice = ViewBag.MaxPrice, *@
+        @*             sortBy = ViewBag.SortBy *@
+        @*         })) *@
+        @* </div> *@
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5" role="alert">
+            <h4>No games found</h4>
+            <p class="mb-0">Try adjusting your filters or search terms</p>
+        </div>
+    }
+</div>
+

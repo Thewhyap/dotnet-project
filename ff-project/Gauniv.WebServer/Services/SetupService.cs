@@ -48,31 +48,46 @@ namespace Gauniv.WebServer.Services
             this.serviceProvider = serviceProvider;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             using (var scope = serviceProvider.CreateScope()) // this will use `IServiceScopeFactory` internally
             {
                 applicationDbContext = scope.ServiceProvider.GetService<ApplicationDbContext>();
-                var userSignInManager = scope.ServiceProvider.GetService<UserManager<User>>();
-                var signInManager = scope.ServiceProvider.GetService<SignInManager<User>>();
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+                // var signInManager = scope.ServiceProvider.GetRequiredService<SignInManager<User>>();
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
 
                 if (applicationDbContext is null)
                 {
                     throw new Exception("ApplicationDbContext is null");
                 }
 
-                var r = userSignInManager?.CreateAsync(new User()
+
+                if (!await roleManager.RoleExistsAsync("ADMIN"))
+                {
+                    await roleManager.CreateAsync(new IdentityRole("ADMIN"));
+                }
+
+                var adminUser = new User()
                 {
                     UserName = "test@test.com",
                     Email = "test@test.com",
+                    FirstName = "Test",
+                    LastName = "Test",
                     EmailConfirmed = true
-                }, "password").Result;
+                };
+                
+                var createAdminUser = await userManager.CreateAsync(adminUser, "123456");
 
                 // ....
+                if (createAdminUser.Succeeded) {
+                    userManager.AddToRoleAsync(adminUser, "ADMIN").GetAwaiter().GetResult();
+                }
 
                 applicationDbContext.SaveChanges();
 
-                return Task.CompletedTask;
+                //return Task.CompletedTask;
             }
         }
 
