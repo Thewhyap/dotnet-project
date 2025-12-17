@@ -11,11 +11,11 @@ public partial class Bootstrap : Node
 
 		if (args.Contains("--server"))
 		{
-			GetTree().ChangeSceneToFile("res://server/ServerMain.tscn");
+			GetTree().ChangeSceneToFile("res://scripts/server/server_root.tscn");
 		}
 		else
 		{
-			GetTree().ChangeSceneToFile("res://client/ClientMain.tscn");
+			GetTree().ChangeSceneToFile("res://scenes/client_root.tscn");
 		}
 	}
 

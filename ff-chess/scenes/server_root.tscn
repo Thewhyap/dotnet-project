@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cyk6bj06qnj5"]
+[gd_scene load_steps=15 format=3 uid="uid://cyk6bj06qnj5"]
 
 [ext_resource type="Script" uid="uid://c6vr3pd2vob6t" path="res://scripts/server/NetworkServer.cs" id="1_bav36"]
 [ext_resource type="Script" uid="uid://rbfqglm83pnt" path="res://scripts/server/LobbyService.cs" id="1_i0cep"]
@@ -14,8 +14,27 @@
 [ext_resource type="Script" uid="uid://bj52kco3rx1by" path="res://scripts/server/PlayerRegistry.cs" id="12_hela8"]
 [ext_resource type="Script" uid="uid://dqvskfdjnvbm3" path="res://scripts/server/SpectatorRegistry.cs" id="13_si14y"]
 
+[sub_resource type="CSharpScript" id="CSharpScript_bav36"]
+script/source = "using Godot;
+using System;
+
+public partial class ServerRoot : Node2D
+{
+	// Called when the node enters the scene tree for the first time.
+	public override void _Ready()
+	{
+	}
+
+	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public override void _Process(double delta)
+	{
+	}
+}
+"
+
 [node name="ServerRoot" type="Node2D"]
 position = Vector2(-1, 0)
+script = SubResource("CSharpScript_bav36")
 
 [node name="NetworkServer" type="Node" parent="."]
 script = ExtResource("1_bav36")
