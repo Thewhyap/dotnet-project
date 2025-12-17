@@ -5,6 +5,6 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="launch.md" />
-  </ItemGroup>
+  <ProjectReference Include="..\FFChessShared\FFChessShared.csproj" />
+</ItemGroup>
 </Project>

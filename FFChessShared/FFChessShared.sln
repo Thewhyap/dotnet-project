@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFChessShared", "FFChessShared\FFChessShared.csproj", "{1EA57487-01D4-4E80-A769-5A14B0600019}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFChessShared", "FFChessShared.csproj", "{D2676EED-AD59-4E86-BCD5-2FE1AA89E7AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +8,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1EA57487-01D4-4E80-A769-5A14B0600019}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1EA57487-01D4-4E80-A769-5A14B0600019}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1EA57487-01D4-4E80-A769-5A14B0600019}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1EA57487-01D4-4E80-A769-5A14B0600019}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2676EED-AD59-4E86-BCD5-2FE1AA89E7AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2676EED-AD59-4E86-BCD5-2FE1AA89E7AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2676EED-AD59-4E86-BCD5-2FE1AA89E7AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2676EED-AD59-4E86-BCD5-2FE1AA89E7AC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

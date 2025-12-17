@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using FFChessShared;
 
 // Navigation des scenes
 public partial class SceneRouter : Node
@@ -15,7 +16,8 @@ public partial class SceneRouter : Node
 
   public override void _Ready()
   {
-	CallDeferred(nameof(LoadInitialScene));
+	  Class1 toto = new Class1();
+		CallDeferred(nameof(LoadInitialScene));
   }
 
   private void ClearScreen()
