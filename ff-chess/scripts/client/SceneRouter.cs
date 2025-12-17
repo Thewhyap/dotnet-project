@@ -16,7 +16,6 @@ public partial class SceneRouter : Node
 
   public override void _Ready()
   {
-	  Class1 toto = new Class1();
 		CallDeferred(nameof(LoadInitialScene));
   }
 
