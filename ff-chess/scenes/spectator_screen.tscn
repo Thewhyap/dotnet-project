@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://6ycskqnk6bds"]
+
+[node name="SpectatorScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ChessBoardView" type="Node2D" parent="."]
+
+[node name="SpectatorLabel" type="Label" parent="ChessBoardView"]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "SpectatorScreen
+"
+
+[node name="SpecatorHUD" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MatchInfoPanel" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0

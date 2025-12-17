@@ -1,0 +1,45 @@
+[gd_scene load_steps=2 format=3 uid="uid://6dmyhj3da5oa"]
+
+[ext_resource type="Script" uid="uid://cxdcyoihqgbcs" path="res://views/ChessBoardView.cs" id="1_8mhku"]
+
+[node name="GameScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="GameScreenLabel" type="Label" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Game Screen"
+
+[node name="ChessBoardView" type="Node2D" parent="."]
+script = ExtResource("1_8mhku")
+
+[node name="BoardVisual" type="Control" parent="ChessBoardView"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PiecesVisual" type="Control" parent="ChessBoardView"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PlayerHud" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MoveHistoryPanel" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="StatusPanel" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0

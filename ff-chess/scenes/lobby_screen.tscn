@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://26i7qlfpqssu"]
+
+[node name="LobbyScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LobbyList" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LobbyLabel" type="Label" parent="LobbyList"]
+layout_mode = 2
+text = "Lobby"
+
+[node name="CreateLobbyPanel" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LobbyDetailsPanel" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ActionButtons" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0

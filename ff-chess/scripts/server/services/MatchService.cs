@@ -3,6 +3,8 @@ using System;
 
 public partial class MatchService : Node
 {
+	private int _nextMatchId = 1;
+	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -13,9 +15,15 @@ public partial class MatchService : Node
 	{
 	}
 
-	public void create_match(long lobbyId)
+	public void create_match(Lobby lobby)
 	{
-		
+		var match = new MatchSession
+		{
+			Name = $"Match_{_nextMatchId++}"
+		};
+
+		GetNode("MatchSessions").AddChild(match);
+		match.Initialize(lobby);
 	}
 
 	public void close_match(long matchId)

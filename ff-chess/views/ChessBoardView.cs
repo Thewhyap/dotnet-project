@@ -1,12 +1,8 @@
 using Godot;
 using System;
 
-public partial class RulesEngine : Node
+public partial class ChessBoardView : Node2D
 {
-	public static bool IsMoveValid(Vector2I from, Vector2I to)
-	{
-		return true; // TODO TO IMPLEMENT
-	}
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
