@@ -36,5 +36,6 @@ public partial class LobbyItemScene : Control
 	private void OnJoinPressed()
 	{
 		GD.Print($"Joining: {_nameLabel.Text}");
+		GetNode<SceneRouter>("/root/ClientRoot/SceneRouter").LoadGame();
 	}
 }
