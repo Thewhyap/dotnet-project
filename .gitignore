@@ -18,3 +18,5 @@ data_*/
 mono_crash.*.json
 /.idea
 /ff-chess/.idea
+/FFChessShared/.idea
+/FFChessShared/FFChessShared/obj
