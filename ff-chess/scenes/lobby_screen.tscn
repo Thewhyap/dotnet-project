@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://26i7qlfpqssu"]
+[gd_scene load_steps=0 format=3 uid="uid://26i7qlfpqssu"]
 
 [node name="LobbyScreen" type="Control"]
 layout_mode = 3

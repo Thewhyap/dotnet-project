@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://6ycskqnk6bds"]
+[gd_scene load_steps=0 format=3 uid="uid://6ycskqnk6bds"]
 
 [node name="SpectatorScreen" type="Control"]
 layout_mode = 3
