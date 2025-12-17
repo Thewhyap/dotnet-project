@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://ch1avs5tr6k0l"]
+
+[ext_resource type="Script" uid="uid://m17tdv40pkbf" path="res://scripts/client/lobby/LobbyItemScene.cs" id="1_xipqh"]
+
+[node name="LobbyItemScene" type="Control"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_xipqh")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="NameLabel" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="PlayersLabel" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="SpecatorLabel" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="JoinButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "Join"

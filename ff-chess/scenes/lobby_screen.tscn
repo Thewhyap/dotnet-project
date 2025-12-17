@@ -5,6 +5,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+script = ExtResource("1_wbad2")
 
 [node name="LobbyList" type="VBoxContainer" parent="."]
 layout_mode = 0
