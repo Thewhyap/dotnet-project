@@ -4,7 +4,7 @@
 /android/
 
 # Godot-specific ignores
-.import/
+**/.import/
 export.cfg
 export_credentials.cfg
 *.tmp
@@ -16,15 +16,10 @@ export_credentials.cfg
 .mono/
 data_*/
 mono_crash.*.json
-/.idea
-/ff-chess/.idea
-/FFChessShared/.idea
-/FFChessShared/FFChessShared/obj
-/FFChessShared/obj
-/FFChessShared/bin
-/ff-chess-server/.idea
-/ff-chess-server/ff-chess-server/obj
+**/.idea
+**/.vs/
+**/bin/
+**/obj/
 
-.vs/
-bin/
-obj/
+# MAC OS ignores
+.DS_Store
