@@ -1,6 +1,6 @@
 namespace Server.Network;
 
-public partial class NetworkServer
+public class NetworkServer
 {
 	//TODO
 }

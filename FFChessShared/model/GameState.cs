@@ -1,33 +1,26 @@
-namespace FFChessShared;
+using FFChessShared;
 
-public readonly struct GameState
+public class GameState
 {
-	public Board Board { get; }
-	public PieceColor CurrentTurn { get; }
-	
-	public bool WhiteCanCastleKingSide { get; }
-	public bool WhiteCanCastleQueenSide { get; }
-	public bool BlackCanCastleKingSide { get; }
-	public bool BlackCanCastleQueenSide { get; }
+    public Board Board { get; }
+    public PieceColor CurrentTurn { get; set; }
 
-	public ChessSquare? EnPassantTarget { get; }
+    public bool WhiteCanCastleKingSide { get; set; }
+    public bool WhiteCanCastleQueenSide { get; set; }
+    public bool BlackCanCastleKingSide { get; set; }
+    public bool BlackCanCastleQueenSide { get; set; }
+    public int DrawMoveClock {  get; set; }
 
-	public GameState(
-		Board board,
-		PieceColor currentTurn,
-		bool whiteCastleK,
-		bool whiteCastleQ,
-		bool blackCastleK,
-		bool blackCastleQ,
-		ChessSquare? enPassantTarget
-	)
-	{
-		Board = board;
-		CurrentTurn = currentTurn;
-		WhiteCanCastleKingSide = whiteCastleK;
-		WhiteCanCastleQueenSide = whiteCastleQ;
-		BlackCanCastleKingSide = blackCastleK;
-		BlackCanCastleQueenSide = blackCastleQ;
-		EnPassantTarget = enPassantTarget;
-	}
+    public ChessSquare? EnPassantTarget { get; set; }
+
+    public GameState( Board board, PieceColor turn = PieceColor.White )
+    {
+        Board = board;
+        CurrentTurn = turn;
+        WhiteCanCastleKingSide = true;
+        WhiteCanCastleQueenSide = true;
+        BlackCanCastleKingSide = true;
+        BlackCanCastleQueenSide = true;
+        EnPassantTarget = null;
+    }
 }
