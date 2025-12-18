@@ -6,6 +6,7 @@ using FFChessShared.generators;
 
 public partial class LobbyScreen : Control
 {
+	
 	private VBoxContainer _lobbyList;
 	private Button _createLobbyButton;
 	private PackedScene _lobbyItemScene;
@@ -13,8 +14,8 @@ public partial class LobbyScreen : Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		 _lobbyList = GetNode<VBoxContainer>("LobbyList");
-		 _createLobbyButton = GetNode<Button>("ActionButtons/Button");
+		 _lobbyList = GetNode<VBoxContainer>("CenterContainer/VBoxContainer/LobbyList");
+		 _createLobbyButton = GetNode<Button>("CenterContainer/VBoxContainer/ActionButtons/CreateLobbyButton");
 		 _createLobbyButton.Pressed += OnCreateLobbyButtonPressed;
 		 _lobbyItemScene = GD.Load<PackedScene>("res://scripts/client/lobby/LobbyItemScene.tscn");
 		 
