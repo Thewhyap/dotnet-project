@@ -37,7 +37,8 @@ public partial class LobbyItemScene : Control
 	private void OnJoinPressed()
 	{
 		GD.Print($"Joining: {_nameLabel.Text}");
-		GetNode<SceneRouter>("/root/ClientRoot/SceneRouter").LoadGame();
+		var fakeGameFromServer = new Game(); // TODO Call server to get actual game data
+		GetNode<SceneRouter>("/root/ClientRoot/SceneRouter").LoadGame(fakeGameFromServer);
 	}
 	
 	private string getReadableGameStatus(MatchStatus status)

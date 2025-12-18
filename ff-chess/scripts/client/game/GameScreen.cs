@@ -7,7 +7,7 @@ namespace FFChess.scripts.client.game;
 
 public partial class GameScreen : Control
 {
-	private Game _gameModel;
+	private Game _game;
 	private ChessBoardView _boardView;
 	private Vector2 _selectedPiecePosition = Vector2.Zero; // Stocke les coordonnées du pion sélectionné
 	private bool _hasPieceSelected = false;
@@ -15,7 +15,7 @@ public partial class GameScreen : Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		_gameModel = new Game();
+		_game = new Game();
 		_boardView = GetNode<ChessBoardView>("ChessBoardView");
 		
 		// Calculate square size based on viewport height
@@ -30,6 +30,12 @@ public partial class GameScreen : Control
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+	}
+	
+	public void SetGame(Game game)
+	{
+		_game = game;
+		RenderBoard();
 	}
 	
 	private void OnViewportSizeChanged()
@@ -72,9 +78,9 @@ public partial class GameScreen : Control
 		// Remove existing pieces
 		_boardView.ClearPieces();
 		
-		for (int y = 0; y < _gameModel.GameState.Board.Cells.GetLength(0); y++)
+		for (int y = 0; y < _game.GameState.Board.Cells.GetLength(0); y++)
 		{
-			for (int x = 0; x < _gameModel.GameState.Board.Cells.GetLength(1); x++)
+			for (int x = 0; x < _game.GameState.Board.Cells.GetLength(1); x++)
 			{	
 				// Scale coordinates
 				var scaledX = x * GameConstants.SquareSize;
@@ -88,7 +94,7 @@ public partial class GameScreen : Control
 			_boardView.AddChild(squareView);
 				
 				// Handle the piece on the square
-				var maybePiece = _gameModel.GameState.Board.Cells[y, x];
+				var maybePiece = _game.GameState.Board.Cells[y, x];
 				if (maybePiece != null)
 				{
 					Piece piece = (Piece) maybePiece;

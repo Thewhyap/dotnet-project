@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using FFChess.scripts.client.game;
 using FFChessShared;
 
 // Navigation des scenes
@@ -13,6 +14,11 @@ public partial class SceneRouter : Node
   private const string LOBBY = "res://scenes/lobby_screen.tscn";
   private const string GAME = "res://scenes/game_screen.tscn";
   private const string SPECTATOR = "res://scenes/spectator_screen.tscn";
+  
+  /**
+   * Pending game to pass to the game screen once loaded
+   */
+  private Game ?_pendingGame;
 
   public override void _Ready()
   {
@@ -92,7 +98,13 @@ public partial class SceneRouter : Node
 
   public void LoadMainMenu(){ LoadScreen(MAIN_MENU); }
   public void LoadLobby(){ LoadScreen(LOBBY); }
-  public void LoadGame(){ LoadScreen(GAME); }
+
+  public void LoadGame(Game game)
+  {
+	  LoadScreen(GAME);
+	  _pendingGame = game;
+	  CallDeferred(nameof(PassGameToScreen));
+  }
   public void LoadSpectator(){ LoadScreen(SPECTATOR); }
 
   public void LoadInitialScene()
@@ -119,5 +131,23 @@ public partial class SceneRouter : Node
 
 	GD.Print("UI root found: ", _screenRoot.GetPath());
 	LoadMainMenu();
+  }
+  
+  private void PassGameToScreen()
+  {
+	  if (_screenRoot == null || _screenRoot.GetChildCount() == 0) return;
+	
+	  Control screen = _screenRoot.GetChild<Control>(_screenRoot.GetChildCount() - 1);
+
+	  if (_pendingGame == null)
+	  {
+		  throw new InvalidOperationException("No pending game to pass to GameScreen, please set _pendingGame before calling PassGameToScreen.");
+	  }
+	  
+	  if (screen is GameScreen gameScreen)
+	  {
+		  gameScreen.SetGame((Game) _pendingGame);
+		  _pendingGame = null;
+	  }
   }
 }

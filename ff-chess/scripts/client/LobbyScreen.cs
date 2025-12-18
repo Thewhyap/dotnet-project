@@ -55,5 +55,9 @@ public partial class LobbyScreen : Control
 		// TODO implement lobby creation logic (Server call)
 		// The sever will create a new Lobby and return it's data.
 		GD.Print("Create Lobby button pressed.");
+		
+		// Simulate the game returned from server
+		var gameFromServer = new Game();
+		GetNode<SceneRouter>("/root/ClientRoot/SceneRouter").LoadGame(gameFromServer);
 	}
 }
