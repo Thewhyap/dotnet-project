@@ -41,7 +41,7 @@ public partial class GameScreen : Control
 				var maybePiece = _gameModel.GameState.Board.Cells[y, x];
 				if (maybePiece != null)
 				{
-					var piece = maybePiece.Value;
+					var piece = maybePiece;
 					var pieceView = new PieceView();
 					pieceView.SetPiece(piece);
 					pieceView.setCoordinates(x, y);
