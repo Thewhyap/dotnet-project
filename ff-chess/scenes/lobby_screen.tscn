@@ -1,4 +1,6 @@
-[gd_scene load_steps=0 format=3 uid="uid://26i7qlfpqssu"]
+[gd_scene load_steps=2 format=3 uid="uid://26i7qlfpqssu"]
+
+[ext_resource type="Script" uid="uid://bub7wl5hjlkt8" path="res://scripts/client/LobbyScreen.cs" id="1_wbad2"]
 
 [node name="LobbyScreen" type="Control"]
 layout_mode = 3

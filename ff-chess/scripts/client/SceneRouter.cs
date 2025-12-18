@@ -46,7 +46,7 @@ public partial class SceneRouter : Node
 	PackedScene scene = GD.Load<PackedScene>(path);
 	if (scene == null)
 	{
-	  GD.PrintErr("Failed to load scene at path: ", path);
+	  GD.PrintErr("Unable to load scene at path: ", path, "\n file not found.");
 	  return;
 	}
 
