@@ -24,3 +24,7 @@ mono_crash.*.json
 /FFChessShared/bin
 /ff-chess-server/.idea
 /ff-chess-server/ff-chess-server/obj
+
+.vs/
+bin/
+obj/
