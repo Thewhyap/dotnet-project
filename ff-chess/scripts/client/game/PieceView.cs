@@ -35,7 +35,7 @@ public partial class PieceView : Node2D
 		// Define clickable rectangle
 		_clickRect = new Rect2(Vector2.Zero, new Vector2(GameConstants.SquareSize, GameConstants.SquareSize));
 		
-		GD.Print($"PieceView created at ({_gridX}, {_gridY}) with SquareSize: {GameConstants.SquareSize}");
+		// GD.Print($"PieceView created at ({_gridX}, {_gridY}) with SquareSize: {GameConstants.SquareSize}");
 	}
 
 	public void SetPiece(Piece piece)

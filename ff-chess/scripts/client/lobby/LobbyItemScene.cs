@@ -38,7 +38,7 @@ public partial class LobbyItemScene : Control
 	{
 		GD.Print($"Joining: {_nameLabel.Text}");
 		var fakeGameFromServer = new Game(); // TODO Call server to get actual game data
-		GetNode<SceneRouter>("/root/ClientRoot/SceneRouter").LoadGame(fakeGameFromServer);
+		GetNode<SceneRouter>("/root/ClientRoot/GameUpdaterServer/SceneRouter").LoadGame(fakeGameFromServer);
 	}
 	
 	private string getReadableGameStatus(MatchStatus status)

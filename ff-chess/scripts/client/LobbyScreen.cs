@@ -58,6 +58,6 @@ public partial class LobbyScreen : Control
 		
 		// Simulate the game returned from server
 		var gameFromServer = new Game();
-		GetNode<SceneRouter>("/root/ClientRoot/SceneRouter").LoadGame(gameFromServer);
+		GetNode<SceneRouter>("/root/ClientRoot/GameUpdaterServer/SceneRouter").LoadGame(gameFromServer);
 	}
 }

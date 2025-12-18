@@ -106,6 +106,21 @@ public partial class SceneRouter : Node
 	  CallDeferred(nameof(PassGameToScreen));
   }
   public void LoadSpectator(){ LoadScreen(SPECTATOR); }
+  
+  /**
+   * Update the current game in the GameScreen, if active 
+   */
+  public void UpdateGame(Game game)
+  {
+	  GD.Print("Updating Game Screen");
+	  if (_screenRoot == null || _screenRoot.GetChildCount() == 0) return;
+
+	  Control screen = _screenRoot.GetChild<Control>(_screenRoot.GetChildCount() - 1);
+	  if (screen is GameScreen gameScreen)
+	  {
+		  gameScreen.SetGame(game);
+	  }
+  }
 
   public void LoadInitialScene()
   {

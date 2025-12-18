@@ -44,7 +44,7 @@ public partial class SquareView : Node2D
 		// Define clickable rectangle
 		_clickRect = new Rect2(Vector2.Zero, new Vector2(GameConstants.SquareSize, GameConstants.SquareSize));
 		
-		GD.Print($"SquareView created at ({_gridX}, {_gridY})");
+		// GD.Print($"SquareView created at ({_gridX}, {_gridY})");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
