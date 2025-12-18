@@ -1,14 +1,19 @@
 using Godot;
 using System;
 using FFChess.scripts.client;
-using FFChessShared;
 
-public partial class PieceView : Node2D
+public partial class SquareView : Node2D
 {
-	private Piece _piece;
+	private bool _isBlack;
+	private const string Variant = "1";
 	private Sprite2D _sprite;
-	private const string Variant = "2";
-
+	
+	public SquareView(bool isBlack)
+	{
+		_isBlack = isBlack;
+	}
+	
+	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		_sprite = new Sprite2D();
@@ -24,17 +29,12 @@ public partial class PieceView : Node2D
 		AddChild(_sprite);
 	}
 
-	public void SetPiece(Piece piece)
+	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public override void _Process(double delta)
 	{
-		_piece = piece;
-		UpdateVisuals();
 	}
-
-	private void UpdateVisuals()
-	{
-		
-	}
-
+	
+	
 	public void setCoordinates(float x, float y)
 	{
 		Position = new Vector2(x, y);
@@ -42,7 +42,8 @@ public partial class PieceView : Node2D
 	
 	private Texture2D LoadTexture()
 	{
-		var imagePath = $"res://assets/textures/pawns/{_piece.Color.ToString().ToLower()}_{_piece.Type.ToString().ToLower()}_{Variant}.png";
+		var color = _isBlack ? "black" : "white";
+		var imagePath = $"res://assets/textures/squares/{color}_square_{Variant}.png";
 		Texture2D texture = GD.Load<Texture2D>(imagePath);
 		if (texture == null)
 		{

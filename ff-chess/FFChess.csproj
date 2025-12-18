@@ -46,7 +46,7 @@
     <Content Include="assets\textures\pawns\rookW.png" />
     <Content Include="assets\textures\pawns\rookW2.png" />
     <Content Include="assets\textures\pawns\rookW3.png" />
-    <Content Include="assets\textures\squares\squareB.png" />
-    <Content Include="assets\textures\squares\squareW.png" />
+    <Content Include="assets\textures\squares\black_square_1.png" />
+    <Content Include="assets\textures\squares\white_square_1.png" />
   </ItemGroup>
 </Project>
