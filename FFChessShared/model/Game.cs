@@ -10,4 +10,13 @@ public readonly struct Game
 		GameState = gameState;
 		Status = status;
 	}
+	
+	/**
+	 * Creates a default game with initial game state and empty status
+	 */
+	public Game()
+	{
+		GameState = GameState.CreateDefault();
+		Status = new MatchStatus();
+	}
 }
