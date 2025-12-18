@@ -16,7 +16,7 @@ offset_bottom = 40.0
 
 [node name="LobbyLabel" type="Label" parent="LobbyList"]
 layout_mode = 2
-text = "Lobby"
+text = "Lobbies "
 
 [node name="CreateLobbyPanel" type="Control" parent="."]
 anchors_preset = 0
@@ -32,3 +32,9 @@ offset_bottom = 40.0
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+
+[node name="Button" type="Button" parent="ActionButtons"]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Create lobby"
