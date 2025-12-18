@@ -7,19 +7,33 @@ public partial class GameScreen : Control
 {
 	private Game _gameModel;
 	private ChessBoardView _boardView;
-	private readonly int _squareSize = 80;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		 _gameModel = new Game();
+		_gameModel = new Game();
 		_boardView = GetNode<ChessBoardView>("ChessBoardView");
+		
+		// Calculate square size based on viewport height
+		GameConstants.CalculateSquareSizeFromViewport(GetViewportRect().Size);
+		
 		RenderBoard();
+		
+		GetViewportRect();
+		GetViewport().SizeChanged += OnViewportSizeChanged;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+	}
+	
+	private void OnViewportSizeChanged()
+	{
+		// Recalculate square size and re-render board
+		GameConstants.CalculateSquareSizeFromViewport(GetViewportRect().Size);
+		_boardView.ClearBoard();
+		RenderBoard();
 	}
 	
 	public void OnSquareClicked(ChessSquare square)
