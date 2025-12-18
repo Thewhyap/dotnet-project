@@ -10,13 +10,13 @@
   <ItemGroup>
     <Content Include="assets\textures\board.png" />
     <Content Include="assets\textures\icon.png" />
-    <Content Include="assets\textures\pawns\bishopB.png" />
-    <Content Include="assets\textures\pawns\bishopB2.png" />
-    <Content Include="assets\textures\pawns\bishopB3.png" />
+    <Content Include="assets\textures\pawns\black_bishop.png" />
+    <Content Include="assets\textures\pawns\black_bishop_2.png" />
+    <Content Include="assets\textures\pawns\black_bishop_3.png" />
     <Content Include="assets\textures\pawns\bishopW.png" />
     <Content Include="assets\textures\pawns\bishopW2.png" />
     <Content Include="assets\textures\pawns\bishopW3.png" />
-    <Content Include="assets\textures\pawns\kingB.png" />
+    <Content Include="assets\textures\pawns\black_king.png" />
     <Content Include="assets\textures\pawns\kingB2.png" />
     <Content Include="assets\textures\pawns\kingB3.png" />
     <Content Include="assets\textures\pawns\kingW.png" />

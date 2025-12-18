@@ -32,14 +32,24 @@ public partial class GameScreen : Control
 	
 		// Récupère toutes les pièces du modèle partagé
 		var allPieces = _gameModel.GameState.Board.GetAllPieces();
-	
-		// Pour chaque pièce, crée/met à jour sa représentation visuelle
-		foreach (var piece in allPieces)
+
+
+		for (int y = 0; y < _gameModel.GameState.Board.Cells.GetLength(0); y++)
 		{
-			var pieceView = new PieceView();
-			pieceView.SetPiece(piece);
-			_boardView.AddChild(pieceView);
-			GD.Print("Rendering piece: " + piece.Type );
+			for (int x = 0; x < _gameModel.GameState.Board.Cells.GetLength(1); x++)
+			{
+				var maybePiece = _gameModel.GameState.Board.Cells[y, x];
+				if (maybePiece != null)
+				{
+					var piece = maybePiece.Value;
+					var pieceView = new PieceView();
+					pieceView.SetPiece(piece);
+					pieceView.setCoordinates(x, y);
+					_boardView.AddChild(pieceView);
+					GD.Print("Rendering piece: " + piece.Type );
+				}
+			}
 		}
+		
 	}
 }
