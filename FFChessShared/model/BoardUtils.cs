@@ -1,19 +1,16 @@
 namespace FFChessShared;
 
-/// <summary>
-/// Utilitaire pour initialiser et configurer des plateaux d'échec
-/// </summary>
+/**
+ * Utility class for creating and manipulating chess boards
+ */
 public static class BoardUtils
 {
-	/// <summary>
-	/// Taille standard d'un plateau d'échec
-	/// </summary>
+	
 	public const int StandardBoardSize = 8;
 
-	/// <summary>
-	/// Crée un plateau d'échec standard (8x8) avec toutes les pièces en position initiale
-	/// </summary>
-	/// <returns>Un plateau d'échec configuré</returns>
+	/**
+	 * Creates a standard chess board with pieces in starting positions
+	 */
 	public static Board CreateStandardBoard()
 	{
 		var board = new Board(StandardBoardSize);
@@ -29,23 +26,17 @@ public static class BoardUtils
 		return board;
 	}
 
-	/// <summary>
-	/// Crée un plateau d'échec vide d'une taille donnée
-	/// </summary>
-	/// <param name="size">La taille du plateau (8 pour standard)</param>
-	/// <returns>Un plateau d'échec vide</returns>
+	/**
+	 * Creates an empty chess board of the given size
+	 */
 	public static Board CreateEmptyBoard(int size = StandardBoardSize)
 	{
 		return new Board(size);
 	}
 
-	/// <summary>
-	/// Place une pièce sur le plateau
-	/// </summary>
-	/// <param name="board">Le plateau</param>
-	/// <param name="row">La ligne (0-7)</param>
-	/// <param name="col">La colonne (0-7)</param>
-	/// <param name="piece">La pièce à placer</param>
+	/**
+	 * Place a piece at the given position
+	 */
 	public static void PlacePiece(Board board, int row, int col, Piece piece)
 	{
 		if (IsValidPosition(board, row, col))
@@ -54,13 +45,9 @@ public static class BoardUtils
 		}
 	}
 
-	/// <summary>
-	/// Récupère une pièce à une position donnée
-	/// </summary>
-	/// <param name="board">Le plateau</param>
-	/// <param name="row">La ligne</param>
-	/// <param name="col">La colonne</param>
-	/// <returns>La pièce ou null si la case est vide</returns>
+	/**
+	 * Get the piece at the given position, or null if empty or invalid
+	 */
 	public static Piece? GetPieceAt(Board board, int row, int col)
 	{
 		if (IsValidPosition(board, row, col))
@@ -70,21 +57,17 @@ public static class BoardUtils
 		return null;
 	}
 
-	/// <summary>
-	/// Vérifie si une position est valide sur le plateau
-	/// </summary>
-	/// <param name="board">Le plateau</param>
-	/// <param name="row">La ligne</param>
-	/// <param name="col">La colonne</param>
-	/// <returns>True si la position est valide</returns>
+	/**
+	 * Check if the given position is valid on the board
+	 */
 	public static bool IsValidPosition(Board board, int row, int col)
 	{
 		return row >= 0 && row < board.Size && col >= 0 && col < board.Size;
 	}
 
-	/// <summary>
-	/// Place la rangée arrière de pièces (tours, cavaliers, fous, dame, roi)
-	/// </summary>
+	/**
+	 * Place the back row pieces on the given row
+	 */
 	private static void PlaceBackRow(Board board, int row, PieceColor color)
 	{
 		// Tours
@@ -104,9 +87,9 @@ public static class BoardUtils
 		board.Cells[row, 4] = new Piece(PieceType.King, color);
 	}
 
-	/// <summary>
-	/// Place la rangée de pions
-	/// </summary>
+	/**
+	 * Place the pawns on the given row
+	 */
 	private static void PlacePawns(Board board, int row, PieceColor color)
 	{
 		for (int col = 0; col < StandardBoardSize; col++)

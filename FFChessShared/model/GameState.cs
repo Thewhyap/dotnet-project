@@ -30,4 +30,21 @@ public readonly struct GameState
 		BlackCanCastleQueenSide = blackCastleQ;
 		EnPassantTarget = enPassantTarget;
 	}
+	
+	/**
+	 * Create a default game state with standard board setup
+	 */
+	public static GameState CreateDefault()
+	{
+		var board = BoardUtils.CreateStandardBoard();
+		return new GameState(
+			board,
+			PieceColor.White,
+			true,  // WhiteCanCastleKingSide
+			true,  // WhiteCanCastleQueenSide
+			true,  // BlackCanCastleKingSide
+			true,  // BlackCanCastleQueenSide
+			null   // EnPassantTarget
+		);
+	}
 }
