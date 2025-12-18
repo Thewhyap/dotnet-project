@@ -10,11 +10,11 @@ public readonly struct Board
 	{
 		Cells = new Piece?[size, size];
 	}
-	
+
 	public List<Piece> GetAllPieces()
 	{
 		var pieces = new List<Piece>();
-		
+
 		for (int row = 0; row < Size; row++)
 		{
 			for (int col = 0; col < Size; col++)
@@ -25,4 +25,6 @@ public readonly struct Board
 				}
 			}
 		}
+		return pieces;
+	}
 }
