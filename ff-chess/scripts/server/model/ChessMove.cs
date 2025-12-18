@@ -1,14 +1,11 @@
-using Godot;
-using System;
-
 namespace Shared;
 
 public readonly struct ChessMove
 {
-	public readonly Case From;
-	public readonly Case To;
+	public readonly ChessSquare From;
+	public readonly ChessSquare To;
 	
-	public ChessMove(Case from, Case to)
+	public ChessMove(ChessSquare from, ChessSquare to)
 	{
 		From = from;
 		To = to;
