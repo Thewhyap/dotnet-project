@@ -36,9 +36,9 @@ public partial class GameScreen : Control
 		// Pour chaque pièce, crée/met à jour sa représentation visuelle
 		foreach (var piece in allPieces)
 		{
-			// var pieceView = new PieceView();
-			// pieceView.SetPiece(piece);
-			// _boardView.AddChild(pieceView);
+			var pieceView = new PieceView();
+			pieceView.SetPiece(piece);
+			_boardView.AddChild(pieceView);
 			GD.Print("Rendering piece: " + piece.Type );
 		}
 	}

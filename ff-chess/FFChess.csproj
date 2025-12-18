@@ -7,4 +7,46 @@
   <ItemGroup>
   <ProjectReference Include="..\FFChessShared\FFChessShared.csproj" />
 </ItemGroup>
+  <ItemGroup>
+    <Content Include="assets\textures\board.png" />
+    <Content Include="assets\textures\icon.png" />
+    <Content Include="assets\textures\pawns\bishopB.png" />
+    <Content Include="assets\textures\pawns\bishopB2.png" />
+    <Content Include="assets\textures\pawns\bishopB3.png" />
+    <Content Include="assets\textures\pawns\bishopW.png" />
+    <Content Include="assets\textures\pawns\bishopW2.png" />
+    <Content Include="assets\textures\pawns\bishopW3.png" />
+    <Content Include="assets\textures\pawns\kingB.png" />
+    <Content Include="assets\textures\pawns\kingB2.png" />
+    <Content Include="assets\textures\pawns\kingB3.png" />
+    <Content Include="assets\textures\pawns\kingW.png" />
+    <Content Include="assets\textures\pawns\kingW2.png" />
+    <Content Include="assets\textures\pawns\kingW3.png" />
+    <Content Include="assets\textures\pawns\knightB.png" />
+    <Content Include="assets\textures\pawns\knightB2.png" />
+    <Content Include="assets\textures\pawns\knightB3.png" />
+    <Content Include="assets\textures\pawns\knightW.png" />
+    <Content Include="assets\textures\pawns\knightW2.png" />
+    <Content Include="assets\textures\pawns\knightW3.png" />
+    <Content Include="assets\textures\pawns\pawnB.png" />
+    <Content Include="assets\textures\pawns\pawnB2.png" />
+    <Content Include="assets\textures\pawns\pawnB3.png" />
+    <Content Include="assets\textures\pawns\pawnW.png" />
+    <Content Include="assets\textures\pawns\pawnW2.png" />
+    <Content Include="assets\textures\pawns\pawnW3.png" />
+    <Content Include="assets\textures\pawns\queenB.png" />
+    <Content Include="assets\textures\pawns\queenB2.png" />
+    <Content Include="assets\textures\pawns\queenB3.png" />
+    <Content Include="assets\textures\pawns\queenW.png" />
+    <Content Include="assets\textures\pawns\queenW2.png" />
+    <Content Include="assets\textures\pawns\queenW3.png" />
+    <Content Include="assets\textures\pawns\rookB.png" />
+    <Content Include="assets\textures\pawns\rookB2.png" />
+    <Content Include="assets\textures\pawns\rookB3.png" />
+    <Content Include="assets\textures\pawns\rookW.png" />
+    <Content Include="assets\textures\pawns\rookW2.png" />
+    <Content Include="assets\textures\pawns\rookW3.png" />
+    <Content Include="assets\textures\squares\squareB.png" />
+    <Content Include="assets\textures\squares\squareW.png" />
+  </ItemGroup>
 </Project>
