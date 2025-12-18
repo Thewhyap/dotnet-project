@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using FFChess.data;
+using FFChessShared;
 using FFChessShared.generators;
 
 public partial class LobbyScreen : Control
@@ -29,22 +30,22 @@ public partial class LobbyScreen : Control
 	
 	 private void LoadLobbies()
 	{
-		foreach (var lobby in GetLobbiesFromServer())
+		foreach (var gameLobby in GetLobbiesFromServer())
 		{
 			var item = _lobbyItemScene.Instantiate<LobbyItemScene>();
 			_lobbyList.AddChild(item);
-			item.SetData(lobby.Name, lobby.Players, lobby.MaxPlayers);
+			item.SetData(gameLobby);
 		}
 		GD.Print("Lobbies loaded.");
 	}
 
-	private List<LobbyData> GetLobbiesFromServer()
+	private List<Game> GetLobbiesFromServer()
 	{
 		// TODO replace with actual server call
-		return new List<LobbyData>
+		return new List<Game>
 		{
-			new LobbyData(LobbyNameGenerator.GenerateLobbyName(), 4, 8),
-			new LobbyData(LobbyNameGenerator.GenerateLobbyName(), 2, 8)
+			new Game(),
+			new Game()
 			 
 		};
 	}

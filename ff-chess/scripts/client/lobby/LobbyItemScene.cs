@@ -1,17 +1,18 @@
 using Godot;
 using System;
+using FFChessShared;
 
 public partial class LobbyItemScene : Control
 {
 	private Label _nameLabel;
-	private Label _playersLabel;
+	private Label _statusLabel;
 	private Button _joinButton;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		GD.Print("LobbyItem ready.");
 		_nameLabel = GetNode<Label>("HBoxContainer/NameLabel");
-		_playersLabel = GetNode<Label>("HBoxContainer/PlayersLabel");
+		_statusLabel = GetNode<Label>("HBoxContainer/StatusLabel");
 		_joinButton = GetNode<Button>("HBoxContainer/JoinButton");
 		
 		_joinButton.Pressed += OnJoinPressed;
@@ -22,20 +23,35 @@ public partial class LobbyItemScene : Control
 	{
 	}
 	
-	public void SetData(string name, int players, int maxPlayers)
+	public void SetData(Game game)
 	{
-		if (_nameLabel == null || _playersLabel == null || _joinButton == null)
+		if (_nameLabel == null || _statusLabel == null || _joinButton == null)
 		{
 			GD.PrintErr("Labels not initialized yet!");
 			return;
 		}
-		_nameLabel.Text = name;
-		_playersLabel.Text = $"{players}/{maxPlayers}";
+		_nameLabel.Text = game.Name;
+		_statusLabel.Text = getReadableGameStatus(game.Status);
 	}
 
 	private void OnJoinPressed()
 	{
 		GD.Print($"Joining: {_nameLabel.Text}");
 		GetNode<SceneRouter>("/root/ClientRoot/SceneRouter").LoadGame();
+	}
+	
+	private string getReadableGameStatus(MatchStatus status)
+	{
+		switch (status)
+		{
+			case MatchStatus.Waiting:
+				return "Waiting for players";
+			case MatchStatus.InGame:
+				return "In progress";
+			case MatchStatus.Closed:
+				return "Finished";
+			default:
+				return "Unknown state";
+		}
 	}
 }
