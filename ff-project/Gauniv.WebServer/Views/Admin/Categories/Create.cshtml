@@ -1,0 +1,143 @@
+﻿@model Gauniv.WebServer.Dtos.Game.CreateGameDto
+
+@{
+    ViewData["Title"] = "Admin - Create Category";
+}
+
+<div class="container-fluid">
+    <div class="row">
+
+        <partial name="_AdminSideMenuPartial" />
+
+        <!-- Main Content -->
+        <main class="col-md-8 ms-sm-auto col-lg-9 px-md-4">
+            <div class="py-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Admin</a></li>
+                        <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Categories">Categories Management</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Create Category</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2">Create New Category</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a asp-controller="Admin" asp-action="Categories" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Back to Categories
+                    </a>
+                </div>
+            </div>
+            
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Create Category Form -->
+            <div class="card">
+                <div class="card-body">
+                    <form asp-controller="Admin" asp-action="CreateCategory" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Category Name -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label"></label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter category name" autofocus />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Enter category description (optional)"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                            <small class="form-text text-muted">
+                                <i class="bi bi-info-circle"></i> Maximum 500 characters
+                            </small>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-controller="Admin" asp-action="Categories" class="btn btn-secondary">
+                                <i class="bi bi-x-circle me-1"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save me-1"></i>
+                                Create Category
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+        </main>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Character counter for description
+        const descriptionField = document.querySelector('textarea[name="Description"]');
+        if (descriptionField) {
+            const maxLength = 500;
+            const counterDiv = document.createElement('div');
+            counterDiv.className = 'text-muted small mt-1';
+            counterDiv.textContent = `0 / ${maxLength} characters`;
+            descriptionField.parentElement.appendChild(counterDiv);
+
+            descriptionField.addEventListener('input', function() {
+                const currentLength = this.value.length;
+                counterDiv.textContent = `${currentLength} / ${maxLength} characters`;
+                
+                if (currentLength > maxLength) {
+                    counterDiv.classList.add('text-danger');
+                    counterDiv.classList.remove('text-muted');
+                } else {
+                    counterDiv.classList.add('text-muted');
+                    counterDiv.classList.remove('text-danger');
+                }
+            });
+        }
+    </script>
+}
+
+<style>
+    .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+
+    .sidebar .nav-link {
+        color: #333;
+        padding: 0.75rem 1rem;
+        border-radius: 0.25rem;
+        transition: all 0.3s;
+    }
+
+    .sidebar .nav-link:hover {
+        background-color: #e9ecef;
+    }
+
+    .sidebar .nav-link.active {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style>

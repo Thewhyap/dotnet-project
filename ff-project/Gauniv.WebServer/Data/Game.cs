@@ -46,12 +46,16 @@ namespace Gauniv.WebServer.Data
         public string Description { get; set; }
         
         [Required]
+        public byte[] Image { get; set; }
+        
+        [Required]
         public byte[] Payload { get; set; }
         
         [Required]
         public double Price { get; set; }
         
         public IEnumerable<Category> GameCategories { get; set; }
+        
         public IEnumerable<User> GameUsers { get; set; }
         
         public DateTime CreatedAt { get; set; }

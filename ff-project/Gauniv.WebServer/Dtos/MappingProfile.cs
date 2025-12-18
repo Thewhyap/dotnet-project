@@ -38,8 +38,8 @@ namespace Gauniv.WebServer.Dtos
     {
         public MappingProfile(ApplicationDbContext dbContext)
         {
-            TypeAdapterConfig<Game, GameDto>.NewConfig();
-            TypeAdapterConfig<GameDto, Game>.NewConfig();
+            // TypeAdapterConfig<Game, GameDto>.NewConfig();
+            // TypeAdapterConfig<GameDto, Game>.NewConfig();
         }
     }
 }
