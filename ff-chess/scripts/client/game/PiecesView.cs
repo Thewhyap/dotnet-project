@@ -1,8 +1,21 @@
 using Godot;
 using System;
+using FFChessShared;
 
-public partial class ChessBoardView : Node2D
+public partial class PiecesView : Control
 {
+	private Piece _model;
+	
+	public void SetPiece(Piece piece)
+	{
+		_model = piece;
+		UpdateVisuals();
+	}
+	
+	private void UpdateVisuals()
+	{
+		// Positionnement, texture selon le type/couleur
+	}
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -14,7 +27,5 @@ public partial class ChessBoardView : Node2D
 	{
 	}
 	
-	public void ClearPieces(){
-		
-	}
+	
 }

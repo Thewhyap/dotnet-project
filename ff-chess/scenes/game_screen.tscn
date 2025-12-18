@@ -1,12 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://6dmyhj3da5oa"]
+[gd_scene load_steps=4 format=3 uid="uid://6dmyhj3da5oa"]
 
+[ext_resource type="Script" uid="uid://buekjj11ys2e5" path="res://scripts/client/game/GameScreen.cs" id="1_3uriw"]
 [ext_resource type="Script" uid="uid://cxdcyoihqgbcs" path="res://views/ChessBoardView.cs" id="1_8mhku"]
+[ext_resource type="Script" uid="uid://qkovnvj8vcuh" path="res://scripts/client/game/PiecesView.cs" id="2_85ytm"]
 
 [node name="GameScreen" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+script = ExtResource("1_3uriw")
 
 [node name="GameScreenLabel" type="Label" parent="."]
 layout_mode = 0
@@ -17,17 +20,19 @@ text = "Game Screen"
 [node name="ChessBoardView" type="Node2D" parent="."]
 script = ExtResource("1_8mhku")
 
-[node name="BoardVisual" type="Control" parent="ChessBoardView"]
+[node name="BoardView" type="Control" parent="ChessBoardView"]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="PiecesVisual" type="Control" parent="ChessBoardView"]
+[node name="PiecesView" type="Control" parent="ChessBoardView"]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+script = ExtResource("2_85ytm")
 
 [node name="PlayerHud" type="Control" parent="."]
 anchors_preset = 0
