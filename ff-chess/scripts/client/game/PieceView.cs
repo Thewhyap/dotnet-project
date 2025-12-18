@@ -13,6 +13,7 @@ public partial class PieceView : Node2D
 	{
 		_sprite = new Sprite2D();
 		_sprite.Texture = LoadTexture();
+		_sprite.Centered = false;
 		
 		// Scale the sprite to fit within in the given square size
 		float textureWidth = _sprite.Texture.GetWidth();
