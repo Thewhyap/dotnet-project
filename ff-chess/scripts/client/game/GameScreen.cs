@@ -9,6 +9,7 @@ public partial class GameScreen : Control
 {
 	private Game _game;
 	private ChessBoardView _boardView;
+	private Button _quitButton;
 	private Vector2 _selectedPiecePosition = Vector2.Zero; // Stocke les coordonnées du pion sélectionné
 	private bool _hasPieceSelected = false;
 	
@@ -16,10 +17,12 @@ public partial class GameScreen : Control
 	public override void _Ready()
 	{
 		_game = new Game();
-		_boardView = GetNode<ChessBoardView>("ChessBoardView");
+		_boardView = GetNode<ChessBoardView>("HBoxContainer/ChessBoardView");
+		_quitButton = GetNode<Button>("HBoxContainer/VBoxContainer/QuitButton");
 		
 		// Calculate square size based on viewport height
 		GameConstants.CalculateSquareSizeFromViewport(GetViewportRect().Size);
+		_quitButton.Pressed += HandleQuitButtonPressed;
 		
 		RenderBoard();
 		
@@ -109,5 +112,11 @@ public partial class GameScreen : Control
 			}
 		}
 		
+	}
+
+	private void HandleQuitButtonPressed()
+	{
+		GD.Print("Quit button pressed - TODO implement quit logic");
+		//TODO implement quit logic
 	}
 }
