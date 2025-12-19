@@ -1,22 +1,90 @@
 using FFChessShared;
+using Server.Chess;
 
 namespace Server.Match;
 
-public class MatchSession
+public class MatchSession(GameManager gameManager)
 {
-    public Guid Id { get; } = Guid.NewGuid();
+    private static readonly Random _rand = new();
 
-    public GameState State { get; }
-    public Player WhitePlayer { get; }
-    public Player BlackPlayer { get; }
+    public Player? WhitePlayer { get; private set; }
+    public Player? BlackPlayer { get; private set; }
+    private readonly HashSet<Player> _viewers = new();
 
-    private readonly List<IClient> _viewers = new();
+    public GameManager GameManager { get; private set; } = gameManager;
 
-    public MatchSession(Player white, Player black, GameState initialState)
+    public bool AddPlayer(Player player)
     {
-        WhitePlayer = white;
-        BlackPlayer = black;
-        State = initialState;
+        bool isPlayer = true;
+
+        if (WhitePlayer == null && BlackPlayer == null)
+        {
+            if (_rand.Next(2) == 0)
+            {
+                WhitePlayer = player;
+                player.AssignedColor = PieceColor.White;
+            }
+            else
+            {
+                BlackPlayer = player;
+                player.AssignedColor = PieceColor.Black;
+            }
+        }
+        else if (WhitePlayer == null)
+        {
+            WhitePlayer = player;
+            player.AssignedColor = PieceColor.White;
+        }
+        else if (BlackPlayer == null)
+        {
+            BlackPlayer = player;
+            player.AssignedColor = PieceColor.Black;
+        }
+        else
+        {
+            player.AssignedColor = null;
+            _viewers.Add(player);
+            isPlayer = false;
+        }
+
+        await player.SendPlayerInfo();
+
+        return isPlayer;
+    }
+
+    public void RemovePlayer(Player player)
+    {
+        if (player == WhitePlayer)
+        {
+            WhitePlayer = null;
+            if (GameManager.Game.Status == MatchStatus.InGame)
+                GameManager.EndGameWithWin(PieceColor.Black);
+        }
+        else if (player == BlackPlayer)
+        {
+            BlackPlayer = null;
+            if (GameManager.Game.Status == MatchStatus.InGame)
+                GameManager.EndGameWithWin(PieceColor.White);
+        }
+        else
+        {
+            _viewers.Remove(player);
+        }
+    }
+
+    public bool TryPromote(Player player, PieceType promotionChoice)
+    {
+        if (!IsPlayerTurn(player))
+            return false;
+
+        if (GameManager.Game.TurnStatus != TurnStatus.WaitingPromotion)
+            return false;
+
+        var result = GameManager.Promote(promotionChoice);
+
+        BroadcastGameState();
+
+        return result;
     }
 
     public bool TryMakeMove(Player player, ChessMove move)
@@ -24,31 +92,29 @@ public class MatchSession
         if (!IsPlayerTurn(player))
             return false;
 
-        if (!GameRules.IsMoveLegal(State, move))
+        if (GameManager.Game.TurnStatus != TurnStatus.WaitingMove)
             return false;
 
-        GameRules.ApplyMove(State, move);
-        BroadcastState();
-        return true;
+        var result = GameManager.Move(move);
+
+        BroadcastGameState();
+
+        return result;
     }
 
     private bool IsPlayerTurn(Player player)
     {
-        return (State.CurrentTurn == PieceColor.White && player == WhitePlayer)
-            || (State.CurrentTurn == PieceColor.Black && player == BlackPlayer);
+        if (player.AssignedColor == null)
+            return false; // Viewer
+
+        return player.AssignedColor == GameManager.Game.GameState.CurrentTurn;
     }
 
-    public void AddViewer(IClient viewer)
+    private void BroadcastGameState(string? message = null)
     {
-        _viewers.Add(viewer);
-        viewer.Send(State);
-    }
-
-    private void BroadcastState()
-    {
-        WhitePlayer.Send(State);
-        BlackPlayer.Send(State);
-        foreach (var v in _viewers)
-            v.Send(State);
+        WhitePlayer?.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus, message);
+        BlackPlayer?.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus, message);
+        foreach (var viewer in _viewers)
+            viewer.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus, message);
     }
 }

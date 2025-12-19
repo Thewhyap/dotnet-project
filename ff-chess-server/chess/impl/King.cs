@@ -3,17 +3,15 @@ using System;
 
 namespace Server.Chess;
 
-public class King : PieceBase
+public class King(PieceColor color) : PieceBase(PieceType.King, color)
 {
-    public King(PieceColor color) : base(PieceType.King, color) { }
-
-    protected override bool IsSpecificMoveLegal(GameState state, ChessMove move, bool ignored)
+    public override bool IsSpecificMoveLegal(GameState state, ChessMove move, bool ignored)
 	{
-        int kingLine = = (state.CurrentTurn == PieceColor.White) ? 0 : 7;
-        ChessSquare kingSizeRoqueDestinationSquare = new ChessSquare(6, kingLine);
-        ChessSquare QueenSizeRoqueDestinationSquare = new ChessSquare(2, kingLine);
-        List<ChessSquare> kingSizeRoqueSquares = new List<ChessSquare> { new ChessSquare(5, kingLine), kingSizeRoqueDestinationSquare };
-        List<ChessSquare> queenSizeRoqueSquares = new List<ChessSquare> { new ChessSquare(1, kingLine), queenSizeRoqueSquares, new ChessSquare(3, kingLine) };
+        int kingLine = state.CurrentTurn == PieceColor.White ? 0 : 7;
+        ChessSquare kingSizeRoqueDestinationSquare = new(6, kingLine);
+        ChessSquare QueenSizeRoqueDestinationSquare = new(2, kingLine);
+        List<ChessSquare> kingSizeRoqueSquares = new List<ChessSquare> { new(5, kingLine), kingSizeRoqueDestinationSquare };
+        List<ChessSquare> queenSizeRoqueSquares = new List<ChessSquare> { new(1, kingLine), queenSizeRoqueSquares, new(3, kingLine) };
 
         bool canCastleKingSide = (state.CurrentTurn == PieceColor.White) ? state.WhiteCanCastleKingSide : state.BlackCanCastleKingSide;
         bool canCastleQueenSide = (state.CurrentTurn == PieceColor.White) ? state.WhiteCanCastleQueenSide : state.BlackCanCastleQueenSide;

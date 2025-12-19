@@ -2,18 +2,12 @@ using FFChessShared;
 
 namespace Server.Chess;
 
-public abstract class PieceBase : IPiece
+public abstract class PieceBase(PieceType type, PieceColor color) : IPiece
 {
-    public PieceType Type { get; }
-    public PieceColor Color { get; }
+    public PieceType Type { get; } = type;
+    public PieceColor Color { get; } = color;
 
-    protected PieceBase(PieceType type, PieceColor color)
-    {
-        Type = type;
-        Color = color;
-    }
-
-    public override bool IsMoveLegal(GameState state, ChessMove move)
+    public bool IsMoveLegal(GameState state, ChessMove move)
     {
         // Check that you don't attack your own piece
 
@@ -33,4 +27,6 @@ public abstract class PieceBase : IPiece
 
         return IsSpecificMoveLegal(state, move);
     }
+
+    public abstract bool IsSpecificMoveLegal(GameState state, ChessMove move, bool inRoque = false);
 }

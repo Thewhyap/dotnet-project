@@ -2,11 +2,9 @@ using FFChessShared;
 
 namespace Server.Chess;
 
-public class Knight : PieceBase
+public class Knight(PieceColor color) : PieceBase(PieceType.Knight, color)
 {
-    public Knight(PieceColor color) : base(PieceType.Knight, color) { }
-
-    protected override bool IsSpecificMoveLegal(GameState state, ChessMove move, bool ignored)
+    public override bool IsSpecificMoveLegal(GameState state, ChessMove move, bool ignored)
 	{
         int deltaX = to.X - from.X;
         int deltaY = to.Y - from.Y;

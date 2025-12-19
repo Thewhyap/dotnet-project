@@ -3,11 +3,9 @@ using System;
 
 namespace Server.Chess;
 
-public class Pawn : PieceBase
+public class Pawn(PieceColor color) : PieceBase(PieceType.Pawn, color)
 {
-    public Pawn(PieceColor color) : base(PieceType.Pawn, color) { }
-
-    protected override bool IsSpecificMoveLegal(GameState state, ChessMove move, bool inRoque)
+    public override bool IsSpecificMoveLegal(GameState state, ChessMove move, bool inRoque)
 	{
 		Board board = state.Board;
 		int direction = (state.CurrentTurn == PieceColor.White) ? 1 : -1;

@@ -2,11 +2,9 @@ using FFChessShared;
 
 namespace Server.Chess;
 
-public class Rook : PieceBase
+public class Rook(PieceColor color) : PieceBase(PieceType.Rook, color)
 {
-    public Rook(PieceColor color) : base(PieceType.Rook, color) { }
-
-    protected override bool IsSpecificMoveLegal(GameState state, ChessMove move, bool ignored)
+    public override bool IsSpecificMoveLegal(GameState state, ChessMove move, bool ignored)
     {
         int deltaX = to.X - from.X;
         int deltaY = to.Y - from.Y;

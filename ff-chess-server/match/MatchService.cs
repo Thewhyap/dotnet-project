@@ -4,19 +4,44 @@ namespace Server.Match;
 
 public class MatchService
 {
-    private readonly Dictionary<Guid, GameSession> _sessions = new();
+    private readonly Dictionary<Guid, MatchSession> _sessions = new();
+    private readonly Dictionary<string, Player> _connectedPlayersByIP = new();
 
-    public MatchService CreateGame(Player white, Player black)
+    public MatchSession CreateGame(Player creator)
     {
-        var state = GameInitializer.CreateInitialState();
-        var session = new GameSession(white, black, state);
-        _sessions.Add(session.Id, session);
-        return session;
+        var initialState = GameInitializer.CreateInitialState();
+        var match = new MatchSession(creator, initialState);
+        _sessions.Add(match.Id, match);
+        creator.AssignedColor = PieceColor.White;
+        return match;
     }
 
-    public GameSession? GetGame(Guid id)
+    public bool JoinGame(Guid matchId, Player player)
     {
-        return _sessions.TryGetValue(id, out var session) ? session : null;
+        if (!_sessions.TryGetValue(matchId, out var match)) return false;
+
+        if (!match.CanJoinAsPlayer())
+        {
+            match.AddViewer(player);
+            return true; // joined as viewer
+        }
+
+        var assignedColor = match.AssignColorToPlayer(player);
+        player.AssignedColor = assignedColor;
+
+        match.StartGameIfReady();
+        return true;
     }
+
+    public void PlayerDisconnects(Player player)
+    {
+        var match = _sessions.Values.FirstOrDefault(m => m.WhitePlayer == player || m.BlackPlayer == player);
+        if (match != null)
+        {
+            match.RemovePlayer(player);
+        }
+        // Gérer suppression joueur, notify etc.
+    }
+
+    public IEnumerable<MatchSession> ListMatches() => _sessions.Values;
 }
-

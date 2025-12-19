@@ -5,37 +5,61 @@ namespace Server.Chess;
 
 public class GameManager
 {
+    public readonly Game game;
     private readonly GameState state;
 
     public GameManager()
     {
-        state = new GameState(GameHelper.InitializeBoard());
+        game = new Game(new GameState(GameHelper.InitializeBoard()), MatchStatus.Waiting, TurnStatus.WaitingMove);
+        state = game.GameState;
     }
 
-    // Returns true if the move was successful, false otherwise
-    public bool Move(ChessMove move)
+    public void SendGame()
+    {
+        //TODO
+    }
+
+    public void Move(ChessMove move)
 	{
         if (GameHelper.IsOffBoard(state.Board, move.From) || GameHelper.IsOffBoard(state.Board, move.To))
-            return false;
+        {
+            SendGame();
+            return;
+        }
         
 		var piece = state.Board.Cells[move.From.X, move.From.Y];
 
         if (!piece.HasValue)
-            return false;
+        {
+            SendGame();
+            return;
+        }
 
         if(piece.Value.Color != state.CurrentTurn)
-            return false;
+        {
+            SendGame();
+            return;
+        }
 
         if(!piece.Value.IsMoveLegal(state, move))
-            return false;
+        {
+            SendGame();
+            return;
+        }
 
-        RuleHelper.MoveAction(state, move);
+        game.TurnStatus = RuleHelper.MoveAction(state, move);
 
         state.Board.MovePiece(move.From, move.To);
 
-        GameResult? result = RuleHelper.CheckWinCondition(state);
+        if (game.TurnStatus == TurnStatus.WaitingPromotion)
+        {
+            SendGame();
+            return;
+        }
 
-        if (result.HasValue)
+        game.TurnStatus = RuleHelper.CheckWinCondition(state);
+
+        if (game.TurnStatus == TurnStatus.WinWhite || game.TurnStatus == TurnStatus.WinBlack || game.TurnStatus == TurnStatus.Draw)
         {
             EndGame();
         }
@@ -43,17 +67,24 @@ public class GameManager
         {
             NextTurn();
         }
-
-        return true;
     }
 
     private void NextTurn()
     {
         state.CurrentTurn = state.CurrentTurn == PieceColor.White ? PieceColor.Black : PieceColor.White;
+        SendGame();
     }
 
     private void EndGame()
     {
-        //TODO
+        game.Status = MatchStatus.Closed;
+        SendGame();
+    }
+
+    public void EndGameWithWin(PieceColor winningColor)
+    {
+        game.Status = MatchStatus.Closed;
+        game.TurnStatus = winningColor == PieceColor.White ? TurnStatus.WinWhite : TurnStatus.WinBlack;
+        SendGame();
     }
 }

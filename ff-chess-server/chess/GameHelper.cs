@@ -4,17 +4,17 @@ namespace Server.Chess;
 
 public static class GameHelper
 {
-    public ChessSquare GetKingPosition(GameState state)
+    public static ChessSquare GetKingPosition(GameState state)
     {
         return GetKingPosition(state.Board, state.CurrentTurn);
     }
 
-    public ChessSquare GetOpponentKingPosition(GameState state)
+    public static ChessSquare GetOpponentKingPosition(GameState state)
     {
         return GetKingPosition(state.Board, state.CurrentTurn == PieceColor.White ? PieceColor.Black : PieceColor.White);
     }
 
-    public ChessSquare GetKingPosition(Board board, PieceColor color)
+    public static ChessSquare GetKingPosition(Board board, PieceColor color)
     {
         for (int x = 0; x < board.Size; x++)
         {
@@ -59,11 +59,6 @@ public static class GameHelper
         return opponentPiecesPosition;
     }
 
-    public static bool IsOffBoard(Board board, ChessSquare chessSquare)
-    {
-        return (chessSquare.X < 0 || chessSquare.X > board.Size) && (chessSquare.Y < 0 || chessSquare.Y > board.Size);
-    }
-
     public static Board InitializeBoard()
     {
         var board = new Board(8);
@@ -104,7 +99,7 @@ public static class GameHelper
         return board;
     }
 
-    private bool IsOffBoard(Board board, ChessSquare chessSquare)
+    private static bool IsOffBoard(Board board, ChessSquare chessSquare)
     {
         return (chessSquare.X < 0 || chessSquare.X > board.Size) && (chessSquare.Y < 0 || chessSquare.Y > board.Size);
     }

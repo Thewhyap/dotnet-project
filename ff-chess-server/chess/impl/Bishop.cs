@@ -3,11 +3,9 @@ using System;
 
 namespace Server.Chess;
 
-public class Bishop : PieceBase
+public class Bishop(PieceColor color) : PieceBase(PieceType.Bishop, color)
 {
-    public Bishop(PieceColor color) : base(PieceType.Bishop, color) { }
-
-    protected override bool IsSpecificMoveLegal(GameState state, ChessMove move, bool ignored)
+    public override bool IsSpecificMoveLegal(GameState state, ChessMove move, bool ignored)
 	{
         int deltaX = to.X - from.X;
         int deltaY = to.Y - from.Y;

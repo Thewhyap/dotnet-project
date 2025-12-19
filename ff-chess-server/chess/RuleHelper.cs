@@ -4,7 +4,7 @@ namespace Server.Chess;
 
 public static class RuleHelper
 {
-    public static MoveAction(GameState state, ChessMove move)
+    public static TurnStatus MoveAction(GameState state, ChessMove move)
     {
         Board board = state.Board;
 
@@ -76,8 +76,7 @@ public static class RuleHelper
             {
                 if (move.To.Y == board.Size - 1)
                 {
-                    //TODO make white user choose a piece between Bishop, Rook, Knight and Queen
-                    // and then replace pawn ChessSquare by the selected piece
+                    return TurnStatus.WaitingPromotion;
                 }
             }
 
@@ -85,8 +84,7 @@ public static class RuleHelper
             {
                 if (move.To.Y == 0)
                 {
-                    //TODO make black user choose a piece between Bishop, Rook, Knight and Queen
-                    // and then replace pawn ChessSquare by the selected piece
+                    return TurnStatus.WaitingPromotion;
                 }
             }   
         }
@@ -94,26 +92,28 @@ public static class RuleHelper
         {
             state.EnPassantTarget = null;
         }
+
+        return TurnStatus.WaitingMove;
     }
 
     
     // This is not optimized at all (and that does not take into account repetition)
-    public GameResult? CheckWinCondition(GameState state)
+    public static TurnStatus CheckWinCondition(GameState state)
     {
         if (!OpponentHasLegalMove(state))
         {
             // Check for checkmate first
             if(IsKingAttacked(state, true))
             {
-                return state.CurrentTurn == PieceColor.White ? GameResult.White : GameResult.Black;
+                return state.CurrentTurn == PieceColor.White ? TurnStatus.WinWhite : TurnStatus.WinBlack;
             }
             // Stalemate
-            return GameResult.Draw;
+            return TurnStatus.Draw;
         }
 
         // 50 turn rule
         if (state.DrawMoveClock >= 50)
-            return GameResult.Draw;
+            return TurnStatus.Draw;
 
         var opponentPiecesPosition = GameHelper.GetOpponentPiecesPosition(state);
         var playerPiecesPosition = GameHelper.GetPiecesPosition(state);
@@ -123,9 +123,9 @@ public static class RuleHelper
 
         // Insufficient material
         if (IsInsufficientMaterial(playerPieces) || IsInsufficientMaterial(opponentPieces))
-            return GameResult.Draw;
+            return TurnStatus.Draw;
         
-        return false;
+        return TurnStatus.WaitingMove;
     }
 
     private static bool OpponentHasLegalMove(GameState state)
@@ -156,7 +156,7 @@ public static class RuleHelper
         foreach (var opponentPos in opponentPiecesPosition)
         {
             var kingAttack = new ChessMove(opponentPos, kingPosition);
-            IPiece piece = state.Board.Cells[opponentPos.X, opponentPos.Y].Value
+            IPiece piece = state.Board.Cells[opponentPos.X, opponentPos.Y].Value;
             if (piece.IsSpecificMoveLegal(state, kingAttack))
                 return false;
         }
