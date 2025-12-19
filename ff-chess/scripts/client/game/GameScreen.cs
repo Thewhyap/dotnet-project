@@ -14,12 +14,16 @@ public partial class GameScreen : Control
 	private Label _gameStatusLabel;
 	private Label _roleLabel;
 	private Label _viewerCountLabel;
+	private GameResultModal _gameResultModal;
 	private Vector2 _selectedPiecePosition = Vector2.Zero; // Stocke les coordonnées du pion sélectionné
 	private bool _hasPieceSelected = false;
 	
 	// Handle piece selection highlighting
 	private PieceView _currentSelectedPieceView = null; // Ref to the selected piece view
 	private Dictionary<Vector2, PieceView> _pieceViewMap = new();
+	
+	// Track if result modal has been shown to avoid showing it repeatedly
+	private bool _resultModalShown = false;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -30,10 +34,12 @@ public partial class GameScreen : Control
 		_roleLabel = GetNode<Label>("HBoxContainer/VBoxContainer/RoleLabel");
 		_viewerCountLabel = GetNode<Label>("HBoxContainer/VBoxContainer/ViewerCountLabel");
 		_gameStatusLabel = GetNode<Label>("HBoxContainer/VBoxContainer/GameStatusLabel");
+		_gameResultModal = GetNode<GameResultModal>("GameResultModal");
 		
 		// Calculate square size based on viewport height
 		GameConstants.CalculateSquareSizeFromViewport(GetViewportRect().Size);
 		_quitButton.Pressed += HandleQuitButtonPressed;
+		_gameResultModal.OkPressed += OnGameResultModalOkPressed;
 		
 		RenderBoard();
 		
@@ -44,6 +50,12 @@ public partial class GameScreen : Control
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		// Check if game is finished and show result modal (only once)
+		if (!_resultModalShown && _game.Status is MatchStatus.WhiteWon or MatchStatus.BlackWon or MatchStatus.Draw)
+		{
+			_gameResultModal.ShowResult(_game.Status);
+			_resultModalShown = true;
+		}
 	}
 	
 	public void SetGame(Game game)
@@ -152,6 +164,12 @@ public partial class GameScreen : Control
 	{
 		GD.Print("Quit button pressed - TODO implement quit logic");
 		//TODO implement quit logic
+	}
+	
+	private void OnGameResultModalOkPressed()
+	{
+		GD.Print("Game result modal closed - TODO implement what happens after game ends");
+		// TODO: Return to lobby, restart game, etc.
 	}
 
 	private void UpdateRoleDisplay()
