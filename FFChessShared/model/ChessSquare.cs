@@ -1,13 +1,16 @@
+using MessagePack;
+
 namespace FFChessShared;
 
-public readonly struct ChessSquare
+[MessagePackObject]
+public class ChessSquare
 {
-	public readonly int X;
-	public readonly int Y;
-	
+	public ChessSquare() { }
 	public ChessSquare(int x, int y)
 	{
-		X = x;
-		Y = y;
+		X = x; Y = y;
 	}
+
+	[Key(0)] public int X { get; set; } = 0;
+	[Key(1)] public int Y { get; set; } = 0;
 }

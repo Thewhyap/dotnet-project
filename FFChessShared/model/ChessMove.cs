@@ -1,13 +1,16 @@
+using MessagePack;
+
 namespace FFChessShared;
 
-public readonly struct ChessMove
+[MessagePackObject]
+public class ChessMove
 {
-	public readonly ChessSquare From;
-	public readonly ChessSquare To;
-	
+	public ChessMove() { }
 	public ChessMove(ChessSquare from, ChessSquare to)
 	{
-		From = from;
-		To = to;
+		From = from; To = to; 
 	}
+
+	[Key(0)] public ChessSquare From { get; set; } = null!;
+	[Key(1)] public ChessSquare To { get; set; } = null!;
 }

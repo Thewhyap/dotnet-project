@@ -1,11 +1,9 @@
+using MessagePack;
+
 namespace FFChessShared;
 
-public readonly struct Games
+[MessagePackObject]
+public class Games
 {
-	public Game[] CurrentGames { get; }
-
-	public Games(Game[] currentGames)
-	{
-		CurrentGames = currentGames;
-	}
+    [Key(0)] public List<Game> CurrentGames { get; set; } = new List<Game>();
 }
