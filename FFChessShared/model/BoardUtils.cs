@@ -37,7 +37,7 @@ public static class BoardUtils
 	/**
 	 * Place a piece at the given position
 	 */
-	public static void PlacePiece(Board board, int row, int col, Piece piece)
+	public static void PlacePiece(Board board, int row, int col, PieceData piece)
 	{
 		if (IsValidPosition(board, row, col))
 		{
@@ -48,7 +48,7 @@ public static class BoardUtils
 	/**
 	 * Get the piece at the given position, or null if empty or invalid
 	 */
-	public static Piece? GetPieceAt(Board board, int row, int col)
+	public static PieceData? GetPieceAt(Board board, int row, int col)
 	{
 		if (IsValidPosition(board, row, col))
 		{
@@ -71,20 +71,20 @@ public static class BoardUtils
 	private static void PlaceBackRow(Board board, int row, PieceColor color)
 	{
 		// Tours
-		board.Cells[row, 0] = new Piece(PieceType.Rook, color);
-		board.Cells[row, 7] = new Piece(PieceType.Rook, color);
+		board.Cells[row, 0] = new PieceData(PieceType.Rook, color);
+		board.Cells[row, 7] = new PieceData(PieceType.Rook, color);
 		
 		// Cavaliers
-		board.Cells[row, 1] = new Piece(PieceType.Knight, color);
-		board.Cells[row, 6] = new Piece(PieceType.Knight, color);
+		board.Cells[row, 1] = new PieceData(PieceType.Knight, color);
+		board.Cells[row, 6] = new PieceData(PieceType.Knight, color);
 		
 		// Fous
-		board.Cells[row, 2] = new Piece(PieceType.Bishop, color);
-		board.Cells[row, 5] = new Piece(PieceType.Bishop, color);
+		board.Cells[row, 2] = new PieceData(PieceType.Bishop, color);
+		board.Cells[row, 5] = new PieceData(PieceType.Bishop, color);
 		
 		// Dame et Roi
-		board.Cells[row, 3] = new Piece(PieceType.Queen, color);
-		board.Cells[row, 4] = new Piece(PieceType.King, color);
+		board.Cells[row, 3] = new PieceData(PieceType.Queen, color);
+		board.Cells[row, 4] = new PieceData(PieceType.King, color);
 	}
 
 	/**
@@ -94,7 +94,7 @@ public static class BoardUtils
 	{
 		for (int col = 0; col < StandardBoardSize; col++)
 		{
-			board.Cells[row, col] = new Piece(PieceType.Pawn, color);
+			board.Cells[row, col] = new PieceData(PieceType.Pawn, color);
 		}
 	}
 }
