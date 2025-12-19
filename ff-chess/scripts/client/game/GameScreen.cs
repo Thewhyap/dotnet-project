@@ -2,6 +2,7 @@ using Godot;
 using FFChess.scripts.client;
 using FFChess.scripts.client.game;
 using FFChessShared;
+using System.Collections.Generic;
 
 namespace FFChess.scripts.client.game;
 
@@ -15,6 +16,10 @@ public partial class GameScreen : Control
 	private Label _viewerCountLabel;
 	private Vector2 _selectedPiecePosition = Vector2.Zero; // Stocke les coordonnées du pion sélectionné
 	private bool _hasPieceSelected = false;
+	
+	// Handle piece selection highlighting
+	private PieceView _currentSelectedPieceView = null; // Ref to the selected piece view
+	private Dictionary<Vector2, PieceView> _pieceViewMap = new();
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -62,9 +67,24 @@ public partial class GameScreen : Control
 	
 	private void OnPieceClicked(int x, int y)
 	{
-		// GD.Print($"GameScreen: OnPieceClicked called with ({x}, {y})");
+		// Unselect previous piece if any
+		if (_currentSelectedPieceView != null)
+		{
+			_currentSelectedPieceView.SetSelected(false);
+		}
+		
+		// Select the the new piece
 		_selectedPiecePosition = new Vector2(x, y);
 		_hasPieceSelected = true;
+		
+		// Update the selected piece view for the highlighting
+		Vector2 key = new Vector2(x, y);
+		if (_pieceViewMap.TryGetValue(key, out var pieceView))
+		{
+			_currentSelectedPieceView = pieceView;
+			_currentSelectedPieceView.SetSelected(true);
+		}
+		
 		GD.Print($"Select pawn : ({x}, {y})");
 	}
 	
@@ -90,6 +110,9 @@ public partial class GameScreen : Control
 		
 		// Remove existing pieces
 		_boardView.ClearPieces();
+		_pieceViewMap.Clear();
+		_currentSelectedPieceView = null;
+		_hasPieceSelected = false;
 		
 		for (int y = 0; y < _game.GameState.Board.Cells.GetLength(0); y++)
 		{
@@ -117,6 +140,7 @@ public partial class GameScreen : Control
 					pieceView.SetGridCoordinates(x, y);
 					pieceView.PieceClicked += OnPieceClicked;
 					_boardView.AddChild(pieceView);
+					_pieceViewMap[new Vector2(x, y)] = pieceView;
 					// GD.Print("Rendering piece: " + piece.Type );
 				}
 			}

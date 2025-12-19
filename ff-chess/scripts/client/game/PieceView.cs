@@ -8,13 +8,24 @@ namespace FFChess.scripts.client.game;
 
 public partial class PieceView : Node2D
 {
+	// The variant of the piece texture to use
+	private const string Variant = "2";
+	
+	// The piece model this view represents
 	private Piece _piece;
 	private Sprite2D _sprite;
-	private const string Variant = "2";
+	
+	// Selection highlight
+	private ColorRect _selectionHighlight;
+	private bool _isSelected = false;
+	
+	// Grid coordinates
 	private int _gridX;
 	private int _gridY;
-	private Rect2 _clickRect;
 	
+	// Handle click detection
+	private Rect2 _clickRect;
+
 	public event Action<int, int> PieceClicked;
 
 	public override void _Ready()
@@ -31,6 +42,13 @@ public partial class PieceView : Node2D
  
 		_sprite.Scale = new Vector2(scaleX, scaleY);
 		AddChild(_sprite);
+		
+		// Create selection highlight
+		_selectionHighlight = new ColorRect();
+		_selectionHighlight.Color = new Color(1, 1, 0, 0.3f); // Yellow semi-transparent
+		_selectionHighlight.Size = new Vector2(GameConstants.SquareSize, GameConstants.SquareSize);
+		_selectionHighlight.Visible = false;
+		AddChild(_selectionHighlight);
 		
 		// Define clickable rectangle
 		_clickRect = new Rect2(Vector2.Zero, new Vector2(GameConstants.SquareSize, GameConstants.SquareSize));
@@ -58,6 +76,15 @@ public partial class PieceView : Node2D
 	{
 		_gridX = x;
 		_gridY = y;
+	}
+	
+	public void SetSelected(bool selected)
+	{
+		_isSelected = selected;
+		if (_selectionHighlight != null)
+		{
+			_selectionHighlight.Visible = selected;
+		}
 	}
 	
 	public override void _Input(InputEvent @event)
