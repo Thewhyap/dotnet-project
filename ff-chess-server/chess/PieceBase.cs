@@ -2,10 +2,9 @@ using FFChessShared;
 
 namespace Server.Chess;
 
-public abstract class PieceBase(PieceType type, PieceColor color) : IPiece
+public abstract class PieceBase(PieceType type, PieceColor color)
 {
-    public PieceType Type { get; } = type;
-    public PieceColor Color { get; } = color;
+    public PieceData pieceData = new(type, color);
 
     public bool IsMoveLegal(GameState state, ChessMove move)
     {
