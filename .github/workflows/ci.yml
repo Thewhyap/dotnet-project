@@ -1,0 +1,46 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        include:
+          - name: FFChessShared
+            project: FFChessShared/FFChessShared.csproj
+          - name: ff-chess-server
+            project: ff-chess-server/ff-chess-server/ff-chess-server.csproj
+          - name: ff-market
+            project: ff-market/WebServer/WebServer.csproj
+          - name: ff-chess
+            project: ff-chess/FFChess.csproj
+
+    name: Build ${{ matrix.name }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.0.x
+          10.0.x
+    
+    - name: Restore dependencies
+      run: dotnet restore ${{ matrix.project }}
+    
+    - name: Build ${{ matrix.name }}
+      run: dotnet build ${{ matrix.project }} --no-restore --configuration Release
+    
+    - name: Test ${{ matrix.name }}
+      run: dotnet test ${{ matrix.project }} --no-build --configuration Release --verbosity normal
+      continue-on-error: true
+

@@ -2,6 +2,11 @@
 
 Team : PASSERON Adrien, AYIVI Credo, GRUAU Elyan
 
+- Market : [![CI Build](https://github.com/Thewhyap/dotnet-project/actions/workflows/ci.yml/badge.svg)](https://github.com/Thewhyap/dotnet-project/actions/workflows/ci.yml)
+- Server : [![CI Build](https://github.com/Thewhyap/dotnet-project/actions/workflows/ci.yml/badge.svg)](https://github.com/Thewhyap/dotnet-project/actions/workflows/ci.yml)
+- Client : [![CI Build](https://github.com/Thewhyap/dotnet-project/actions/workflows/ci.yml/badge.svg)](https://github.com/Thewhyap/dotnet-project/actions/workflows/ci.yml)
+- Lib : [![CI Build](https://github.com/Thewhyap/dotnet-project/actions/workflows/ci.yml/badge.svg)](https://github.com/Thewhyap/dotnet-project/actions/workflows/ci.yml)
+
 ## Sujet
 
 - Un jeu d'echec
