@@ -23,13 +23,14 @@ public partial class GameResultModal : Control
 
 	public void ShowResult(MatchStatus status)
 	{
-		string title = status switch
-		{
-			MatchStatus.WhiteWon => "White Won!",
-			MatchStatus.BlackWon => "Black Won!",
-			MatchStatus.Draw => "Draw!",
-			_ => "Game Over"
-		};
+		//string title = status switch
+		//{
+			//MatchStatus.WhiteWon => "White Won!",
+			//MatchStatus.BlackWon => "Black Won!",
+			//MatchStatus.Draw => "Draw!",
+			//_ => "Game Over"
+		//}; TODO UNCOMMENT
+		string title = "TODO";
 		
 		_titleLabel.Text = title;
 		Visible = true;
@@ -41,4 +42,3 @@ public partial class GameResultModal : Control
 		OkPressed?.Invoke();
 	}
 }
-

@@ -57,7 +57,8 @@ public partial class GameScreen : Control
 	public override void _Process(double delta)
 	{
 		// Handle the game result modal display
-		if (!_resultModalShown && _game.Status is MatchStatus.WhiteWon or MatchStatus.BlackWon or MatchStatus.Draw)
+		// if (!_resultModalShown && _game.Status is MatchStatus.WhiteWon or MatchStatus.BlackWon or MatchStatus.Draw) TODO UNCOMMENT
+		if(false)
 		{
 			_gameResultModal.ShowResult(_game.Status);
 			_resultModalShown = true;
