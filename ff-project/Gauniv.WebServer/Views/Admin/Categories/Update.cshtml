@@ -42,7 +42,7 @@
             <!-- Update Category Form -->
             <div class="card">
                 <div class="card-body">
-                    <form asp-controller="Admin" asp-action="UpdateCategory" asp-route-id="@Model.Id" method="post">
+                    <form asp-controller="Category" asp-action="UpdateCategory" asp-route-id="@Model.Id" method="post">
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
                         
                         <input type="hidden" asp-for="Id" />

@@ -68,6 +68,11 @@ namespace Gauniv.WebServer.Services
                 {
                     await roleManager.CreateAsync(new IdentityRole("ADMIN"));
                 }
+                
+                if (!await roleManager.RoleExistsAsync("CLIENT"))
+                {
+                    await roleManager.CreateAsync(new IdentityRole("CLIENT"));
+                }
 
                 var adminUser = new User()
                 {
@@ -84,9 +89,27 @@ namespace Gauniv.WebServer.Services
                 if (createAdminUser.Succeeded) {
                     userManager.AddToRoleAsync(adminUser, "ADMIN").GetAwaiter().GetResult();
                 }
+                
+                var clientUser = new User()
+                {
+                    UserName = "client@client.com",
+                    Email = "client@client.com",
+                    FirstName = "Test",
+                    LastName = "Test",
+                    EmailConfirmed = true
+                };
+                
+                var createClientUser = await userManager.CreateAsync(clientUser, "123456");
+
+                // ....
+                if (createClientUser.Succeeded) {
+                    userManager.AddToRoleAsync(clientUser, "CLIENT").GetAwaiter().GetResult();
+                }
 
                 applicationDbContext.SaveChanges();
 
+                
+                
                 //return Task.CompletedTask;
             }
         }

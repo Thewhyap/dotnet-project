@@ -31,7 +31,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using CommunityToolkit.HighPerformance;
 using Gauniv.WebServer.Data;
+using Gauniv.WebServer.Dtos.Game;
 using Gauniv.WebServer.Models;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -47,9 +49,11 @@ namespace Gauniv.WebServer.Controllers
         private readonly ApplicationDbContext applicationDbContext = applicationDbContext;
         private readonly UserManager<User> userManager = userManager;
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(new List<Game> { new() { Id = 0 } });
+            var games = await applicationDbContext.Games.ToListAsync();
+            
+            return View(new GameViewModel() { GamesDtos = games.Adapt<List<GameDto>>()});
         }
 
 

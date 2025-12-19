@@ -42,10 +42,17 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="swagger" asp-action="index">Documentation</a>
                         </li>
                         
-                        @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+                        @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("ADMIN"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin Panel</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Administration</a>
+                            </li>
+                        }
+                        
+                        @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("CLIENT"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Catalog" asp-action="Index">Dashboard</a>
                             </li>
                         }
                     </ul>
@@ -68,8 +75,7 @@
             &copy; 2024 - Gauniv.WebServer - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-
-    @* Script file *@
+    
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

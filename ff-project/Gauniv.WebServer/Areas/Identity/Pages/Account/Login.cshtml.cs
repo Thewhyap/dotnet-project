@@ -134,6 +134,11 @@ namespace Gauniv.WebServer.Areas.Identity.Pages.Account
                         return RedirectToAction("Index", "Admin");
                     }
                     
+                    if (await _userManager.IsInRoleAsync(getUserFromDB, "CLIENT"))
+                    {
+                        return RedirectToAction("Index", "Catalog");
+                    }
+                    
                     return LocalRedirect(returnUrl);
                 }
                 

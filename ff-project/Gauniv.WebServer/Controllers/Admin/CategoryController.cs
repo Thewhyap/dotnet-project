@@ -1,55 +1,16 @@
 ﻿using Gauniv.WebServer.Data;
 using Gauniv.WebServer.Dtos.Category;
-using Gauniv.WebServer.Dtos.Game;
-using Gauniv.WebServer.Models;
 using Gauniv.WebServer.Services;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Gauniv.WebServer.Controllers
+namespace Gauniv.WebServer.Controllers.Admin
 {
-    [Authorize(Roles = "ADMIN")]
-    public class AdminController(ApplicationDbContext applicationDbContext, IFileStorageService fileStorageService) :  Controller
-    {
-        
-        private readonly ApplicationDbContext _applicationDbContext = applicationDbContext;
     
-        private readonly IFileStorageService _fileStorageService = fileStorageService;
-        
-        public IActionResult Index()
-        {
-            return View();
-        }
-        
-        public async Task<IActionResult> Games()
-        {
-            var categories = await _applicationDbContext.Categories
-                .OrderBy(c => c.Name)
-                .ToListAsync();
-            
-            var games = await _applicationDbContext.Games.ToListAsync();
-
-            GameViewModel local_gameViewModel = new GameViewModel()
-            {
-                GamesDtos = games.Adapt<List<GameDto>>(),
-                CategoriesDtos = categories.Adapt<List<CategoryDto>>(),
-            };
-            
-            return View("~/Views/Admin/Games/Index.cshtml",  local_gameViewModel);
-        }
-        
-        public async Task<IActionResult> Categories()
-        {
-            var categories = await _applicationDbContext.Categories.ToListAsync();
-            var categoriesDtos = categories.Adapt<List<CategoryDto>>();
-            return View("~/Views/Admin/Categories/Index.cshtml", categoriesDtos);
-        }
-        
-        
-        // Categories
-        
+    [Authorize(Roles = "ADMIN")]
+    public class CategoryController(ApplicationDbContext _applicationDbContext): Controller
+    {
         [Route("Admin/Categories/Create")]
         [HttpGet]
         public IActionResult CreateCategory()
@@ -205,83 +166,5 @@ namespace Gauniv.WebServer.Controllers
                 return RedirectToAction("Categories");
             }
         }
-        
-        
-        // Games
-        
-        [Route("Admin/Games/Create")]
-        [HttpGet]
-        public async Task<IActionResult> CreateGame()
-        {
-            var categories = await _applicationDbContext.Categories
-                .OrderBy(c => c.Name)
-                .ToListAsync();
-
-            var CreateGameViewModel = new GameCreateViewModel()
-            {
-                CategoriesDtos = categories.Adapt<List<CategoryDto>>()
-            };
-
-            return View("~/Views/Admin/Games/Create.cshtml",  CreateGameViewModel);
-        }
-        
-        
-        [Route("Admin/Games/Create")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateGame(GameCreateViewModel gameViewModel)
-        {
-            if (!ModelState.IsValid)
-            {
-                var categories = await _applicationDbContext.Categories
-                    .OrderBy(c => c.Name)
-                    .ToListAsync();
-
-                var viewModel = new GameCreateViewModel();
-                viewModel.CategoriesDtos = categories.Adapt<List<CategoryDto>>();
-                
-                return View("~/Views/Admin/Games/Create.cshtml", viewModel);
-            }
-
-            try
-            {
-                // Mapping of DTO to entity
-                var game = gameViewModel.GameCreateDto.Adapt<Game>();
-
-                // temp ID saving
-                _applicationDbContext.Games.Add(game);
-                await _applicationDbContext.SaveChangesAsync();
-                
-                game.Payload = await _fileStorageService.SaveGameFileAsync(gameViewModel.GameCreateDto.Payload, game.Id);
-                
-                game.CoverImage = await _fileStorageService.SaveCoverImageAsync(gameViewModel.GameCreateDto.CoverImage, game.Id);
-                
-                game.GameCategories = await _applicationDbContext.Categories
-                    .Where(c => gameViewModel.GameCreateDto.CategoryIds.Contains(c.Id))
-                    .ToListAsync();
-                
-                _applicationDbContext.Games.Update(game);
-                await _applicationDbContext.SaveChangesAsync();
-
-                TempData["Success"] = $"Game '{game.Name}' created successfully!";
-                return RedirectToAction("Games");
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "An error occurred while creating the game. Please try again.";
-                
-                var categories = await _applicationDbContext.Categories
-                    .OrderBy(c => c.Name)
-                    .ToListAsync();
-
-                var viewModel = new GameViewModel();
-                viewModel.CategoriesDtos = categories.Adapt<List<CategoryDto>>();
-                
-                return View("~/Views/Admin/Games/Create.cshtml", viewModel);
-            }
-            
-        }
-        
     }
-    
 }

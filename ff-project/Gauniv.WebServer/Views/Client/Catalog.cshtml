@@ -1,63 +1,30 @@
-﻿@model GameViewModel
+﻿@model List<Gauniv.WebServer.Dtos.Game.GameDto>
 
 @{
-    ViewData["Title"] = "Admin - Game Management";
+    ViewData["Title"] = "Dashboard - Mes jeux";
 }
 
 <div class="container-fluid">
     <div class="row">
         
-        <partial name="_AdminSideMenuPartial" />
-
         <!-- Main Content -->
-        <main class="col-md-8 ms-sm-auto col-lg-9 px-md-4">
+        <main class="col-12 px-md-4">
             <div class="py-3">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Index">Admin</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Game Management</li>
+                        <li class="breadcrumb-item active" aria-current="page">Mes jeux</li>
                     </ol>
                 </nav>
             </div>
 
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                <h1 class="h2">Game Management</h1>
+                <h1 class="h2">Mes jeux</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
-                    <a class="btn btn-success" asp-controller="Game" asp-action="CreateGame">
+                    <a class="btn btn-success" asp-controller="Catalog" asp-action="Index">
                         <i class="bi bi-plus-circle me-1"></i>
-                        Add New Game
+                        Acheter un nouveau jeu
                     </a>
-                </div>
-            </div>
-
-            <!-- Filters -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <form class="row g-3">
-                        <div class="col-md-7">
-                            <label for="searchGame" class="form-label">Search</label>
-                            <input type="text" class="form-control" id="searchGame" placeholder="Game name...">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="filterCategory" class="form-label">Category</label>
-                            <select class="form-select" style="font-size: 11px" id="filterCategory" multiple>
-                                <option>Select Categorie(s)</option>
-                                @if (Model.CategoriesDtos != null && Model.CategoriesDtos.Any())
-                                {
-                                    @foreach (var category in Model.CategoriesDtos)
-                                    {
-                                        <option value="@category.Id">@category.Name</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-secondary w-100">
-                                <i class="bi bi-funnel me-1"></i>
-                                Filter
-                            </button>
-                        </div>
-                    </form>
                 </div>
             </div>
 
@@ -77,9 +44,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (Model.GamesDtos != null && Model.GamesDtos.Any())
+                                @if (Model.Any())
                                 {
-                                    @foreach (var game in Model.GamesDtos)
+                                    @foreach (var game in Model)
                                     {
                                         <tr>
                                             <th scope="row">@game.Id</th>

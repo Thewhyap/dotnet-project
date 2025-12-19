@@ -1,4 +1,4 @@
-﻿@model List<Gauniv.WebServer.Data.Game>
+﻿@model GameViewModel
 @using X.PagedList.Mvc.Core;
 @using X.PagedList;
 @{
@@ -157,37 +157,43 @@
     {
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h5 class="text-muted mb-0">
-                Showing @Model.Count of 50 games
+                Showing @Model.GamesDtos.Count of 50 games
             </h5>
         </div>
         
         <div class="row g-4">
-            @foreach (var game in Enumerable.Range(15,20))
+            @if (Model.GamesDtos.Any())
             {
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                    <div class="card game-card">
-                        <div class="img-wrapper">
-                            <img src="@("https://picsum.photos/300/200?random=" + Enumerable.Range(1,5))" 
-                                 class="card-img-top">
-                        </div>
-                        <div class="card-body card-body-custom">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="game-title">Dragon Ball</h6>
-                                <span class="game-price">5.5 €</span>
+                @foreach (var game in Model.GamesDtos)
+                {
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="card game-card">
+                            <div class="img-wrapper">
+                                <img src="@(game.CoverImage)" alt="@(game.CoverImage)" class="card-img-top">
                             </div>
+                            <div class="card-body card-body-custom">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="game-title">@(game.Name)</h6>
+                                    <span class="game-price">@(game.Price) €</span>
+                                </div>
                             
-                            @if (false)
-                            {
-                                <span class="badge bg-secondary mb-2">game category</span>
-                            }
+                                @if (false)
+                                {
+                                    <span class="badge bg-secondary mb-2">game category</span>
+                                }
                             
-                            <div class="d-flex gap-2 mt-3">
-                                <a asp-action="Details" class="btn btn-sm btn-outline-primary flex-grow-1">Details</a>
-                                <a asp-action="AddToCart" class="btn btn-sm btn-primary">Add</a>
+                                <div class="d-flex gap-2 mt-3">
+                                    <a class="btn btn-sm btn-outline-primary flex-grow-1">Details</a>
+                                    <a class="btn btn-sm btn-primary">Add</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
+            }
+            else
+            {
+                <p>Aucun jeu disponible pour le moment</p>
             }
         </div>
         
