@@ -1,50 +1,23 @@
-namespace FFChessShared;
+using MessagePack;
+using FFChessShared;
 
-public readonly struct GameState
+[MessagePackObject]
+public class GameState
 {
-	public Board Board { get; }
-	public PieceColor CurrentTurn { get; }
-	
-	public bool WhiteCanCastleKingSide { get; }
-	public bool WhiteCanCastleQueenSide { get; }
-	public bool BlackCanCastleKingSide { get; }
-	public bool BlackCanCastleQueenSide { get; }
+    public GameState() { }
+    public GameState(Board board, PieceColor turn = PieceColor.White)
+    {
+        Board = board;
+        CurrentTurn = turn;
+    }
+    [Key(0)] public Board Board { get; set; } = null!;
+    [Key(1)] public PieceColor CurrentTurn { get; set; } = PieceColor.White;
 
-	public ChessSquare? EnPassantTarget { get; }
+    [IgnoreMember] public bool WhiteCanCastleKingSide { get; set; } = true;
+    [IgnoreMember] public bool WhiteCanCastleQueenSide { get; set; } = true;
+    [IgnoreMember] public bool BlackCanCastleKingSide { get; set; } = true;
+    [IgnoreMember] public bool BlackCanCastleQueenSide { get; set; } = true;
+    [IgnoreMember] public int DrawMoveClock { get; set; } = 0;
 
-	public GameState(
-		Board board,
-		PieceColor currentTurn,
-		bool whiteCastleK,
-		bool whiteCastleQ,
-		bool blackCastleK,
-		bool blackCastleQ,
-		ChessSquare? enPassantTarget
-	)
-	{
-		Board = board;
-		CurrentTurn = currentTurn;
-		WhiteCanCastleKingSide = whiteCastleK;
-		WhiteCanCastleQueenSide = whiteCastleQ;
-		BlackCanCastleKingSide = blackCastleK;
-		BlackCanCastleQueenSide = blackCastleQ;
-		EnPassantTarget = enPassantTarget;
-	}
-	
-	/**
-	 * Create a default game state with standard board setup
-	 */
-	public static GameState CreateDefault()
-	{
-		var board = BoardUtils.CreateStandardBoard();
-		return new GameState(
-			board,
-			PieceColor.White,
-			true,  // WhiteCanCastleKingSide
-			true,  // WhiteCanCastleQueenSide
-			true,  // BlackCanCastleKingSide
-			true,  // BlackCanCastleQueenSide
-			null   // EnPassantTarget
-		);
-	}
+    [IgnoreMember] public ChessSquare? EnPassantTarget { get; set; } = null;
 }

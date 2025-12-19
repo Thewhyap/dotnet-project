@@ -1,25 +1,23 @@
+using MessagePack;
+
 namespace FFChessShared;
 
-public readonly struct Game
+[MessagePackObject]
+public class Game
 {
-	public string Name { get; }
-	public GameState GameState { get; }
-	public MatchStatus Status { get; }
+    public Game() { }
 
-	public Game(string name,GameState gameState, MatchStatus status)
-	{
-		Name = name;
-		GameState = gameState;
-		Status = status;
-	}
-	
-	/**
-	 * Creates a default game with initial game state and empty status
-	 */
-	public Game()
-	{
-		Name = "Default_Game_Name";
-		GameState = GameState.CreateDefault();
-		Status = new MatchStatus();
-	}
+    public Game(GameState gameState, string name)
+    {
+        GameState = gameState;
+        Name = name;
+    }
+
+    [Key(0)] public Guid GameId { get; set; }
+    [Key(1)] public GameState GameState { get; set; } = null!;
+    [Key(2)] public MatchStatus Status { get; set; } = MatchStatus.Waiting;
+    [Key(3)] public TurnStatus TurnStatus { get; set; } = TurnStatus.WaitingMove;
+    [Key(4)] public bool HasWhite { get; set; } = false;
+    [Key(5)] public bool HasBlack { get; set; } = false;
+    [Key(6)] public string Name { get; set; } = null!;
 }
