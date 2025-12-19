@@ -38,6 +38,7 @@ layout_mode = 2
 
 [node name="GameScreenLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
 text = "Game Screen"
 
 [node name="StatusPanel" type="Control" parent="HBoxContainer/VBoxContainer"]
@@ -47,5 +48,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="QuitButton" type="Button" parent="HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
 text = "Quit"
