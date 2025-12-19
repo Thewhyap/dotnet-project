@@ -15,6 +15,7 @@ public partial class GameScreen : Control
 	private Label _roleLabel;
 	private Label _viewerCountLabel;
 	private GameResultModal _gameResultModal;
+	private PawnPromotionModal _pawnPromotionModal;
 	private Vector2 _selectedPiecePosition = Vector2.Zero; // Stocke les coordonnées du pion sélectionné
 	private bool _hasPieceSelected = false;
 	
@@ -24,6 +25,9 @@ public partial class GameScreen : Control
 	
 	// Track if result modal has been shown to avoid showing it repeatedly
 	private bool _resultModalShown = false;
+	
+	// Flag to control pawn promotion modal display
+	public bool ShowPawnPromotionModal = false;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -35,11 +39,13 @@ public partial class GameScreen : Control
 		_viewerCountLabel = GetNode<Label>("HBoxContainer/VBoxContainer/ViewerCountLabel");
 		_gameStatusLabel = GetNode<Label>("HBoxContainer/VBoxContainer/GameStatusLabel");
 		_gameResultModal = GetNode<GameResultModal>("GameResultModal");
+		_pawnPromotionModal = GetNode<PawnPromotionModal>("PawnPromotionModal");
 		
 		// Calculate square size based on viewport height
 		GameConstants.CalculateSquareSizeFromViewport(GetViewportRect().Size);
 		_quitButton.Pressed += HandleQuitButtonPressed;
 		_gameResultModal.OkPressed += OnGameResultModalOkPressed;
+		_pawnPromotionModal.PieceSelected += OnPawnPromotionPieceSelected;
 		
 		RenderBoard();
 		
@@ -50,11 +56,18 @@ public partial class GameScreen : Control
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		// Check if game is finished and show result modal (only once)
+		// Handle the game result modal display
 		if (!_resultModalShown && _game.Status is MatchStatus.WhiteWon or MatchStatus.BlackWon or MatchStatus.Draw)
 		{
 			_gameResultModal.ShowResult(_game.Status);
 			_resultModalShown = true;
+		}
+		
+		// Handle the pawn promotion modal display
+		if (ShowPawnPromotionModal)
+		{
+			_pawnPromotionModal.ShowPromotionModal();
+			ShowPawnPromotionModal = false;
 		}
 	}
 	
@@ -164,6 +177,12 @@ public partial class GameScreen : Control
 	{
 		GD.Print("Quit button pressed - TODO implement quit logic");
 		//TODO implement quit logic
+	}
+	
+	private void OnPawnPromotionPieceSelected(PieceType pieceType)
+	{
+		GD.Print($"Pawn promotion piece selected in GameScreen: {pieceType}");
+		// TODO: Use this piece type to complete the pawn promotion
 	}
 	
 	private void OnGameResultModalOkPressed()
