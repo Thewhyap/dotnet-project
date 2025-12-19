@@ -2,7 +2,7 @@ using Godot;
 using System;
 using FFChess.scripts.client;
 
-public partial class ChessBoardView : Node2D
+public partial class ChessBoardView : Control
 {
 	
 	// Called when the node enters the scene tree for the first time.

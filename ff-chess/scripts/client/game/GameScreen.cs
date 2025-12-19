@@ -10,6 +10,9 @@ public partial class GameScreen : Control
 	private Game _game;
 	private ChessBoardView _boardView;
 	private Button _quitButton;
+	private Label _gameStatusLabel;
+	private Label _roleLabel;
+	private Label _viewerCountLabel;
 	private Vector2 _selectedPiecePosition = Vector2.Zero; // Stocke les coordonnées du pion sélectionné
 	private bool _hasPieceSelected = false;
 	
@@ -19,6 +22,9 @@ public partial class GameScreen : Control
 		_game = new Game();
 		_boardView = GetNode<ChessBoardView>("HBoxContainer/ChessBoardView");
 		_quitButton = GetNode<Button>("HBoxContainer/VBoxContainer/QuitButton");
+		_roleLabel = GetNode<Label>("HBoxContainer/VBoxContainer/RoleLabel");
+		_viewerCountLabel = GetNode<Label>("HBoxContainer/VBoxContainer/ViewerCountLabel");
+		_gameStatusLabel = GetNode<Label>("HBoxContainer/VBoxContainer/GameStatusLabel");
 		
 		// Calculate square size based on viewport height
 		GameConstants.CalculateSquareSizeFromViewport(GetViewportRect().Size);
@@ -78,6 +84,10 @@ public partial class GameScreen : Control
 	private void RenderBoard()
 	{
 		
+		// Update UI 
+		UpdateRoleDisplay();
+		UpdateViewerCountDisplay();
+		
 		// Remove existing pieces
 		_boardView.ClearPieces();
 		
@@ -118,5 +128,15 @@ public partial class GameScreen : Control
 	{
 		GD.Print("Quit button pressed - TODO implement quit logic");
 		//TODO implement quit logic
+	}
+
+	private void UpdateRoleDisplay()
+	{
+		_roleLabel.Text = "Your role: TODO"; // TODO set role based on player info
+	}
+	
+	private void UpdateViewerCountDisplay()
+	{
+		_roleLabel.Text = "Viewer count : TODO"; // TODO get viewer count from game info
 	}
 }
