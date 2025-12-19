@@ -1,5 +1,4 @@
-﻿@using Gauniv.WebServer.Data
-@model List<Category>
+﻿@model List<Gauniv.WebServer.Dtos.Category.CategoryDto>
 
 @{
     ViewData["Title"] = "Admin - Categories Management";
@@ -22,11 +21,11 @@
             </div>
 
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                <h1 class="h2">Game Management</h1>
+                <h1 class="h2">Category Management</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <a asp-controller="Admin" asp-action="CreateCategory" class="btn btn-success" >
                         <i class="bi bi-plus-circle me-1"></i>
-                        Add New Game
+                        Add New Category
                     </a>
                 </div>
             </div>
@@ -43,27 +42,9 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <form class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-10">
                             <label for="searchGame" class="form-label">Search</label>
                             <input type="text" class="form-control" id="searchGame" placeholder="Game name...">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="filterCategory" class="form-label">Category</label>
-                            <select class="form-select" id="filterCategory">
-                                <option selected>All Categories</option>
-                                <option>Action</option>
-                                <option>Adventure</option>
-                                <option>RPG</option>
-                                <option>Strategy</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="filterStatus" class="form-label">Status</label>
-                            <select class="form-select" id="filterStatus">
-                                <option selected>All</option>
-                                <option>Active</option>
-                                <option>Inactive</option>
-                            </select>
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn btn-secondary w-100">

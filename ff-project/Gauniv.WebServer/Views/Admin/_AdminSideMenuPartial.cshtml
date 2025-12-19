@@ -6,19 +6,25 @@
         </h5>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Admin" asp-action="Index">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")"
+                   asp-controller="Admin"
+                   asp-action="Index"
+                >
                     <i class="bi bi-speedometer2 me-2"></i>
                     Dashboard
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" asp-controller="Admin" asp-action="Games">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Games" ? "active" : "")" 
+                   asp-controller="Admin" 
+                   asp-action="Games"
+                >
                     <i class="bi bi-controller me-2"></i>
                     Game Management
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Admin" asp-action="Categories">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Categories" ? "active" : "")" asp-controller="Admin" asp-action="Categories">
                     <i class="bi bi-tags me-2"></i>
                     Category Management
                 </a>

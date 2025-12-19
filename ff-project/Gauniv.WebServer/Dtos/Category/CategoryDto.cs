@@ -2,8 +2,12 @@
 
 namespace Gauniv.WebServer.Dtos.Category
 {
-    public class CreateCategoryDto
+    public class CategoryDto
     {
+        
+        [Required]
+        public int Id { get; set; }
+        
         [Required(ErrorMessage = "Category name is required")]
         [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters")]
         [Display(Name = "Category Name")]

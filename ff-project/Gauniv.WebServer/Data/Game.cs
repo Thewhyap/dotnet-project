@@ -46,10 +46,10 @@ namespace Gauniv.WebServer.Data
         public string Description { get; set; }
         
         [Required]
-        public byte[] Image { get; set; }
+        public string CoverImage { get; set; }
         
         [Required]
-        public byte[] Payload { get; set; }
+        public string Payload { get; set; }
         
         [Required]
         public double Price { get; set; }

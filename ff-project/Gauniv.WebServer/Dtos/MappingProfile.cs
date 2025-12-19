@@ -28,6 +28,8 @@
 #endregion
 
 using Gauniv.WebServer.Data;
+using Gauniv.WebServer.Dtos.Category;
+using Gauniv.WebServer.Dtos.Game;
 using Mapster;
 using Mapster.EFCore;
 using Microsoft.EntityFrameworkCore;
@@ -38,8 +40,54 @@ namespace Gauniv.WebServer.Dtos
     {
         public MappingProfile(ApplicationDbContext dbContext)
         {
-            // TypeAdapterConfig<Game, GameDto>.NewConfig();
-            // TypeAdapterConfig<GameDto, Game>.NewConfig();
+
+            TypeAdapterConfig<Data.Category, CategoryDto>.NewConfig()
+                .Map(dest => dest.Name, src => src.Name)
+                .Map(dest => dest.Description, src => src.Description);
+            
+            TypeAdapterConfig<CategoryDto, Data.Category>.NewConfig()
+                .Map(dest => dest.Name, src => src.Name)
+                .Map(dest => dest.Description, src => src.Description);
+
+            TypeAdapterConfig<GameDto, Data.Game>.NewConfig()
+                .Map(dest => dest.Name, src => src.Name)
+                .Map(dest => dest.Description, src => src.Description)
+                .Map(dest => dest.Price, src => src.Price)
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.CoverImage)
+                .Ignore(dest => dest.Payload)
+                .Ignore(dest => dest.GameCategories)
+                .Ignore(dest => dest.GameUsers);
+
+            TypeAdapterConfig<Data.Game, GameDto>.NewConfig()
+                .Map(dest => dest.Name, src => src.Name)
+                .Map(dest => dest.Description, src => src.Description)
+                .Map(dest => dest.Price, src => src.Price)
+                .Map(dest => dest.CoverImage, src => src.CoverImage)
+                .Map(dest => dest.Payload, src => src.Payload)
+                .Map(dest => dest.CategoryIds, src => src.GameCategories.Select(gc => gc.Id))
+                .Map(dest => dest.UserIds, src => src.GameUsers.Select(gu => gu.Id));
+            
+            
+            TypeAdapterConfig<GameCreateDto, Data.Game>.NewConfig()
+                .Map(dest => dest.Name, src => src.Name)
+                .Map(dest => dest.Description, src => src.Description)
+                .Map(dest => dest.Price, src => src.Price)
+                .Ignore(dest => dest.Id)
+                .Ignore(dest => dest.CoverImage)
+                .Ignore(dest => dest.Payload)
+                .Ignore(dest => dest.GameCategories)
+                .Ignore(dest => dest.GameUsers);
+
+            TypeAdapterConfig<Data.Game, GameCreateDto>.NewConfig()
+                .Map(dest => dest.Name, src => src.Name)
+                .Map(dest => dest.Description, src => src.Description)
+                .Map(dest => dest.Price, src => src.Price)
+                .Map(dest => dest.CoverImage, src => src.CoverImage)
+                .Map(dest => dest.Payload, src => src.Payload)
+                .Map(dest => dest.CategoryIds, src => src.GameCategories.Select(gc => gc.Id))
+                .Map(dest => dest.UserIds, src => src.GameUsers.Select(gu => gu.Id));
+
         }
     }
 }

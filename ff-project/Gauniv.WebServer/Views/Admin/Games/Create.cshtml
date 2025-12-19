@@ -1,0 +1,169 @@
+﻿@model GameCreateViewModel
+
+@{
+ViewData["Title"] = "Admin - Create Game";
+}
+
+<div class="container-fluid">
+    <div class="row">
+
+        <partial name="_AdminSideMenuPartial" />
+
+        <!-- Main Content -->
+        <main class="col-md-8 ms-sm-auto col-lg-9 px-md-4">
+            <div class="py-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Admin" asp-action="Index">Admin</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Admin" asp-action="Games">Games</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Create Game
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2">Create New Game</h1>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <form asp-action="CreateGame" asp-controller="Admin" method="post" enctype="multipart/form-data" id="createGameForm">
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                                <!-- Game Name -->
+                                <div class="mb-3">
+                                    <label asp-for="@Model.GameCreateDto.Name" class="form-label">Game Name <span class="text-danger">*</span></label>
+                                    <input asp-for="@Model.GameCreateDto.Name" class="form-control" placeholder="Enter game name" />
+                                    <span asp-validation-for="@Model.GameCreateDto.Name" class="text-danger"></span>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="mb-3">
+                                    <label asp-for="@Model.GameCreateDto.Description" class="form-label">Description</label>
+                                    <textarea asp-for="@Model.GameCreateDto.Description" class="form-control" rows="4" placeholder="Enter game description"></textarea>
+                                    <span asp-validation-for="@Model.GameCreateDto.Description" class="text-danger"></span>
+                                </div>
+
+                                <!-- Price -->
+                                <div class="mb-3">
+                                    <label asp-for="@Model.GameCreateDto.Price" class="form-label">Price (€) <span class="text-danger">*</span></label>
+                                    <input asp-for="@Model.GameCreateDto.Price" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                                    <span asp-validation-for="@Model.GameCreateDto.Price" class="text-danger"></span>
+                                </div>
+
+                                <!-- Categories -->
+                                <div class="mb-3">
+                                    <label asp-for="@Model.GameCreateDto.CategoryIds" class="form-label">Categories <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="categoryIds" asp-for="@Model.GameCreateDto.CategoryIds" multiple>
+                                        @if (Model.CategoriesDtos != null && Model.CategoriesDtos.Any())
+                                        {
+                                            @foreach (var category in Model.CategoriesDtos)
+                                            {
+                                                <option value="@category.Id">@category.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span class="text-danger" asp-validation-for="@Model.GameCreateDto.CategoryIds"></span>
+                                </div>
+                                
+
+                                <!-- Game File Upload -->
+                                <div class="mb-3">
+                                    <label asp-for="@Model.GameCreateDto.Payload" class="form-label">Game File (.zip) <span class="text-danger">*</span></label>
+                                    <input type="file" asp-for="@Model.GameCreateDto.Payload" class="form-control" id="Payload" accept=".zip" />
+                                    <div class="form-text">Upload the game content as a ZIP file (Max 500MB)</div>
+                                    <span class="text-danger" asp-validation-for="@Model.GameCreateDto.Payload"></span>
+                                </div>
+
+                                <!-- Cover Image Upload -->
+                                <div class="mb-3">
+                                    <label for="coverImage" class="form-label">Cover Image</label>
+                                    <input asp-for="@Model.GameCreateDto.CoverImage" type="file" class="form-control" id="coverImage" accept="image/*" />
+                                    <div class="form-text">Upload a cover image (JPG, PNG, WebP - Max 5MB)</div>
+                                    <span class="text-danger" asp-validation-for="@Model.GameCreateDto.CoverImage"></span>
+                                </div>
+
+                                <!-- Image Preview -->
+                                <div class="mb-3" id="imagePreviewContainer" style="display: none;">
+                                    <label class="form-label">Preview</label>
+                                    <div>
+                                        <img id="imagePreview" src="" alt="Cover Preview" class="img-thumbnail" style="max-width: 300px; max-height: 300px;" />
+                                    </div>
+                                </div>
+                                
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-save me-1"></i>
+                                        Create Game
+                                    </button>
+                                    <a asp-controller="Admin" asp-action="Games" class="btn btn-outline-secondary">
+                                        <i class="bi bi-x-circle me-1"></i>
+                                        Retour
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        // Initialize Select2 for categories
+        $('#categoryIds').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Select categories',
+            closeOnSelect: false
+        });
+
+        // Image preview
+        $('#coverImage').on('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imagePreview').attr('src', e.target.result);
+                    $('#imagePreviewContainer').show();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                $('#imagePreviewContainer').hide();
+            }
+        });
+
+        // File size validation
+        $('#Payload').on('change', function() {
+            const file = this.files[0];
+            if (file && file.size > 500 * 1024 * 1024) { // 500MB
+                alert('Game file is too large. Maximum size is 500MB.');
+                this.value = '';
+            }
+        });
+
+        $('#coverImage').on('change', function() {
+            const file = this.files[0];
+            if (file && file.size > 5 * 1024 * 1024) { // 5MB
+                alert('Cover image is too large. Maximum size is 5MB.');
+                this.value = '';
+            }
+        });
+    });
+</script>
+}

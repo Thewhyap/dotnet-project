@@ -26,18 +26,24 @@
 // 
 // Please respect the team's standards for any future contribution
 #endregion
-using Elfie.Serialization;
-using Gauniv.WebServer.Data;
-using Gauniv.WebServer.Dtos;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
 
+using Gauniv.WebServer.Dtos.Category;
+using Gauniv.WebServer.Dtos.Game;
+using System.Runtime.InteropServices;
 
-namespace Gauniv.WebServer.Dtos
+namespace Gauniv.WebServer.Models
 {
-    public class GameDto
+
+    public class GameViewModel
     {
-        public int Id { get; set; }
+        public List<GameDto> GamesDtos { get; set; } = new();
+        public List<CategoryDto> CategoriesDtos { get; set; } = new();
     }
+    
+    public class GameCreateViewModel
+    {
+        public GameCreateDto GameCreateDto { get; set; } = new();
+        public List<CategoryDto> CategoriesDtos { get; set; } = new();
+    }
+    
 }
