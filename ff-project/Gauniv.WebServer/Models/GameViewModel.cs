@@ -38,12 +38,39 @@ namespace Gauniv.WebServer.Models
     {
         public List<GameDto> GamesDtos { get; set; } = new();
         public List<CategoryDto> CategoriesDtos { get; set; } = new();
+        public int CurrentPage { get; set; } = 1;
+        public int TotalPages { get; set; } = 1;
+        public string SearchTerm { get; set; } = string.Empty;
+        public List<int> SelectedCategoryIds { get; set; } = new();
     }
     
     public class GameCreateViewModel
     {
         public GameCreateDto GameCreateDto { get; set; } = new();
         public List<CategoryDto> CategoriesDtos { get; set; } = new();
+    }
+    
+    public class GameUpdateViewModel
+    {
+        public UpdateGameDto UpdateGameDto { get; set; } = new();
+        public List<CategoryDto> CategoriesDtos { get; set; } = new();
+        public string CurrentCoverImage { get; set; } = string.Empty;
+    }
+    
+    public class AdminDashboardViewModel
+    {
+        public int TotalGames { get; set; }
+        public int TotalCategories { get; set; }
+        public int TotalUsers { get; set; }
+        public List<GameDto> RecentGames { get; set; } = new();
+    }
+    
+    public class CategoryViewModel
+    {
+        public List<CategoryDto> CategoriesDtos { get; set; } = new();
+        public int CurrentPage { get; set; } = 1;
+        public int TotalPages { get; set; } = 1;
+        public string SearchTerm { get; set; } = string.Empty;
     }
     
 }

@@ -1,0 +1,189 @@
+ @model GameUpdateViewModel
+
+@{
+ViewData["Title"] = "Admin - Update Game";
+}
+
+<div class="container-fluid">
+    <div class="row">
+
+        <partial name="_AdminSideMenuPartial" />
+
+        <!-- Main Content -->
+        <main class="col-md-8 ms-sm-auto col-lg-9 px-md-4">
+            <div class="py-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Admin" asp-action="Index">Admin</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Admin" asp-action="Games">Games</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Update Game
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2">Update Game</h1>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <form asp-action="UpdateGame" asp-controller="Game" asp-route-id="@Model.UpdateGameDto.Id" method="post" enctype="multipart/form-data" id="updateGameForm">
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                                <input type="hidden" asp-for="@Model.UpdateGameDto.Id" />
+
+                                <!-- Game Name -->
+                                <div class="mb-3">
+                                    <label asp-for="@Model.UpdateGameDto.Name" class="form-label">Game Name <span class="text-danger">*</span></label>
+                                    <input asp-for="@Model.UpdateGameDto.Name" class="form-control" placeholder="Enter game name" />
+                                    <span asp-validation-for="@Model.UpdateGameDto.Name" class="text-danger"></span>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="mb-3">
+                                    <label asp-for="@Model.UpdateGameDto.Description" class="form-label">Description</label>
+                                    <textarea asp-for="@Model.UpdateGameDto.Description" class="form-control" rows="4" placeholder="Enter game description"></textarea>
+                                    <span asp-validation-for="@Model.UpdateGameDto.Description" class="text-danger"></span>
+                                </div>
+
+                                <!-- Price -->
+                                <div class="mb-3">
+                                    <label asp-for="@Model.UpdateGameDto.Price" class="form-label">Price (€) <span class="text-danger">*</span></label>
+                                    <input asp-for="@Model.UpdateGameDto.Price" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                                    <span asp-validation-for="@Model.UpdateGameDto.Price" class="text-danger"></span>
+                                </div>
+
+                                <!-- Categories -->
+                                <div class="mb-3">
+                                    <label class="form-label">Categories <span class="text-danger">*</span></label>
+                                    <div class="p-3 border rounded bg-light">
+                                        @if (Model.CategoriesDtos != null && Model.CategoriesDtos.Any())
+                                        {
+                                            <div class="row g-2">
+                                                @foreach (var category in Model.CategoriesDtos)
+                                                {
+                                                    <div class="col-md-6 col-lg-4">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" 
+                                                                   name="UpdateGameDto.CategoryIds" value="@category.Id" 
+                                                                   id="category_@category.Id"
+                                                                   @(Model.UpdateGameDto.CategoryIds.Contains(category.Id) ? "checked" : "")>
+                                                            <label class="form-check-label" for="category_@category.Id">
+                                                                @category.Name
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <p class="text-muted mb-0">No categories available</p>
+                                        }
+                                    </div>
+                                    <span class="text-danger" asp-validation-for="@Model.UpdateGameDto.CategoryIds"></span>
+                                </div>
+
+                                <!-- Current Cover Image -->
+                                @if (!string.IsNullOrEmpty(Model.CurrentCoverImage))
+                                {
+                                    <div class="mb-3">
+                                        <label class="form-label">Current Cover Image</label>
+                                        <div>
+                                            <img src="@Model.CurrentCoverImage" alt="Current Cover" class="img-thumbnail" style="max-width: 300px; max-height: 300px;" />
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- Cover Image Upload -->
+                                <div class="mb-3">
+                                    <label asp-for="@Model.UpdateGameDto.Image" class="form-label">Update Cover Image (Optional)</label>
+                                    <input asp-for="@Model.UpdateGameDto.Image" type="file" class="form-control" id="coverImage" accept="image/*" />
+                                    <div class="form-text">Upload a new cover image to replace the current one (JPG, PNG, WebP - Max 5MB)</div>
+                                    <span class="text-danger" asp-validation-for="@Model.UpdateGameDto.Image"></span>
+                                </div>
+
+                                <!-- Image Preview -->
+                                <div class="mb-3" id="imagePreviewContainer" style="display: none;">
+                                    <label class="form-label">New Image Preview</label>
+                                    <div>
+                                        <img id="imagePreview" src="" alt="Cover Preview" class="img-thumbnail" style="max-width: 300px; max-height: 300px;" />
+                                    </div>
+                                </div>
+
+                                <!-- Game File Upload -->
+                                <div class="mb-3">
+                                    <label asp-for="@Model.UpdateGameDto.Payload" class="form-label">Update Game File (Optional)</label>
+                                    <input type="file" asp-for="@Model.UpdateGameDto.Payload" class="form-control" id="Payload" accept=".zip" />
+                                    <div class="form-text">Upload a new game file to replace the current one (.zip - Max 500MB)</div>
+                                    <span class="text-danger" asp-validation-for="@Model.UpdateGameDto.Payload"></span>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-save me-1"></i>
+                                        Update Game
+                                    </button>
+                                    <a asp-controller="Admin" asp-action="Games" class="btn btn-outline-secondary">
+                                        <i class="bi bi-x-circle me-1"></i>
+                                        Cancel
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+    $(document).ready(function() {
+        // Image preview
+        $('#coverImage').on('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imagePreview').attr('src', e.target.result);
+                    $('#imagePreviewContainer').show();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                $('#imagePreviewContainer').hide();
+            }
+        });
+
+        // File size validation
+        $('#Payload').on('change', function() {
+            const file = this.files[0];
+            if (file && file.size > 500 * 1024 * 1024) { // 500MB
+                alert('Game file is too large. Maximum size is 500MB.');
+                this.value = '';
+            }
+        });
+
+        $('#coverImage').on('change', function() {
+            const file = this.files[0];
+            if (file && file.size > 5 * 1024 * 1024) { // 5MB
+                alert('Cover image is too large. Maximum size is 5MB.');
+                this.value = '';
+            }
+        });
+    });
+    </script>
+}
+

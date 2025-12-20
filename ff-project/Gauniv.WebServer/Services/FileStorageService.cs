@@ -17,7 +17,8 @@
             var folderPath = Path.Combine(environment.WebRootPath, GameFilesFolder);
             Directory.CreateDirectory(folderPath);
 
-            var fileName = $"{gameId}_{Path.GetFileName(file.FileName)}";
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var fileName = $"{gameId}_{timestamp}_{Path.GetFileName(file.FileName)}";
             var filePath = Path.Combine(folderPath, fileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
@@ -33,8 +34,9 @@
             var folderPath = Path.Combine(environment.WebRootPath, CoverImagesFolder);
             Directory.CreateDirectory(folderPath);
 
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var extension = Path.GetExtension(file.FileName);
-            var fileName = $"{gameId}_cover{extension}";
+            var fileName = $"{gameId}_{timestamp}_cover{extension}";
             var filePath = Path.Combine(folderPath, fileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
