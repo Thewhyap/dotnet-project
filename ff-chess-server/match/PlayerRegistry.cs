@@ -20,4 +20,9 @@ public class PlayerRegistry
     {
         _players.TryRemove(playerId, out _);
     }
+
+    public static IEnumerable<Player> GetAllPlayers()
+    {
+        return _players.Values;
+    }
 }

@@ -4,7 +4,7 @@ namespace Server.Chess;
 
 public abstract class PieceBase(PieceType type, PieceColor color)
 {
-    public PieceData pieceData = new(type, color);
+    public PieceData PieceData = new(type, color);
 
     public bool IsMoveLegal(GameState state, ChessMove move)
     {

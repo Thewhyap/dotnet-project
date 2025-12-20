@@ -20,7 +20,7 @@ public static class GameHelper
         {
             for (int y = 0; y < board.Size; y++)
             {
-                IPiece? piece = board.Cells[x, y];
+                PieceData? piece = board.Cells[x, y];
                 if (piece.HasValue && piece.Value.Type == PieceType.King && piece.Value.Color == color)
                     return new ChessSquare(x, y);
             }
@@ -47,7 +47,7 @@ public static class GameHelper
         {
             for (int y = 0; y < board.Size; y++)
             {
-                Piece? piece = board.Cells[x, y];
+                PieceData? piece = board.Cells[x, y];
                 if (piece.HasValue)
                 {
                     if (piece.Value.Color == color)
@@ -66,35 +66,35 @@ public static class GameHelper
         // Pawns
         for (int x = 0; x < 8; x++)
         {
-            board.Cells[x, board.WhitePawnRow] = new Pawn(PieceColor.White);
-            board.Cells[x, board.BlackPawnRow] = new Pawn(PieceColor.Black);
+            board.Cells[x, board.WhitePawnRow] = new PieceData(PieceType.Pawn, PieceColor.White);
+            board.Cells[x, board.BlackPawnRow] = new Pawn(PieceType.Pawn, PieceColor.Black);
         }
 
         // Rooks
-        board.Cells[board.RookQueenSideColumn, board.WhiteBackRow] = new Rook(PieceColor.White);
-        board.Cells[board.RookKingSideColumn, board.WhiteBackRow] = new Rook(PieceColor.White);
-        board.Cells[board.RookQueenSideColumn, board.BlackBackRow] = new Rook(PieceColor.Black);
-        board.Cells[board.RookKingSideColumn, board.BlackBackRow] = new Rook(PieceColor.Black);
+        board.Cells[board.RookQueenSideColumn, board.WhiteBackRow] = new PieceData(PieceType.Rook, PieceColor.White);
+        board.Cells[board.RookKingSideColumn, board.WhiteBackRow] = new PieceData(PieceType.Rook, PieceColor.White);
+        board.Cells[board.RookQueenSideColumn, board.BlackBackRow] = new PieceData(PieceType.Rook, PieceColor.Black);
+        board.Cells[board.RookKingSideColumn, board.BlackBackRow] = new PieceData(PieceType.Rook, PieceColor.Black);
 
         // Knights
-        board.Cells[board.KnightQueenSideColumn, board.WhiteBackRow] = new Knight(PieceColor.White);
-        board.Cells[board.KnightKingSideColumn, board.WhiteBackRow] = new Knight(PieceColor.White);
-        board.Cells[board.KnightQueenSideColumn, board.BlackBackRow] = new Knight(PieceColor.Black);
-        board.Cells[board.KnightKingSideColumn, board.BlackBackRow] = new Knight(PieceColor.Black);
+        board.Cells[board.KnightQueenSideColumn, board.WhiteBackRow] = new PieceData(PieceType.Knight, PieceColor.White);
+        board.Cells[board.KnightKingSideColumn, board.WhiteBackRow] = new PieceData(PieceType.Knight, PieceColor.White);
+        board.Cells[board.KnightQueenSideColumn, board.BlackBackRow] = new PieceData(PieceType.Knight, PieceColor.Black);
+        board.Cells[board.KnightKingSideColumn, board.BlackBackRow] = new PieceData(PieceType.Knight, PieceColor.Black);
 
         // Bishops
-        board.Cells[board.BishopQueenSideColumn, board.WhiteBackRow] = new Bishop(PieceColor.White);
-        board.Cells[board.BishopKingSideColumn, board.WhiteBackRow] = new Bishop(PieceColor.White);
-        board.Cells[board.BishopQueenSideColumn, board.BlackBackRow] = new Bishop(PieceColor.Black);
-        board.Cells[board.BishopKingSideColumn, board.BlackBackRow] = new Bishop(PieceColor.Black);
+        board.Cells[board.BishopQueenSideColumn, board.WhiteBackRow] = new PieceData(PieceType.Bishop, PieceColor.White);
+        board.Cells[board.BishopKingSideColumn, board.WhiteBackRow] = new PieceData(PieceType.Bishop, PieceColor.White);
+        board.Cells[board.BishopQueenSideColumn, board.BlackBackRow] = new PieceData(PieceType.Bishop, PieceColor.Black);
+        board.Cells[board.BishopKingSideColumn, board.BlackBackRow] = new PieceData(PieceType.Bishop, PieceColor.Black);
 
         // Queens
-        board.Cells[board.QueenColumn, board.WhiteBackRow] = new Queen(PieceColor.White);
-        board.Cells[board.QueenColumn, board.BlackBackRow] = new Queen(PieceColor.Black);
+        board.Cells[board.QueenColumn, board.WhiteBackRow] = new PieceData(PieceType.Queen, PieceColor.White);
+        board.Cells[board.QueenColumn, board.BlackBackRow] = new PieceData(PieceType.Queen, PieceColor.Black);
 
         // Kings
-        board.Cells[board.KingColumn, board.WhiteBackRow] = new King(PieceColor.White);
-        board.Cells[board.KingColumn, board.BlackBackRow] = new King(PieceColor.Black);
+        board.Cells[board.KingColumn, board.WhiteBackRow] = new PieceData(PieceType.King, PieceColor.White);
+        board.Cells[board.KingColumn, board.BlackBackRow] = new PieceData(PieceType.King, PieceColor.Black);
 
         return board;
     }

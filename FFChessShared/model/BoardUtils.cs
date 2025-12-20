@@ -1,5 +1,8 @@
 namespace FFChessShared;
 
+//TODO This should not exist -> MUST BE DELETED
+
+
 /**
  * Utility class for creating and manipulating chess boards
  */

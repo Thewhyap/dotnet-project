@@ -1,6 +1,12 @@
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
+using Server.Network;
 
-app.MapGet("/", () => "Hello World!");
+namespace FFChessServer;
 
-app.Run();
+public static class Program
+{
+    public static async Task Main(string[] args)
+    {
+        var server = new TcpGameServer(port: 8080);
+        await server.StartAsync();
+    }
+}

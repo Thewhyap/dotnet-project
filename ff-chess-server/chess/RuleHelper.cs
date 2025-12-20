@@ -4,15 +4,23 @@ namespace Server.Chess;
 
 public static class RuleHelper
 {
+    public static PieceBase? GetPieceRuleFromSquare(Board board, ChessSquare square)
+    {
+        PieceBase? piece = board.Cells[square.X, square.Y];
+        if (!piece.HasValue)
+            return null;
+        return PieceRuleRegistry.GetRule(piece.Value);
+    }
+
     public static TurnStatus MoveAction(GameState state, ChessMove move)
     {
         Board board = state.Board;
 
-        IPiece piece = board.Cells[move.From.X, move.From.Y].Value;
-        IPiece? targetPiece = board.Cells[move.From.X, move.From.Y];
+        PieceBase piece = GetPieceRuleFromSquare(board, move).Value; // We know that its not null because MoveAction is called after a move has been validated
+        PieceBase? targetPiece = GetPieceRuleFromSquare(board, move);
 
 
-        if (piece.Type == PieceType.Pawn || targetPiece.HasValue)
+        if (piece.PieceData.Type == PieceType.Pawn || targetPiece.HasValue)
         {
             state.DrawMoveClock = 0;
         }
@@ -21,7 +29,7 @@ public static class RuleHelper
             state.DrawMoveClock += 1;
         }
 
-        if (piece.Type == PieceType.Rook)
+        if (piece.PieceData.Type == PieceType.Rook)
         {
             if (state.CurrentTurn == PieceColor.White)
             {
@@ -44,7 +52,7 @@ public static class RuleHelper
             }
         }
 
-        if (piece.Type == PieceType.King)
+        if (piece.PieceData.Type == PieceType.King)
         {
             if (state.CurrentTurn == PieceColor.White)
             {
@@ -59,7 +67,7 @@ public static class RuleHelper
             }
         }
 
-        if (piece.Type == PieceType.Pawn)
+        if (piece.PieceData.Type == PieceType.Pawn)
         {
             int deltaY = move.To.Y - move.From.Y;
             int direction = deltaY > 0 ? 1 : -1;
@@ -131,10 +139,10 @@ public static class RuleHelper
     private static bool OpponentHasLegalMove(GameState state)
     {
         var opponentPiecesPosition = GameHelper.GetOpponentPiecesPosition(state);
-        
-        foreach(var opponentPos in opponentPiecesPosition)
+        var opponentPieces = GetPiecesFromPosition(opponentPiecesPosition);
+
+        foreach (var piece in opponentPieces)
         {
-            IPiece piece = state.Board.Cells[opponentPos.X, opponentPos.Y].Value;
             for (int x = 0; x < board.Size; x++)
             {
                 for (int y = 0; y < board.Size; y++)
@@ -149,26 +157,29 @@ public static class RuleHelper
 
     private static bool IsKingAttacked(GameState state, bool isOpponentKing = false)
     {
-        PieceColor color = isOpponentKing ? state.CurrentTurn == PieceColor.White ? PieceColor.Black : PieceColor.White : state.CurrentTurn;
-        var opponentPiecesPosition = GameHelper.GetPiecesPosition(state.Board, color);
-        ChessSquare kingPosition = GameHelper.GetKingPosition(state.Board, color);
+        PieceColor kingColor = isOpponentKing ? state.CurrentTurn == PieceColor.White ? PieceColor.Black : PieceColor.White : state.CurrentTurn;
+        PieceColor attackersColor = kingColor == PieceColor.White ? PieceColor.Black : PieceColor.White;
+        var opponentPiecesPosition = GameHelper.GetPiecesPosition(state.Board, attackersColor);
+        ChessSquare kingPosition = GameHelper.GetKingPosition(state.Board, kingColor);
 
         foreach (var opponentPos in opponentPiecesPosition)
         {
             var kingAttack = new ChessMove(opponentPos, kingPosition);
-            IPiece piece = state.Board.Cells[opponentPos.X, opponentPos.Y].Value;
+            PieceBase piece = GetPieceRuleFromSquare(state.Board, opponentPos).Value;
             if (piece.IsSpecificMoveLegal(state, kingAttack))
-                return false;
+                return true;
         }
+
+        return false;
     }
 
-    private static List<IPiece> GetPiecesFromPosition(Board board, List<ChessSquare> piecePositions)
+    private static List<PieceBase> GetPiecesFromPosition(Board board, List<ChessSquare> piecePositions)
     {
-        var pieces = new List<IPiece>();
+        var pieces = new List<PieceBase>();
 
         foreach (var pos in piecePositions)
         {
-            var piece = board.Cells[pos.X, pos.Y];
+            var piece = GetPieceRuleFromSquare(board, pos);
             if (piece.HasValue)
                 pieces.Add(piece.Value);
         }
@@ -176,7 +187,7 @@ public static class RuleHelper
         return pieces;
     }
 
-    private static bool IsInsufficientMaterial(List<IPiece> pieces)
+    private static bool IsInsufficientMaterial(List<PieceBase> pieces)
     {
         // Only king
         if (pieces.Count < 2)
@@ -186,7 +197,7 @@ public static class RuleHelper
         if (pieces.Count == 2)
         {
             bool hasMinor =
-                pieces.Any(p => p.Type == PieceType.Bishop || p.Type == PieceType.Knight);
+                pieces.Any(p => p.PieceData.Type == PieceType.Bishop || p.Type == PieceType.Knight);
 
             return hasMinor;
         }
@@ -194,7 +205,7 @@ public static class RuleHelper
         // King + 2 Knights
         if (pieces.Count == 3)
         {
-            int knightCount = pieces.Count(p => p.Type == PieceType.Knight);
+            int knightCount = pieces.Count(p => p.PieceData.Type == PieceType.Knight);
 
             return knightCount == 2;
         }

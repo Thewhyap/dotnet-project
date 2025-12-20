@@ -1,6 +1,6 @@
-namespace FFChessShared.generators;
+namespace Server.Chess;
 
-public class NicknameGenerator
+public static class NicknameGenerator
 {
     private static readonly string[] Nicknames = {
         "John Doe",
@@ -35,7 +35,7 @@ public class NicknameGenerator
     };
     
     
-    public static string GenerateNickanme()
+    public static string GenerateNickname()
     {
         var random = new Random();
         var name = Nicknames[random.Next(Nicknames.Length)];

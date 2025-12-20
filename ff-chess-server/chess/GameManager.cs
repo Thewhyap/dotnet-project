@@ -10,7 +10,7 @@ public class GameManager
 
     public GameManager()
     {
-        game = new Game(new GameState(GameHelper.InitializeBoard()), MatchStatus.Waiting, TurnStatus.WaitingMove);
+        game = new Game(new GameState(GameHelper.InitializeBoard()), LobbyNameGenerator.GenerateLobbyName());
         state = game.GameState;
     }
 

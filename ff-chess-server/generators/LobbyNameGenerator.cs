@@ -1,6 +1,6 @@
-namespace FFChessShared.generators;
+namespace Server.Chess;
 
-public class LobbyNameGenerator
+public static class LobbyNameGenerator
 {
     private static readonly string[] Names = {
         "Paris", 
