@@ -13,43 +13,38 @@ public class MatchSession(GameManager gameManager)
 
     public GameManager GameManager { get; private set; } = gameManager;
 
-    public bool AddPlayer(Player player)
+    public void AddPlayer(Player player)
     {
-        bool isPlayer = true;
-
-        if (WhitePlayer == null && BlackPlayer == null)
+        if (!WhitePlayer.HasValue && !BlackPlayer == null)
         {
             if (_rand.Next(2) == 0)
             {
-                WhitePlayer = player;
-                player.AssignedColor = PieceColor.White;
+                WhitePlayer.Value = player;
+                player.SendGameJoined(gameManager.Game, PieceColor.White);
             }
             else
             {
-                BlackPlayer = player;
-                player.AssignedColor = PieceColor.Black;
+                BlackPlayer.Value = player;
+                player.SendGameJoined(gameManager.Game, PieceColor.Black);
             }
         }
-        else if (WhitePlayer == null)
+        else if (!WhitePlayer.HasValue)
         {
-            WhitePlayer = player;
-            player.AssignedColor = PieceColor.White;
+            WhitePlayer.Value = player;
+            player.SendGameJoined(gameManager.Game, PieceColor.White);
         }
-        else if (BlackPlayer == null)
+        else if (!BlackPlayer.HasValue)
         {
-            BlackPlayer = player;
-            player.AssignedColor = PieceColor.Black;
+            BlackPlayer.Value = player;
+            player.SendGameJoined(gameManager.Game, PieceColor.Black);
         }
         else
         {
-            player.AssignedColor = null;
             _viewers.Add(player);
-            isPlayer = false;
+            player.SendGameJoined(gameManager.Game, null);
         }
 
         await player.SendPlayerInfo();
-
-        return isPlayer;
     }
 
     public void RemovePlayer(Player player)
@@ -104,17 +99,28 @@ public class MatchSession(GameManager gameManager)
 
     private bool IsPlayerTurn(Player player)
     {
-        if (player.AssignedColor == null)
-            return false; // Viewer
+        PieceColor currentTurn = GameManager.Game.GameState.CurrentTurn;
+        if (currentTurn == PieceColor.White)
+            return player == WhitePlayer;
 
-        return player.AssignedColor == GameManager.Game.GameState.CurrentTurn;
+        return player == BlackPlayer;
     }
 
-    private void BroadcastGameState(string? message = null)
+    private void BroadcastGameState()
     {
-        WhitePlayer?.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus, message);
-        BlackPlayer?.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus, message);
+        WhitePlayer?.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus);
+        BlackPlayer?.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus);
         foreach (var viewer in _viewers)
-            viewer.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus, message);
+            viewer.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus);
+    }
+
+    private void BroadcastGameInfo()
+    {
+        GameInfo gameInfo = GameManager.Game.GameInfo;
+
+        WhitePlayer?.SendGameInfo(GameManager.Game.GameState, GameManager.Game.TurnStatus);
+        BlackPlayer?.SendGameInfo(GameManager.Game.GameState, GameManager.Game.TurnStatus);
+        foreach (var viewer in _viewers)
+            viewer.SendGameInfo(GameManager.Game.GameState, GameManager.Game.TurnStatus);
     }
 }
