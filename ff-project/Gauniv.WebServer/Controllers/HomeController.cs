@@ -27,9 +27,6 @@
 // Please respect the team's standards for any future contribution
 #endregion
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
-using CommunityToolkit.HighPerformance;
 using Gauniv.WebServer.Data;
 using Gauniv.WebServer.Dtos;
 using Gauniv.WebServer.Dtos.Category;
@@ -40,7 +37,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Packaging;
 using X.PagedList.Extensions;
 
 namespace Gauniv.WebServer.Controllers
@@ -122,6 +118,175 @@ namespace Gauniv.WebServer.Controllers
             var categories =  await applicationDbContext.Categories.ToListAsync();
             
             return View(categories.Adapt<List<CategoryDto>>());
+        }
+        
+        [Authorize(Roles = "CLIENT")]
+        [HttpPost]
+        public async Task<IActionResult> AddToCart(int gameId)
+        {
+            var local_user = await userManager.GetUserAsync(User);
+            if (local_user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Vérifier si le jeu existe
+            var local_game = await applicationDbContext.Games.FindAsync(gameId);
+            if (local_game == null)
+            {
+                return NotFound();
+            }
+
+            // Vérifier si l'utilisateur possède déjà le jeu
+            var local_userOwnsGame = await applicationDbContext.Games
+                .AnyAsync(g => g.Id == gameId && g.GameUsers.Any(u => u.Id == local_user.Id));
+            
+            if (local_userOwnsGame)
+            {
+                TempData["Error"] = "Vous possédez déjà ce jeu.";
+                return RedirectToAction("Index");
+            }
+
+            // Récupérer le panier de la session
+            var local_cart = HttpContext.Session.GetString("Cart");
+            var local_cartGameIds = string.IsNullOrEmpty(local_cart) 
+                ? new List<int>() 
+                : System.Text.Json.JsonSerializer.Deserialize<List<int>>(local_cart) ?? new List<int>();
+
+            // Vérifier si le jeu est déjà dans le panier
+            if (local_cartGameIds.Contains(gameId))
+            {
+                TempData["Error"] = "Ce jeu est déjà dans votre panier.";
+                return RedirectToAction("Index");
+            }
+
+            // Ajouter au panier
+            local_cartGameIds.Add(gameId);
+            HttpContext.Session.SetString("Cart", System.Text.Json.JsonSerializer.Serialize(local_cartGameIds));
+
+            TempData["Success"] = "Jeu ajouté au panier avec succès!";
+            return RedirectToAction("Index");
+        }
+
+        [Authorize(Roles = "CLIENT")]
+        public async Task<IActionResult> Cart()
+        {
+            var local_user = await userManager.GetUserAsync(User);
+            if (local_user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Récupérer le panier de la session
+            var local_cart = HttpContext.Session.GetString("Cart");
+            var local_cartGameIds = string.IsNullOrEmpty(local_cart) 
+                ? new List<int>() 
+                : System.Text.Json.JsonSerializer.Deserialize<List<int>>(local_cart) ?? new List<int>();
+
+            // Récupérer les jeux du panier
+            var local_games = await applicationDbContext.Games
+                .Where(g => local_cartGameIds.Contains(g.Id))
+                .ToListAsync();
+
+            var local_gameDtos = local_games.Adapt<List<GameDto>>();
+
+            var local_viewModel = new CartViewModel
+            {
+                CartGames = local_gameDtos,
+                TotalPrice = local_gameDtos.Sum(g => g.Price),
+                ItemCount = local_gameDtos.Count
+            };
+
+            return View(local_viewModel);
+        }
+
+        [Authorize(Roles = "CLIENT")]
+        [HttpPost]
+        public IActionResult RemoveFromCart(int gameId)
+        {
+            // Récupérer le panier de la session
+            var local_cart = HttpContext.Session.GetString("Cart");
+            var local_cartGameIds = string.IsNullOrEmpty(local_cart) 
+                ? new List<int>() 
+                : System.Text.Json.JsonSerializer.Deserialize<List<int>>(local_cart) ?? new List<int>();
+
+            // Retirer le jeu du panier
+            var local_removed = local_cartGameIds.Remove(gameId);
+            
+            if (local_removed)
+            {
+                // Si le panier est vide, supprimer la clé de session
+                if (local_cartGameIds.Count == 0)
+                {
+                    HttpContext.Session.Remove("Cart");
+                }
+                else
+                {
+                    // Sinon, mettre à jour la session avec la nouvelle liste
+                    HttpContext.Session.SetString("Cart", System.Text.Json.JsonSerializer.Serialize(local_cartGameIds));
+                }
+                
+                TempData["Success"] = "Jeu retiré du panier.";
+            }
+            else
+            {
+                TempData["Error"] = "Ce jeu n'est pas dans votre panier.";
+            }
+
+            return RedirectToAction("Cart");
+        }
+
+        [Authorize(Roles = "CLIENT")]
+        [HttpPost]
+        public async Task<IActionResult> Checkout()
+        {
+            var local_user = await userManager.GetUserAsync(User);
+            if (local_user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Récupérer le panier de la session
+            var local_cart = HttpContext.Session.GetString("Cart");
+            var local_cartGameIds = string.IsNullOrEmpty(local_cart) 
+                ? new List<int>() 
+                : System.Text.Json.JsonSerializer.Deserialize<List<int>>(local_cart) ?? new List<int>();
+
+            if (!local_cartGameIds.Any())
+            {
+                TempData["Error"] = "Votre panier est vide.";
+                return RedirectToAction("Cart");
+            }
+
+            // Récupérer les jeux du panier
+            var local_games = await applicationDbContext.Games
+                .Include(g => g.GameUsers)
+                .Where(g => local_cartGameIds.Contains(g.Id))
+                .ToListAsync();
+
+            // Associer les jeux à l'utilisateur
+            foreach (var local_game in local_games)
+            {
+                if (local_game.GameUsers == null)
+                {
+                    local_game.GameUsers = new List<User>();
+                }
+                
+                var local_gameUsersList = local_game.GameUsers.ToList();
+                if (!local_gameUsersList.Any(u => u.Id == local_user.Id))
+                {
+                    local_gameUsersList.Add(local_user);
+                    local_game.GameUsers = local_gameUsersList;
+                }
+            }
+
+            await applicationDbContext.SaveChangesAsync();
+
+            // Vider le panier
+            HttpContext.Session.Remove("Cart");
+
+            TempData["Success"] = "Achat effectué avec succès! Les jeux ont été ajoutés à votre bibliothèque.";
+            return RedirectToAction("Index");
         }
         
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

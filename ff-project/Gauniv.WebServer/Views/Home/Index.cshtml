@@ -103,6 +103,24 @@
     <p class="lead mb-0">Discover our game list</p>
 </div>
 
+<div class="container">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+</div>
+
 <!-- Filter Section -->
 <div class="container filter-section">
     <form asp-action="Index" asp-controller="Home" method="get" class="row g-3 align-items-end">
@@ -179,7 +197,19 @@
                             
                             <div class="d-flex gap-2 mt-3">
                                 <a class="btn btn-sm btn-outline-primary flex-grow-1">Details</a>
-                                <a class="btn btn-sm btn-primary">Add</a>
+                                @if (User.IsInRole("CLIENT"))
+                                {
+                                    <form asp-action="AddToCart" asp-controller="Home" method="post" class="d-inline">
+                                        <input type="hidden" name="gameId" value="@game.Id" />
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-cart-plus"></i> Add
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-primary" title="Connectez-vous en tant que client" disabled>Add</button>
+                                }
                             </div>
                         </div>
                     </div>
