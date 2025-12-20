@@ -21,16 +21,15 @@ public partial class GameResultModal : Control
 		Visible = false;
 	}
 
-	public void ShowResult(MatchStatus status)
+	public void ShowResult(TurnStatus status)
 	{
-		//string title = status switch
-		//{
-			//MatchStatus.WhiteWon => "White Won!",
-			//MatchStatus.BlackWon => "Black Won!",
-			//MatchStatus.Draw => "Draw!",
-			//_ => "Game Over"
-		//}; TODO EG UNCOMMENT
-		string title = "TODO EG";
+		string title = status switch
+		{
+			TurnStatus.WinWhite => "White Won!",
+			TurnStatus.WinBlack => "Black Won!",
+			TurnStatus.Draw => "Draw!",
+			_ => "Game Over"
+		};
 		
 		_titleLabel.Text = title;
 		Visible = true;

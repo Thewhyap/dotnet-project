@@ -12,6 +12,7 @@ public partial class GameScreen : Control
 	private GameState _gameState;
 	private GameInfo _gameInfo;
 	private TurnStatus _turnStatus;
+	private PieceColor _playerColor;
 	
 	// Nodes
 	private ChessBoardView _boardView;
@@ -37,6 +38,7 @@ public partial class GameScreen : Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		_playerColor = PieceColor.White; //TODO EG set a real pieceColor
 		_boardView = GetNode<ChessBoardView>("HBoxContainer/ChessBoardView");
 		_quitButton = GetNode<Button>("HBoxContainer/VBoxContainer/QuitButton");
 		_roleLabel = GetNode<Label>("HBoxContainer/VBoxContainer/RoleLabel");
@@ -61,18 +63,17 @@ public partial class GameScreen : Control
 	public override void _Process(double delta)
 	{
 		// Handle the game result modal display
-		// TODO EG how to know who is the winner?
-		// if (!_resultModalShown && _gameState. is MatchStatus.WhiteWon or MatchStatus.BlackWon or MatchStatus.Draw) TODO UNCOMMENT
+		if (_turnStatus == TurnStatus.Draw || _turnStatus == TurnStatus.WinBlack || _turnStatus == TurnStatus.WinWhite)
 		{
-			_gameResultModal.ShowResult(_gameInfo.Status);
+			_gameResultModal.ShowResult(_turnStatus);
 			_resultModalShown = true;
 		}
 		
 		// Handle the pawn promotion modal display
-		if (ShowPawnPromotionModal)
+		if (_turnStatus == TurnStatus.WaitingPromotion || _gameState.CurrentTurn == _playerColor)
 		{
 			_pawnPromotionModal.ShowPromotionModal();
-			ShowPawnPromotionModal = false;
+			ShowPawnPromotionModal = true;
 		}
 	}
 	
