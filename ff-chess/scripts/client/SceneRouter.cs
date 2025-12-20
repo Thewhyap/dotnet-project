@@ -115,12 +115,26 @@ public partial class SceneRouter : Node
 	  GD.Print("Updating Game Screen");
 	  if (_screenRoot == null || _screenRoot.GetChildCount() == 0) return;
 
-	  Control screen = _screenRoot.GetChild<Control>(_screenRoot.GetChildCount() - 1);
-	  if (screen is GameScreen gameScreen)
+	  var gameScreen = GetGameScreenNode();
 	  {
 		  gameScreen.SetGameState(gameUpdate.State);
 		  gameScreen.SetTurnStatus(gameUpdate.TurnStatus);
 	  }
+  }
+
+  public void InitGame(GameJoined gameJoined)
+  {
+	  var gameScreen = GetGameScreenNode();
+	  var intialGameUpdate = gameJoined.InitialGameState;
+	  UpdateGame(intialGameUpdate);
+
+	  if (gameJoined.AssignedColor == null)
+	  {
+		  GD.PrintErr("Assigned Color is null. Aborting initial load.");
+		  return;
+	  }
+	  
+	  gameScreen.SetPlayerColor((PieceColor) gameJoined.AssignedColor);
   }
 
   public void LoadInitialScene()
@@ -165,5 +179,16 @@ public partial class SceneRouter : Node
 		  gameScreen.SetGameInfo((GameInfo) _pendingGameInfo);
 		  _pendingGameInfo = null;
 	  }
+  }
+
+  private GameScreen GetGameScreenNode()
+  {
+	  Control screen = _screenRoot.GetChild<Control>(_screenRoot.GetChildCount() - 1);
+	  if (screen is GameScreen gameScreen)
+	  {
+		  return gameScreen;
+	  }
+		GD.PrintErr("Game screen not found. Aborting initial load.");
+	  return null;
   }
 }

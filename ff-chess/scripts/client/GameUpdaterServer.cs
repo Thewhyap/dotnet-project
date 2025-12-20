@@ -23,11 +23,19 @@ public partial class GameUpdaterServer : Node
     {
         try
         {
-            // GameState update
+            // GameUpdate
             try
             {
                 var gameUpdate = MessagePackSerializer.Deserialize<GameUpdate>(data);
                 HandleGameStateUpdate(gameUpdate);
+                return;
+            }
+            catch { }
+
+            try
+            {
+                var gameJoined = MessagePackSerializer.Deserialize<GameJoined>(data);
+                HandleGameJoined(gameJoined);
                 return;
             }
             catch { }
@@ -63,12 +71,17 @@ public partial class GameUpdaterServer : Node
     private void HandleGameStateUpdate(GameUpdate gameUpdate)
     {
         GD.Print($"Game state updated: {gameUpdate.State}");
-        GetNode<SceneRouter>("/root/ClientRoot/GameUpdaterServer/SceneRouter").UpdateGame(gameUpdate);
+        GetSceneRouterNode().UpdateGame(gameUpdate);
     }
 
     private void HandleGameInfo(GameInfo info)
     {
         GD.Print($"Game info received: {info.GameName}");
+    }
+
+    private void HandleGameJoined(GameJoined gameJoined)
+    {
+        GetSceneRouterNode().InitGame(gameJoined);
     }
     
     private void HandleGameList(GameInfo[] games)
@@ -94,21 +107,34 @@ public partial class GameUpdaterServer : Node
     
     public void SendMovePieceRequest(ChessMove move)
     {
-        _networkClient.SendMessage(move);
+        ClientMove moveMessage = new ClientMove
+        {
+            Move = move
+        };
+        _networkClient.SendMessage(moveMessage);
     }
 
-    public void SendQuitGameRequest()
+    public void SendQuitGameRequest(Guid gameId)
     {
-        var message = new ClientQuitGame();
+        var message = new ClientQuitGame
+        {
+            GameId = gameId
+        };
         _networkClient.SendMessage(message);
     }
     
-    public void SendPromoteRequest(PieceType promotionChoice)
+    public void SendPromoteRequest(Guid gameId, PieceType promotionChoice)
     {
         ClientPromotion message = new ClientPromotion
         {
+            GameId =  gameId,
             PromotionChoice = promotionChoice
         };
         _networkClient.SendMessage(message);
+    }
+
+    private SceneRouter GetSceneRouterNode()
+    {
+        return GetNode<SceneRouter>("/root/ClientRoot/GameUpdaterServer/SceneRouter");
     }
 }

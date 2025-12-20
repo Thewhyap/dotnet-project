@@ -89,6 +89,11 @@ public partial class GameScreen : Control
 		RenderBoard();
 	}
 	
+	public void SetPlayerColor(PieceColor pieceColor)
+	{
+		_playerColor = pieceColor;
+	}
+	
 
 	public void SetGameInfo(GameInfo gameInfo)
 	{
@@ -196,14 +201,14 @@ public partial class GameScreen : Control
 	{
 		GD.Print("Quit button pressed");
 		var gameUpdater = getGameUpdaterServer();
-		gameUpdater.SendQuitGameRequest();
+		gameUpdater.SendQuitGameRequest(_gameInfo.GameId);
 	}
 	
 	private void OnPawnPromotionPieceSelected(PieceType pieceType)
 	{
 		GD.Print($"Pawn promotion piece selected in GameScreen: {pieceType}");
 		var gameUpdater = getGameUpdaterServer();
-		gameUpdater.SendPromoteRequest(pieceType);
+		gameUpdater.SendPromoteRequest(_gameInfo.GameId, pieceType);
 	}
 	
 	private void OnGameResultModalOkPressed()
