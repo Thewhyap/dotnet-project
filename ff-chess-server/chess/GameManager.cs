@@ -5,13 +5,13 @@ namespace Server.Chess;
 
 public class GameManager
 {
-    public readonly Game game;
+    public readonly Game Game;
     private readonly GameState state;
 
     public GameManager()
     {
-        game = new Game(new GameState(GameHelper.InitializeBoard()), LobbyNameGenerator.GenerateLobbyName());
-        state = game.GameState;
+        Game = new Game(new GameState(GameHelper.InitializeBoard()), LobbyNameGenerator.GenerateLobbyName());
+        state = Game.GameState;
     }
 
     public void SendGame()
@@ -47,19 +47,19 @@ public class GameManager
             return;
         }
 
-        game.TurnStatus = RuleHelper.MoveAction(state, move);
+        Game.TurnStatus = RuleHelper.MoveAction(state, move);
 
         state.Board.MovePiece(move.From, move.To);
 
-        if (game.TurnStatus == TurnStatus.WaitingPromotion)
+        if (Game.TurnStatus == TurnStatus.WaitingPromotion)
         {
             SendGame();
             return;
         }
 
-        game.TurnStatus = RuleHelper.CheckWinCondition(state);
+        Game.TurnStatus = RuleHelper.CheckWinCondition(state);
 
-        if (game.TurnStatus == TurnStatus.WinWhite || game.TurnStatus == TurnStatus.WinBlack || game.TurnStatus == TurnStatus.Draw)
+        if (Game.TurnStatus == TurnStatus.WinWhite || Game.TurnStatus == TurnStatus.WinBlack || Game.TurnStatus == TurnStatus.Draw)
         {
             EndGame();
         }
@@ -77,14 +77,14 @@ public class GameManager
 
     private void EndGame()
     {
-        game.Status = MatchStatus.Closed;
+        Game.Status = MatchStatus.Closed;
         SendGame();
     }
 
     public void EndGameWithWin(PieceColor winningColor)
     {
-        game.Status = MatchStatus.Closed;
-        game.TurnStatus = winningColor == PieceColor.White ? TurnStatus.WinWhite : TurnStatus.WinBlack;
+        Game.Status = MatchStatus.Closed;
+        Game.TurnStatus = winningColor == PieceColor.White ? TurnStatus.WinWhite : TurnStatus.WinBlack;
         SendGame();
     }
 }
