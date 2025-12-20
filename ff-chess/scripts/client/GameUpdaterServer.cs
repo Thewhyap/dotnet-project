@@ -9,7 +9,11 @@ public partial class GameUpdaterServer : Node
 
     public override async void _Ready()
     {
-        _networkClient = GetNode<NetworkClient>("NetworkClient");
+        _networkClient = GetParent().GetNode<NetworkClient>("NetworkClient");
+        if (_networkClient == null)
+        {
+            GD.PrintErr("Network client not found");
+        }
         _networkClient.OnMessageReceived += OnMessageReceived;
 
         await _networkClient.ConnectToServer("localhost", 5000);
