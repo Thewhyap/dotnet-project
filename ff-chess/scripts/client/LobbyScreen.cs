@@ -1,0 +1,64 @@
+using Godot;
+using System.Collections.Generic;
+using FFChessShared;
+
+
+public partial class LobbyScreen : Control
+{
+	
+	private VBoxContainer _lobbyList;
+	private Button _createLobbyButton;
+	private PackedScene _lobbyItemScene;
+	
+	// Called when the node enters the scene tree for the first time.
+	public override void _Ready()
+	{
+		 _lobbyList = GetNode<VBoxContainer>("VBoxContainer/LobbyList");
+		 _createLobbyButton = GetNode<Button>("VBoxContainer/ActionButtons/CreateLobbyButton");
+		 _createLobbyButton.Pressed += OnCreateLobbyButtonPressed;
+		 _lobbyItemScene = GD.Load<PackedScene>("res://scripts/client/lobby/LobbyItemScene.tscn");
+		 
+		 // Fetch the lobbies from the server
+		 GetLobbiesFromServer();
+	}
+
+	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public override void _Process(double delta)
+	{
+	}
+	
+	/*
+	 * Display the list of game lobbies
+	 */
+	 public void DisplayGamesLobbies(GameInfo[] lobbies)
+	{
+		foreach (var gameLobby in lobbies)
+		{
+			var item = _lobbyItemScene.Instantiate<LobbyItemScene>();
+			_lobbyList.AddChild(item);
+			item.SetData(gameLobby);
+		}
+	}
+
+	private void GetLobbiesFromServer()
+	{
+		var gameUpdater = GetGameUpdater();
+		gameUpdater.SendGetGamesRequest();
+	}
+
+	private void OnCreateLobbyButtonPressed()
+	{
+		// The sever will create a new Lobby and return it's data.
+		GD.Print("Create Lobby button pressed.");
+		var gameUpdater = GetGameUpdater();
+		gameUpdater.SendCreateGameRequest();
+	}
+	
+	/**
+	 * Helper to get the GameUpdaterServer node
+	 */
+	private GameUpdaterServer GetGameUpdater()
+	{
+		return GetNode<GameUpdaterServer>("/root/ClientRoot/GameUpdaterServer");
+	}
+}

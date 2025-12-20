@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="FFChess"
-run/main_scene="uid://xcceev7a1kma"
+run/main_scene="uid://l2wbpyi5gqym"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 

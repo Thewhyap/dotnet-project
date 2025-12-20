@@ -1,45 +1,209 @@
-[gd_scene load_steps=2 format=3 uid="uid://6dmyhj3da5oa"]
+[gd_scene load_steps=6 format=3 uid="uid://6dmyhj3da5oa"]
 
+[ext_resource type="Script" uid="uid://buekjj11ys2e5" path="res://scripts/client/game/GameScreen.cs" id="1_3uriw"]
 [ext_resource type="Script" uid="uid://cxdcyoihqgbcs" path="res://views/ChessBoardView.cs" id="1_8mhku"]
+[ext_resource type="Script" uid="uid://qkovnvj8vcuh" path="res://scripts/client/game/PiecesView.cs" id="2_85ytm"]
+[ext_resource type="Script" uid="uid://c8uikmp1yct7f" path="res://scripts/client/game/GameResultModal.cs" id="3_wj6q3"]
+[ext_resource type="Script" uid="uid://ctdu5etuo5cwm" path="res://scripts/client/game/PawnPromotionModal.cs" id="4_hp8m2"]
 
 [node name="GameScreen" type="Control"]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3uriw")
 
-[node name="GameScreenLabel" type="Label" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-text = "Game Screen"
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="ChessBoardView" type="Node2D" parent="."]
+[node name="ChessBoardView" type="Control" parent="HBoxContainer"]
+custom_minimum_size = Vector2(600, 600)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
 script = ExtResource("1_8mhku")
 
-[node name="BoardVisual" type="Control" parent="ChessBoardView"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="BoardView" type="Control" parent="HBoxContainer/ChessBoardView"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="PiecesVisual" type="Control" parent="ChessBoardView"]
-layout_mode = 3
+[node name="PiecesView" type="Control" parent="HBoxContainer/ChessBoardView"]
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+script = ExtResource("2_85ytm")
 
-[node name="PlayerHud" type="Control" parent="."]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="Spacer" type="Control" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="MoveHistoryPanel" type="Control" parent="."]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+custom_minimum_size = Vector2(500, 200)
+layout_mode = 2
+size_flags_vertical = 2
 
-[node name="StatusPanel" type="Control" parent="."]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="GameScreenLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Game Screen"
+
+[node name="RoleLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "role : "
+
+[node name="ViewerCountLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+
+[node name="GameStatusLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+
+[node name="MoveHistoryPanel" type="Control" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="QuitButton" type="Button" parent="HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Quit"
+
+[node name="GameResultModal" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_wj6q3")
+
+[node name="ColorRect" type="ColorRect" parent="GameResultModal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="PanelContainer" type="PanelContainer" parent="GameResultModal"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameResultModal/PanelContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="GameResultModal/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "White Won!"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="GameResultModal/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+
+[node name="OkButton" type="Button" parent="GameResultModal/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "OK"
+
+[node name="PawnPromotionModal" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_hp8m2")
+
+[node name="ColorRect" type="ColorRect" parent="PawnPromotionModal"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="PanelContainer" type="PanelContainer" parent="PawnPromotionModal"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -150.0
+offset_right = 300.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PawnPromotionModal/PanelContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="PawnPromotionModal/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Choose Promotion Piece"
+horizontal_alignment = 1
+
+[node name="Spacer1" type="Control" parent="PawnPromotionModal/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PawnPromotionModal/PanelContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="QueenButton" type="Button" parent="PawnPromotionModal/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Queen"
+
+[node name="RookButton" type="Button" parent="PawnPromotionModal/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Rook"
+
+[node name="BishopButton" type="Button" parent="PawnPromotionModal/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Bishop"
+
+[node name="KnightButton" type="Button" parent="PawnPromotionModal/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Knight"

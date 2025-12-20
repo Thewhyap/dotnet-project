@@ -15,15 +15,21 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer"]
+custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
 text = "FFChess"
 
 [node name="PlayButton" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
 text = "Play"
 script = ExtResource("1_0ad5b")
 
 [node name="QuitButton" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
+theme_override_font_sizes/font_size = 32
 text = "Quit game"
 script = ExtResource("2_e7tdj")

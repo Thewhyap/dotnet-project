@@ -1,31 +1,38 @@
-[gd_scene load_steps=0 format=3 uid="uid://26i7qlfpqssu"]
+[gd_scene load_steps=2 format=3 uid="uid://26i7qlfpqssu"]
+
+[ext_resource type="Script" uid="uid://bub7wl5hjlkt8" path="res://scripts/client/LobbyScreen.cs" id="1_wbad2"]
 
 [node name="LobbyScreen" type="Control"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = 15
+offset_right = 0.0
+offset_bottom = 0.0
+script = ExtResource("1_wbad2")
 
-[node name="LobbyList" type="VBoxContainer" parent="."]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+offset_right = 0.0
+offset_bottom = 0.0
 
-[node name="LobbyLabel" type="Label" parent="LobbyList"]
+[node name="LobbyLabel" type="Label" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-text = "Lobby"
+theme_override_font_sizes/font_size = 32
+text = "Lobbies "
 
-[node name="CreateLobbyPanel" type="Control" parent="."]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="ActionButtons" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
 
-[node name="LobbyDetailsPanel" type="Control" parent="."]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="CreateLobbyButton" type="Button" parent="VBoxContainer/ActionButtons"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 0
+offset_top = 4.0
+offset_right = 106.0
+offset_bottom = 35.0
+theme_override_font_sizes/font_size = 32
+text = "Create lobby"
 
-[node name="ActionButtons" type="Control" parent="."]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="LobbyList" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2

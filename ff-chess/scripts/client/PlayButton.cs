@@ -16,6 +16,6 @@ public partial class PlayButton : Button
 	
 	private void OnButtonPressed()
 	{
-		GetNode<SceneRouter>("/root/ClientRoot/SceneRouter").LoadLobby();
+		GetNode<SceneRouter>("/root/ClientRoot/GameUpdaterServer/SceneRouter").LoadLobby();
 	}
 }

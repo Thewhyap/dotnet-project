@@ -4,5 +4,5 @@ public enum MatchStatus
 {
 	Waiting,
 	InGame,
-	Closed
+	Closed,
 }

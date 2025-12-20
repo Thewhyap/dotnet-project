@@ -1,6 +1,33 @@
 [gd_scene load_steps=2 format=3 uid="uid://xcceev7a1kma"]
 
-[ext_resource type="Script" uid="uid://d2gbpv1l5kcc1" path="res://scenes/Bootstrap.cs" id="1_qmcbq"]
+[sub_resource type="CSharpScript" id="CSharpScript_k66xr"]
+script/source = "using Godot;
+using System;
+using System.Linq;
+
+public partial class Bootstrap : Node
+{
+	// Called when the node enters the scene tree for the first time.
+	public override void _Ready()
+	{
+		var args = OS.GetCmdlineArgs();
+
+		if (args.Contains(\"--server\"))
+		{
+			GetTree().ChangeSceneToFile(\"res://scripts/server/server_root.tscn\");
+		}
+		else
+		{
+			GetTree().ChangeSceneToFile(\"res://scenes/client_root.tscn\");
+		}
+	}
+
+	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	public override void _Process(double delta)
+	{
+	}
+}
+"
 
 [node name="Bootstrap" type="Node"]
-script = ExtResource("1_qmcbq")
+script = SubResource("CSharpScript_k66xr")
