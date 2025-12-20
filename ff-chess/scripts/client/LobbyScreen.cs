@@ -17,9 +17,6 @@ public partial class LobbyScreen : Control
 		 _createLobbyButton = GetNode<Button>("VBoxContainer/ActionButtons/CreateLobbyButton");
 		 _createLobbyButton.Pressed += OnCreateLobbyButtonPressed;
 		 _lobbyItemScene = GD.Load<PackedScene>("res://scripts/client/lobby/LobbyItemScene.tscn");
-		 
-		 // Fetch the lobbies from the server
-		 GetLobbiesFromServer();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -39,12 +36,7 @@ public partial class LobbyScreen : Control
 			item.SetData(gameLobby);
 		}
 	}
-
-	private void GetLobbiesFromServer()
-	{
-		var gameUpdater = GetGameUpdater();
-		gameUpdater.SendGetGamesRequest();
-	}
+	 
 
 	private void OnCreateLobbyButtonPressed()
 	{

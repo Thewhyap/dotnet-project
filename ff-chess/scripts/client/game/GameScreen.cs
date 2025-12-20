@@ -8,8 +8,11 @@ namespace FFChess.scripts.client.game;
 
 public partial class GameScreen : Control
 {
+	// Model
 	private GameState _gameState;
 	private GameInfo _gameInfo;
+	
+	// Nodes
 	private ChessBoardView _boardView;
 	private Button _quitButton;
 	private Label _gameStatusLabel;
@@ -17,7 +20,7 @@ public partial class GameScreen : Control
 	private Label _viewerCountLabel;
 	private GameResultModal _gameResultModal;
 	private PawnPromotionModal _pawnPromotionModal;
-	private Vector2 _selectedPiecePosition = Vector2.Zero; // Stocke les coordonnées du pion sélectionné
+	private Vector2 _selectedPiecePosition = Vector2.Zero; 
 	private bool _hasPieceSelected = false;
 	
 	// Handle piece selection highlighting
@@ -92,11 +95,6 @@ public partial class GameScreen : Control
 		RenderBoard();
 	}
 	
-	public void OnSquareClicked(ChessSquare square)
-	{
-		// Logique de coup
-	}
-	
 	private void OnPieceClicked(int x, int y)
 	{
 		// Unselect previous piece if any
@@ -125,7 +123,7 @@ public partial class GameScreen : Control
 		if (_hasPieceSelected)
 		{
 			GD.Print($"Case cliquée à ({x}, {y}) - TODO EG Move pawn from ({_selectedPiecePosition.X}, {_selectedPiecePosition.Y})");
-			var gameUpdater = GetNode<GameUpdaterServer>("/root/ClientRoot/GameUpdaterServer");
+			var gameUpdater = getGameUpdaterServer();
 			ChessSquare from = new ChessSquare((int) _selectedPiecePosition.X, (int) _selectedPiecePosition.Y);
 			ChessSquare to = new ChessSquare(x, y);
 			ChessMove move = new ChessMove(from, to);
@@ -187,14 +185,16 @@ public partial class GameScreen : Control
 
 	private void HandleQuitButtonPressed()
 	{
-		GD.Print("Quit button pressed - TODO EG implement quit logic");
-		//TODO EG implement quit logic
+		GD.Print("Quit button pressed");
+		var gameUpdater = getGameUpdaterServer();
+		gameUpdater.SendQuitGameRequest();
 	}
 	
 	private void OnPawnPromotionPieceSelected(PieceType pieceType)
 	{
 		GD.Print($"Pawn promotion piece selected in GameScreen: {pieceType}");
-		// TODO EG: Use this piece type to complete the pawn promotion
+		var gameUpdater = getGameUpdaterServer();
+		gameUpdater.SendPromoteRequest(pieceType);
 	}
 	
 	private void OnGameResultModalOkPressed()
@@ -211,5 +211,10 @@ public partial class GameScreen : Control
 	private void UpdateViewerCountDisplay()
 	{
 		_roleLabel.Text = "Viewer count : TODO EG"; // TODO EG get viewer count from game info
+	}
+
+	private GameUpdaterServer getGameUpdaterServer()
+	{
+		return GetNode<GameUpdaterServer>("/root/ClientRoot/GameUpdaterServer");
 	}
 }

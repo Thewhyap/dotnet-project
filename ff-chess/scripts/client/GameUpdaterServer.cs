@@ -82,14 +82,6 @@ public partial class GameUpdaterServer : Node
         _networkClient.SendMessage(payload);
     }
     
-    public void SendGetGamesRequest()
-    {
-        GD.Print("Requesting lobbies from server...");
-        var request = new ClientGetGames(); // TODO EG define a specific request message
-        _networkClient.SendMessage(request);
-        GD.Print("Lobbies loaded.");
-    }
-    
     public void SendCreateGameRequest()
     {
         var payload = new ClientCreateGame();
@@ -99,5 +91,20 @@ public partial class GameUpdaterServer : Node
     public void SendMovePieceRequest(ChessMove move)
     {
         _networkClient.SendMessage(move);
+    }
+
+    public void SendQuitGameRequest()
+    {
+        var message = new ClientQuitGame();
+        _networkClient.SendMessage(message);
+    }
+    
+    public void SendPromoteRequest(PieceType promotionChoice)
+    {
+        ClientPromotion message = new ClientPromotion
+        {
+            PromotionChoice = promotionChoice
+        };
+        _networkClient.SendMessage(message);
     }
 }
