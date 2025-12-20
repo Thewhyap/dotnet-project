@@ -13,13 +13,15 @@ public partial class GameScreen : Control
 	private GameInfo _gameInfo;
 	private TurnStatus _turnStatus;
 	private PieceColor _playerColor;
+	private string _playerName;
+	private string _playerRole;
 	
 	// Nodes
 	private ChessBoardView _boardView;
 	private Button _quitButton;
 	private Label _gameStatusLabel;
 	private Label _roleLabel;
-	private Label _viewerCountLabel;
+	private Label _turnStatusLabel;
 	private GameResultModal _gameResultModal;
 	private PawnPromotionModal _pawnPromotionModal;
 	private Vector2 _selectedPiecePosition = Vector2.Zero; 
@@ -38,11 +40,10 @@ public partial class GameScreen : Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		_playerColor = PieceColor.White; //TODO EG set a real pieceColor
 		_boardView = GetNode<ChessBoardView>("HBoxContainer/ChessBoardView");
 		_quitButton = GetNode<Button>("HBoxContainer/VBoxContainer/QuitButton");
 		_roleLabel = GetNode<Label>("HBoxContainer/VBoxContainer/RoleLabel");
-		_viewerCountLabel = GetNode<Label>("HBoxContainer/VBoxContainer/ViewerCountLabel");
+		_turnStatusLabel = GetNode<Label>("HBoxContainer/VBoxContainer/TurnStatusLabel");
 		_gameStatusLabel = GetNode<Label>("HBoxContainer/VBoxContainer/GameStatusLabel");
 		_gameResultModal = GetNode<GameResultModal>("GameResultModal");
 		_pawnPromotionModal = GetNode<PawnPromotionModal>("PawnPromotionModal");
@@ -94,6 +95,10 @@ public partial class GameScreen : Control
 		_playerColor = pieceColor;
 	}
 	
+	public void SetPlayerName(string playerName)
+	{
+		_playerName = playerName;
+	}
 
 	public void SetGameInfo(GameInfo gameInfo)
 	{
@@ -136,7 +141,7 @@ public partial class GameScreen : Control
 	{
 		if (_hasPieceSelected)
 		{
-			GD.Print($"Case cliquée à ({x}, {y}) - TODO EG Move pawn from ({_selectedPiecePosition.X}, {_selectedPiecePosition.Y})");
+			GD.Print($"Square clicked at ({x}, {y}) - Should move pawn to ({_selectedPiecePosition.X}, {_selectedPiecePosition.Y})");
 			var gameUpdater = getGameUpdaterServer();
 			ChessSquare from = new ChessSquare((int) _selectedPiecePosition.X, (int) _selectedPiecePosition.Y);
 			ChessSquare to = new ChessSquare(x, y);
@@ -155,7 +160,7 @@ public partial class GameScreen : Control
 		
 		// Update UI 
 		UpdateRoleDisplay();
-		UpdateViewerCountDisplay();
+		UpdateTurnStatusDisplay();
 		
 		// Remove existing pieces
 		_boardView.ClearPieces();
@@ -219,12 +224,61 @@ public partial class GameScreen : Control
 
 	private void UpdateRoleDisplay()
 	{
-		_roleLabel.Text = "Your role: TODO EG"; // TODO EG set role based on player info
+		var role = "Observer";
+		if (_playerColor != null)
+		{
+			role = _playerColor == PieceColor.Black ? "Player (Black)" : "Player (White)";
+		}
+		
+		_roleLabel.Text =  "Your role: "+role;
 	}
 	
-	private void UpdateViewerCountDisplay()
+	private void UpdateTurnStatusDisplay()
 	{
-		_roleLabel.Text = "Viewer count : TODO EG"; // TODO EG get viewer count from game info
+		var message = "MESSAGE_NOT_HANDLED_PROPERLY";
+		switch (_turnStatus)
+		{
+			case TurnStatus.WaitingMove:
+			{
+				if (_gameState.CurrentTurn == _playerColor)
+				{
+					message = "Waiting for your move ...";
+				}
+				else
+				{
+					message = "Waiting for the opponent's move ...";
+				}
+				break;
+			}
+			case TurnStatus.WaitingPromotion: 
+			{
+				if (_gameState.CurrentTurn == _playerColor)
+				{
+					message = "Waiting for you to promote a pawn...";	
+				}
+				else
+				{
+					message = "Waiting for the opponent to promote a pawn...";
+				}
+				break;
+			}
+			case TurnStatus.Draw:
+			{
+				message = "Draw!";
+				break;
+			}
+			case TurnStatus.WinBlack:
+			{
+				message = "Black won!";
+				break;
+			}
+			case TurnStatus.WinWhite:
+			{
+				message = "White won!";
+				break;
+			}
+		}
+		_turnStatusLabel.Text = message; 
 	}
 
 	private GameUpdaterServer getGameUpdaterServer()
