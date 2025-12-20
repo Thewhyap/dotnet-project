@@ -1,0 +1,305 @@
+﻿@model List<Gauniv.WebServer.Data.User>
+@{
+    ViewData["Title"] = "Online Users";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        
+        <partial name="_ClientSideMenuPartial" />
+
+        <!-- Main Content -->
+        <main class="col-md-8 ms-sm-auto col-lg-9 px-md-4">
+            <div class="py-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Catalog" asp-action="Index">Client</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Online Users
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-people-fill me-2"></i>Users Online
+                </h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="badge bg-primary fs-6 px-3 py-2">
+                        <i class="bi bi-circle-fill text-success me-2" style="font-size: 0.6rem;"></i>
+                        <span id="onlineCount">0</span> Online
+                    </div>
+                </div>
+            </div>
+
+            <!-- Online Users Section -->
+            <div class="row" id="usersContainer">
+                <!-- Users will be dynamically added here -->
+            </div>
+
+            <!-- No users message -->
+            <div id="noUsersMessage" class="text-center py-5" style="display: none;">
+                <i class="bi bi-person-x fs-1 text-muted mb-3"></i>
+                <h5 class="text-muted">No users online at the moment</h5>
+                <p class="text-muted">Be the first to connect!</p>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<style>
+    .user-card {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .user-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-color: #0d6efd;
+    }
+
+    .user-card.online {
+        border-left: 4px solid #28a745;
+    }
+
+    .user-card.offline {
+        opacity: 0.6;
+        border-left: 4px solid #6c757d;
+    }
+
+    .status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .status-online {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-offline {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .user-avatar {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border-radius: 50%;
+        margin-right: 15px;
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+    
+    .sidebar .nav-link {
+        color: #333;
+        padding: 0.75rem 1rem;
+        border-radius: 0.25rem;
+        transition: all 0.3s;
+    }
+    
+    .sidebar .nav-link:hover {
+        background-color: #e9ecef;
+    }
+    
+    .sidebar .nav-link.active {
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    .sidebar-heading {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        // Use the global SignalR connection from online.js
+        // Wait for the connection to be ready
+        function initializeUsersPage() {
+            if (typeof connection === 'undefined' || connection.state !== signalR.HubConnectionState.Connected) {
+                console.log("⏳ Waiting for SignalR connection...");
+                setTimeout(initializeUsersPage, 100);
+                return;
+            }
+
+            console.log("🎯 Initializing Users page with existing SignalR connection");
+
+            const onlineUsers = new Set();
+
+        connection.on("UserConnected", function (userId, userName, email) {
+            console.log("User connected:", userId, userName);
+            onlineUsers.add(userId);
+            addOrUpdateUserCard(userId, userName, email, true);
+            updateOnlineCount();
+        });
+
+        connection.on("UserDisconnected", function (userId) {
+            console.log("User disconnected:", userId);
+            onlineUsers.delete(userId);
+            updateUserStatus(userId, false);
+            updateOnlineCount();
+        });
+
+            connection.on("UpdateOnlineCount", function (count) {
+                document.getElementById("onlineCount").textContent = count;
+            });
+
+            // Request initial list of online users
+            connection.invoke("GetOnlineUsers")
+                .then(function (users) {
+                    console.log("📋 Online users:", users);
+                    users.forEach(user => {
+                        onlineUsers.add(user.id);
+                        addOrUpdateUserCard(user.id, user.userName, user.email, true);
+                    });
+                    updateOnlineCount();
+                })
+                .catch(function (err) {
+                    console.error("❌ Error getting online users:", err);
+                });
+
+        function addOrUpdateUserCard(userId, userName, email, isOnline) {
+            let userCard = document.getElementById("user-" + userId);
+            
+            if (!userCard) {
+                // Create new user card
+                const container = document.getElementById("usersContainer");
+                const col = document.createElement("div");
+                col.className = "col-md-6 col-lg-4 mb-4";
+                col.id = "user-" + userId;
+                
+                const initials = getInitials(userName || email);
+                
+                col.innerHTML = `
+                    <div class="card user-card ${isOnline ? 'online' : 'offline'} h-100">
+                        <div class="card-body position-relative">
+                            <span class="status-badge ${isOnline ? 'status-online' : 'status-offline'}">
+                                <i class="bi bi-circle-fill ${isOnline ? 'pulse' : ''}" style="font-size: 0.5rem;"></i>
+                                ${isOnline ? 'Online' : 'Offline'}
+                            </span>
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar">
+                                    ${initials}
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-semibold">${userName || 'Unknown'}</h6>
+                                    <p class="text-muted small mb-0">${email}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(col);
+            } else {
+                // Update existing card
+                updateUserStatus(userId, isOnline);
+            }
+
+            toggleNoUsersMessage();
+        }
+
+        function updateUserStatus(userId, isOnline) {
+            const userCard = document.getElementById("user-" + userId);
+            if (userCard) {
+                const card = userCard.querySelector('.user-card');
+                const badge = userCard.querySelector('.status-badge');
+                const icon = userCard.querySelector('.bi-circle-fill');
+                
+                if (isOnline) {
+                    card.classList.remove('offline');
+                    card.classList.add('online');
+                    badge.classList.remove('status-offline');
+                    badge.classList.add('status-online');
+                    badge.innerHTML = '<i class="bi bi-circle-fill pulse" style="font-size: 0.5rem;"></i> Online';
+                } else {
+                    card.classList.remove('online');
+                    card.classList.add('offline');
+                    badge.classList.remove('status-online');
+                    badge.classList.add('status-offline');
+                    badge.innerHTML = '<i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i> Offline';
+                }
+            }
+        }
+
+        function updateOnlineCount() {
+            document.getElementById("onlineCount").textContent = onlineUsers.size;
+            toggleNoUsersMessage();
+        }
+
+        function toggleNoUsersMessage() {
+            const container = document.getElementById("usersContainer");
+            const noUsersMsg = document.getElementById("noUsersMessage");
+            
+            if (container.children.length === 0) {
+                noUsersMsg.style.display = "block";
+            } else {
+                noUsersMsg.style.display = "none";
+            }
+        }
+
+        function getInitials(name) {
+            if (!name) return "?";
+            const parts = name.split("@@")[0].split(".");
+            if (parts.length >= 2) {
+                return (parts[0][0] + parts[1][0]).toUpperCase();
+            }
+            return name.substring(0, 2).toUpperCase();
+        }
+
+        // Initialize all users as offline
+            @foreach (var user in Model)
+            {
+                <text>
+                addOrUpdateUserCard("@user.Id", "@user.UserName", "@user.Email", false);
+                </text>
+            }
+
+            toggleNoUsersMessage();
+        }
+
+        // Start initialization when page loads
+        initializeUsersPage();
+    </script>
+}
+

@@ -1,27 +1,30 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+﻿// SignalR Connection for Online Status
+// This script connects all authenticated users to the SignalR hub
 "use strict";
 
-var connection = new signalR.HubConnectionBuilder().withUrl("/online").build();
-connection.on("ReceiveMessage", function ( message) {
-    console.log("message", message);
-});
+var connection = new signalR.HubConnectionBuilder()
+    .withUrl("/online")
+    .withAutomaticReconnect()
+    .build();
 
-connection.start().then(function () {
-    console.log("connected");
-    myFunction();
-
-    setInterval(function () {
-        myFunction()
-    }, 10000)
-}).catch(function (err) {
-    return console.error(err.toString());
-});
-
-function myFunction() {
-    let res = connection.invoke("SendMessage").catch(function (err) {
-        return console.error(err.toString());
+// Start the connection
+connection.start()
+    .then(function () {
+        console.log("✅ SignalR Connected - User is now online");
+    })
+    .catch(function (err) {
+        console.error("❌ SignalR Connection Error:", err.toString());
     });
-}
+
+// Handle reconnection
+connection.onreconnecting(function() {
+    console.log("🔄 SignalR Reconnecting...");
+});
+
+connection.onreconnected(function() {
+    console.log("✅ SignalR Reconnected");
+});
+
+connection.onclose(function() {
+    console.log("❌ SignalR Connection Closed");
+});

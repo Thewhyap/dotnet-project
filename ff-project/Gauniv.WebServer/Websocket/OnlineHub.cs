@@ -52,10 +52,111 @@ namespace Gauniv.WebServer.Websocket
 
         public async override Task OnConnectedAsync()
         {
+            var local_user = await userManager.GetUserAsync(Context.User);
+            if (local_user != null)
+            {
+                var local_userId = local_user.Id;
+                
+                if (ConnectedUsers.ContainsKey(local_userId))
+                {
+                    ConnectedUsers[local_userId].Count++;
+                }
+                else
+                {
+                    ConnectedUsers[local_userId] = new OnlineStatus
+                    {
+                        User = local_user,
+                        Count = 1
+                    };
+                }
+
+                // Only notify if user is CLIENT (not ADMIN)
+                var local_roles = await userManager.GetRolesAsync(local_user);
+                if (local_roles.Contains("CLIENT"))
+                {
+                    await Clients.All.SendAsync("UserConnected", local_userId, local_user.UserName, local_user.Email);
+                    
+                    // Count only CLIENT users for the online count
+                    var local_clientCount = 0;
+                    foreach (var status in ConnectedUsers.Values)
+                    {
+                        var roles = await userManager.GetRolesAsync(status.User);
+                        if (roles.Contains("CLIENT"))
+                        {
+                            local_clientCount++;
+                        }
+                    }
+                    await Clients.All.SendAsync("UpdateOnlineCount", local_clientCount);
+                }
+            }
+
+            await base.OnConnectedAsync();
         }
 
         public async override Task OnDisconnectedAsync(Exception? exception)
         {
+            var local_user = await userManager.GetUserAsync(Context.User);
+            if (local_user != null)
+            {
+                var local_userId = local_user.Id;
+                
+                if (ConnectedUsers.ContainsKey(local_userId))
+                {
+                    ConnectedUsers[local_userId].Count--;
+                    
+                    if (ConnectedUsers[local_userId].Count <= 0)
+                    {
+                        ConnectedUsers.Remove(local_userId);
+                        
+                        // Only notify if user is CLIENT (not ADMIN)
+                        var local_roles = await userManager.GetRolesAsync(local_user);
+                        if (local_roles.Contains("CLIENT"))
+                        {
+                            await Clients.All.SendAsync("UserDisconnected", local_userId);
+                            
+                            // Count only CLIENT users for the online count
+                            var local_clientCount = 0;
+                            foreach (var status in ConnectedUsers.Values)
+                            {
+                                var roles = await userManager.GetRolesAsync(status.User);
+                                if (roles.Contains("CLIENT"))
+                                {
+                                    local_clientCount++;
+                                }
+                            }
+                            await Clients.All.SendAsync("UpdateOnlineCount", local_clientCount);
+                        }
+                    }
+                }
+            }
+
+            await base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task<List<object>> GetOnlineUsers()
+        {
+            var local_onlineUsers = new List<object>();
+
+            foreach (var status in ConnectedUsers.Values)
+            {
+                var local_roles = await userManager.GetRolesAsync(status.User);
+                
+                // Only include users with CLIENT role (exclude ADMIN)
+                if (local_roles.Contains("CLIENT"))
+                {
+                    local_onlineUsers.Add(new
+                    {
+                        status.User.Id,
+                        status.User.UserName,
+                        status.User.Email,
+                        status.User.FirstName,
+                        status.User.LastName
+                    });
+                }
+            }
+
+            return local_onlineUsers;
         }
     }
 }
+
