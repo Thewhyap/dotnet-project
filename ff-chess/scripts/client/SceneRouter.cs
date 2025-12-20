@@ -110,7 +110,7 @@ public partial class SceneRouter : Node
   /**
    * Update the current game in the GameScreen, if active 
    */
-  public void UpdateGame(GameState gameState)
+  public void UpdateGame(GameUpdate gameUpdate)
   {
 	  GD.Print("Updating Game Screen");
 	  if (_screenRoot == null || _screenRoot.GetChildCount() == 0) return;
@@ -118,7 +118,8 @@ public partial class SceneRouter : Node
 	  Control screen = _screenRoot.GetChild<Control>(_screenRoot.GetChildCount() - 1);
 	  if (screen is GameScreen gameScreen)
 	  {
-		  gameScreen.SetGameState(gameState);
+		  gameScreen.SetGameState(gameUpdate.State);
+		  gameScreen.SetTurnStatus(gameUpdate.TurnStatus);
 	  }
   }
 

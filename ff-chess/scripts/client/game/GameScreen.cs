@@ -11,6 +11,7 @@ public partial class GameScreen : Control
 	// Model
 	private GameState _gameState;
 	private GameInfo _gameInfo;
+	private TurnStatus _turnStatus;
 	
 	// Nodes
 	private ChessBoardView _boardView;
@@ -80,6 +81,13 @@ public partial class GameScreen : Control
 		_gameState = gameState;
 		RenderBoard();
 	}
+	
+	public void SetTurnStatus(TurnStatus turnStatus)
+	{
+		_turnStatus = turnStatus;
+		RenderBoard();
+	}
+	
 
 	public void SetGameInfo(GameInfo gameInfo)
 	{

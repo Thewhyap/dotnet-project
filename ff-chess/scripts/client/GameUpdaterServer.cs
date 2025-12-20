@@ -22,8 +22,8 @@ public partial class GameUpdaterServer : Node
             // GameState update
             try
             {
-                var gameState = MessagePackSerializer.Deserialize<GameState>(data);
-                HandleGameStateUpdate(gameState);
+                var gameUpdate = MessagePackSerializer.Deserialize<GameUpdate>(data);
+                HandleGameStateUpdate(gameUpdate);
                 return;
             }
             catch { }
@@ -56,10 +56,10 @@ public partial class GameUpdaterServer : Node
         }
     }
 
-    private void HandleGameStateUpdate(GameState state)
+    private void HandleGameStateUpdate(GameUpdate gameUpdate)
     {
-        GD.Print($"Game state updated: {state}");
-        GetNode<SceneRouter>("/root/ClientRoot/GameUpdaterServer/SceneRouter").UpdateGame(state);
+        GD.Print($"Game state updated: {gameUpdate.State}");
+        GetNode<SceneRouter>("/root/ClientRoot/GameUpdaterServer/SceneRouter").UpdateGame(gameUpdate);
     }
 
     private void HandleGameInfo(GameInfo info)
