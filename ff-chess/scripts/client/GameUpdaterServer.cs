@@ -1,81 +1,103 @@
 using Godot;
 using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text.Json;
-using System.Threading.Tasks;
 using FFChessShared;
+using MessagePack;
 
 public partial class GameUpdaterServer : Node
 {
-	private HttpListener _httpListener;
-	private const int PORT = 8080;
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
-		_httpListener = new HttpListener();
-		_httpListener.Prefixes.Add($"http://localhost:{PORT}/");
-		_httpListener.Start();
-		GD.Print("Game update server listening on port ", PORT);
+    private NetworkClient _networkClient;
 
-		// Écouter les requêtes en arrière-plan
-		Task.Run(ListenForRequests);
-	}
+    public override async void _Ready()
+    {
+        _networkClient = GetNode<NetworkClient>("NetworkClient");
+        _networkClient.OnMessageReceived += OnMessageReceived;
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
-	
-	private async Task ListenForRequests()
-	{
-		while (_httpListener.IsListening)
-		{
-			try
-			{
-				HttpListenerContext context = await _httpListener.GetContextAsync();
-				if (context.Request.Url.AbsolutePath == "/game/update")
-				{
-					HandleGameUpdate(context);
-				}
-			}
-			catch (Exception ex)
-			{
-				GD.PrintErr("Error: ", ex.Message);
-			}
-		}
-	}
+        await _networkClient.ConnectToServer("localhost", 5000);
+    }
 
-	
-	private void HandleGameUpdate(HttpListenerContext context)
-	{
-		using (var reader = new System.IO.StreamReader(context.Request.InputStream))
-		{
-			string jsonData = reader.ReadToEnd();
-			Game game = JsonSerializer.Deserialize<Game>(jsonData);
+    private void OnMessageReceived(byte[] data)
+    {
+        try
+        {
+            // GameState update
+            try
+            {
+                var gameState = MessagePackSerializer.Deserialize<GameState>(data);
+                HandleGameStateUpdate(gameState);
+                return;
+            }
+            catch { }
+            
+            // GameInfo message
+            try
+            {
+                var gameInfo = MessagePackSerializer.Deserialize<GameInfo>(data);
+                HandleGameInfo(gameInfo);
+                return;
+            }
+            catch { }
+            
+            // GameInfo[] message (list of games)
+            try
+            {
+                var gameList = MessagePackSerializer.Deserialize<GameInfo[]>(data);
+                HandleGameList(gameList);
+                return;
+            }
+            catch { }
+            
+            
 
-			// Exécuter sur le thread principal
-			CallDeferred(nameof(UpdateGameDeferred), jsonData);
-		}
+            GD.PrintErr("Unknown message type received");
+        }
+        catch (Exception e)
+        {
+            GD.PrintErr($"Error deserializing message: {e.Message}");
+        }
+    }
 
-		context.Response.StatusCode = 200;
-		context.Response.Close();
-	}
+    private void HandleGameStateUpdate(GameState state)
+    {
+        GD.Print($"Game state updated: {state}");
+        GetNode<SceneRouter>("/root/ClientRoot/GameUpdaterServer/SceneRouter").UpdateGame(state);
+    }
 
-	private void UpdateGameDeferred(string jsonData)
-	{
-		Game game = JsonSerializer.Deserialize<Game>(jsonData);
+    private void HandleGameInfo(GameInfo info)
+    {
+        GD.Print($"Game info received: {info.GameName}");
+    }
+    
+    private void HandleGameList(GameInfo[] games)
+    {
+        GD.Print($"Received list of {games.Length} games from server.");
+        // Here you would typically update the lobby UI with the received game list
+        
+        var lobbyScreen = GetNode<LobbyScreen>("/root/ClientRoot/GameUpdaterServer/LobbyScreen");
+        lobbyScreen.DisplayGamesLobbies(games);
+    }
 
-		var sceneRouter = GetTree().Root.GetNode<SceneRouter>("/root/ClientRoot/GameUpdaterServer/SceneRouter");
-		if (sceneRouter != null)
-		{
-			sceneRouter.UpdateGame(game);
-		}
-	}
-
-	public override void _ExitTree()
-	{
-		_httpListener?.Stop();
-		_httpListener?.Close();
-	}
+    public void SendJoinGameRequest(Guid gameId)
+    {
+        var payload = new ClientJoinGame() { GameId = gameId };
+        _networkClient.SendMessage(payload);
+    }
+    
+    public void SendGetGamesRequest()
+    {
+        GD.Print("Requesting lobbies from server...");
+        var request = new ClientGetGames(); // TODO EG define a specific request message
+        _networkClient.SendMessage(request);
+        GD.Print("Lobbies loaded.");
+    }
+    
+    public void SendCreateGameRequest()
+    {
+        var payload = new ClientCreateGame();
+        _networkClient.SendMessage(payload);
+    }
+    
+    public void SendMovePieceRequest(ChessMove move)
+    {
+        _networkClient.SendMessage(move);
+    }
 }

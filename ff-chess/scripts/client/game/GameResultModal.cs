@@ -29,8 +29,8 @@ public partial class GameResultModal : Control
 			//MatchStatus.BlackWon => "Black Won!",
 			//MatchStatus.Draw => "Draw!",
 			//_ => "Game Over"
-		//}; TODO UNCOMMENT
-		string title = "TODO";
+		//}; TODO EG UNCOMMENT
+		string title = "TODO EG";
 		
 		_titleLabel.Text = title;
 		Visible = true;

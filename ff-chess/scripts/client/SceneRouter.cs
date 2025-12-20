@@ -18,7 +18,7 @@ public partial class SceneRouter : Node
   /**
    * Pending game to pass to the game screen once loaded
    */
-  private Game ?_pendingGame;
+  private GameInfo ?_pendingGameInfo;
 
   public override void _Ready()
   {
@@ -99,10 +99,10 @@ public partial class SceneRouter : Node
   public void LoadMainMenu(){ LoadScreen(MAIN_MENU); }
   public void LoadLobby(){ LoadScreen(LOBBY); }
 
-  public void LoadGame(Game game)
+  public void LoadGame(GameInfo game)
   {
 	  LoadScreen(GAME);
-	  _pendingGame = game;
+	  _pendingGameInfo = game;
 	  CallDeferred(nameof(PassGameToScreen));
   }
   public void LoadSpectator(){ LoadScreen(SPECTATOR); }
@@ -110,7 +110,7 @@ public partial class SceneRouter : Node
   /**
    * Update the current game in the GameScreen, if active 
    */
-  public void UpdateGame(Game game)
+  public void UpdateGame(GameState gameState)
   {
 	  GD.Print("Updating Game Screen");
 	  if (_screenRoot == null || _screenRoot.GetChildCount() == 0) return;
@@ -118,7 +118,7 @@ public partial class SceneRouter : Node
 	  Control screen = _screenRoot.GetChild<Control>(_screenRoot.GetChildCount() - 1);
 	  if (screen is GameScreen gameScreen)
 	  {
-		  gameScreen.SetGame(game);
+		  gameScreen.SetGameState(gameState);
 	  }
   }
 
@@ -154,15 +154,15 @@ public partial class SceneRouter : Node
 	
 	  Control screen = _screenRoot.GetChild<Control>(_screenRoot.GetChildCount() - 1);
 
-	  if (_pendingGame == null)
+	  if (_pendingGameInfo == null)
 	  {
 		  throw new InvalidOperationException("No pending game to pass to GameScreen, please set _pendingGame before calling PassGameToScreen.");
 	  }
 	  
 	  if (screen is GameScreen gameScreen)
 	  {
-		  gameScreen.SetGame((Game) _pendingGame);
-		  _pendingGame = null;
+		  gameScreen.SetGameInfo((GameInfo) _pendingGameInfo);
+		  _pendingGameInfo = null;
 	  }
   }
 }

@@ -4,9 +4,9 @@ using FFChessShared;
 
 public partial class PiecesView : Control
 {
-	private Piece _model;
+	private PieceData _model;
 	
-	public void SetPiece(Piece piece)
+	public void SetPiece(PieceData piece)
 	{
 		_model = piece;
 		UpdateVisuals();

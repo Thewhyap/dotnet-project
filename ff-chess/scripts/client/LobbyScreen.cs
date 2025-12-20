@@ -1,9 +1,7 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using FFChess.data;
 using FFChessShared;
-using FFChessShared.generators;
+
 
 public partial class LobbyScreen : Control
 {
@@ -20,7 +18,8 @@ public partial class LobbyScreen : Control
 		 _createLobbyButton.Pressed += OnCreateLobbyButtonPressed;
 		 _lobbyItemScene = GD.Load<PackedScene>("res://scripts/client/lobby/LobbyItemScene.tscn");
 		 
-		 LoadLobbies();
+		 // Fetch the lobbies from the server
+		 GetLobbiesFromServer();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -28,36 +27,38 @@ public partial class LobbyScreen : Control
 	{
 	}
 	
-	 private void LoadLobbies()
+	/*
+	 * Display the list of game lobbies
+	 */
+	 public void DisplayGamesLobbies(GameInfo[] lobbies)
 	{
-		foreach (var gameLobby in GetLobbiesFromServer())
+		foreach (var gameLobby in lobbies)
 		{
 			var item = _lobbyItemScene.Instantiate<LobbyItemScene>();
 			_lobbyList.AddChild(item);
 			item.SetData(gameLobby);
 		}
-		GD.Print("Lobbies loaded.");
 	}
 
-	private List<Game> GetLobbiesFromServer()
+	private void GetLobbiesFromServer()
 	{
-		// TODO replace with actual server call
-		return new List<Game>
-		{
-			new Game(),
-			new Game()
-			 
-		};
+		var gameUpdater = GetGameUpdater();
+		gameUpdater.SendGetGamesRequest();
 	}
 
 	private void OnCreateLobbyButtonPressed()
 	{
-		// TODO implement lobby creation logic (Server call)
 		// The sever will create a new Lobby and return it's data.
 		GD.Print("Create Lobby button pressed.");
-		
-		// Simulate the game returned from server
-		var gameFromServer = new Game();
-		GetNode<SceneRouter>("/root/ClientRoot/GameUpdaterServer/SceneRouter").LoadGame(gameFromServer);
+		var gameUpdater = GetGameUpdater();
+		gameUpdater.SendCreateGameRequest();
+	}
+	
+	/**
+	 * Helper to get the GameUpdaterServer node
+	 */
+	private GameUpdaterServer GetGameUpdater()
+	{
+		return GetNode<GameUpdaterServer>("/root/ClientRoot/GameUpdaterServer");
 	}
 }

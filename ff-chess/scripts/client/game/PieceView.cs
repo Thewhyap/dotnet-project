@@ -12,7 +12,7 @@ public partial class PieceView : Node2D
 	private const string Variant = "2";
 	
 	// The piece model this view represents
-	private Piece _piece;
+	private PieceData _piece;
 	private Sprite2D _sprite;
 	
 	// Selection highlight
@@ -56,7 +56,7 @@ public partial class PieceView : Node2D
 		// GD.Print($"PieceView created at ({_gridX}, {_gridY}) with SquareSize: {GameConstants.SquareSize}");
 	}
 
-	public void SetPiece(Piece piece)
+	public void SetPiece(PieceData piece)
 	{
 		_piece = piece;
 		UpdateVisuals();

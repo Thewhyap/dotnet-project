@@ -8,7 +8,8 @@ namespace FFChess.scripts.client.game;
 
 public partial class GameScreen : Control
 {
-	private Game _game;
+	private GameState _gameState;
+	private GameInfo _gameInfo;
 	private ChessBoardView _boardView;
 	private Button _quitButton;
 	private Label _gameStatusLabel;
@@ -32,7 +33,6 @@ public partial class GameScreen : Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		_game = new Game();
 		_boardView = GetNode<ChessBoardView>("HBoxContainer/ChessBoardView");
 		_quitButton = GetNode<Button>("HBoxContainer/VBoxContainer/QuitButton");
 		_roleLabel = GetNode<Label>("HBoxContainer/VBoxContainer/RoleLabel");
@@ -57,10 +57,10 @@ public partial class GameScreen : Control
 	public override void _Process(double delta)
 	{
 		// Handle the game result modal display
-		// if (!_resultModalShown && _game.Status is MatchStatus.WhiteWon or MatchStatus.BlackWon or MatchStatus.Draw) TODO UNCOMMENT
-		if(false)
+		// TODO EG how to know who is the winner?
+		// if (!_resultModalShown && _gameState. is MatchStatus.WhiteWon or MatchStatus.BlackWon or MatchStatus.Draw) TODO UNCOMMENT
 		{
-			_gameResultModal.ShowResult(_game.Status);
+			_gameResultModal.ShowResult(_gameInfo.Status);
 			_resultModalShown = true;
 		}
 		
@@ -72,9 +72,15 @@ public partial class GameScreen : Control
 		}
 	}
 	
-	public void SetGame(Game game)
+	public void SetGameState(GameState gameState)
 	{
-		_game = game;
+		_gameState = gameState;
+		RenderBoard();
+	}
+
+	public void SetGameInfo(GameInfo gameInfo)
+	{
+		_gameInfo = gameInfo;
 		RenderBoard();
 	}
 	
@@ -118,7 +124,12 @@ public partial class GameScreen : Control
 	{
 		if (_hasPieceSelected)
 		{
-			GD.Print($"Case cliquée à ({x}, {y}) - TODO Move pawn from ({_selectedPiecePosition.X}, {_selectedPiecePosition.Y})");
+			GD.Print($"Case cliquée à ({x}, {y}) - TODO EG Move pawn from ({_selectedPiecePosition.X}, {_selectedPiecePosition.Y})");
+			var gameUpdater = GetNode<GameUpdaterServer>("/root/ClientRoot/GameUpdaterServer");
+			ChessSquare from = new ChessSquare((int) _selectedPiecePosition.X, (int) _selectedPiecePosition.Y);
+			ChessSquare to = new ChessSquare(x, y);
+			ChessMove move = new ChessMove(from, to);
+			gameUpdater.SendMovePieceRequest(move);
 			_hasPieceSelected = false;
 		}
 		else
@@ -140,9 +151,9 @@ public partial class GameScreen : Control
 		_currentSelectedPieceView = null;
 		_hasPieceSelected = false;
 		
-		for (int y = 0; y < _game.GameState.Board.Cells.GetLength(0); y++)
+		for (int y = 0; y < _gameState.Board.Cells.GetLength(0); y++)
 		{
-			for (int x = 0; x < _game.GameState.Board.Cells.GetLength(1); x++)
+			for (int x = 0; x < _gameState.Board.Cells.GetLength(1); x++)
 			{	
 				// Scale coordinates
 				var scaledX = x * GameConstants.SquareSize;
@@ -156,10 +167,10 @@ public partial class GameScreen : Control
 			_boardView.AddChild(squareView);
 				
 				// Handle the piece on the square
-				var maybePiece = _game.GameState.Board.Cells[y, x];
+				var maybePiece = _gameState.Board.Cells[y, x];
 				if (maybePiece != null)
 				{
-					Piece piece = (Piece) maybePiece;
+					PieceData piece = (PieceData) maybePiece;
 					var pieceView = new PieceView();
 					pieceView.SetPiece(piece);
 					pieceView.setCoordinates(scaledX, scaledY);
@@ -176,29 +187,29 @@ public partial class GameScreen : Control
 
 	private void HandleQuitButtonPressed()
 	{
-		GD.Print("Quit button pressed - TODO implement quit logic");
-		//TODO implement quit logic
+		GD.Print("Quit button pressed - TODO EG implement quit logic");
+		//TODO EG implement quit logic
 	}
 	
 	private void OnPawnPromotionPieceSelected(PieceType pieceType)
 	{
 		GD.Print($"Pawn promotion piece selected in GameScreen: {pieceType}");
-		// TODO: Use this piece type to complete the pawn promotion
+		// TODO EG: Use this piece type to complete the pawn promotion
 	}
 	
 	private void OnGameResultModalOkPressed()
 	{
-		GD.Print("Game result modal closed - TODO implement what happens after game ends");
-		// TODO: Return to lobby, restart game, etc.
+		GD.Print("Game result modal closed - TODO EG implement what happens after game ends");
+		// TODO EG: Return to lobby, restart game, etc.
 	}
 
 	private void UpdateRoleDisplay()
 	{
-		_roleLabel.Text = "Your role: TODO"; // TODO set role based on player info
+		_roleLabel.Text = "Your role: TODO EG"; // TODO EG set role based on player info
 	}
 	
 	private void UpdateViewerCountDisplay()
 	{
-		_roleLabel.Text = "Viewer count : TODO"; // TODO get viewer count from game info
+		_roleLabel.Text = "Viewer count : TODO EG"; // TODO EG get viewer count from game info
 	}
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://l2wbpyi5gqym"]
+[gd_scene load_steps=9 format=3 uid="uid://l2wbpyi5gqym"]
 
 [ext_resource type="Script" uid="uid://duvpfnih28rv" path="res://scripts/client/ClientRoot.cs" id="1_13kar"]
 [ext_resource type="Script" uid="uid://d3h1ln80noudr" path="res://scripts/client/SceneRouter.cs" id="2_1wvkc"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://26i7qlfpqssu" path="res://scenes/lobby_screen.tscn" id="4_13kar"]
 [ext_resource type="PackedScene" uid="uid://6dmyhj3da5oa" path="res://scenes/game_screen.tscn" id="5_b0ukw"]
 [ext_resource type="PackedScene" uid="uid://6ycskqnk6bds" path="res://scenes/spectator_screen.tscn" id="6_w4f7k"]
+[ext_resource type="Script" uid="uid://cyofy5pk0j1l" path="res://scripts/client/network/NetworkClient.cs" id="8_b0ukw"]
 
 [node name="ClientRoot" type="Node2D"]
 script = ExtResource("1_13kar")
@@ -22,12 +23,15 @@ script = ExtResource("2_1wvkc")
 [node name="MainMenuScreen" parent="UI" instance=ExtResource("3_ce1y1")]
 
 [node name="LobbyScreen" parent="UI" instance=ExtResource("4_13kar")]
-
-[node name="GameScreen" parent="UI" instance=ExtResource("5_b0ukw")]
 layout_mode = 3
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="GameScreen" parent="UI" instance=ExtResource("5_b0ukw")]
+
 [node name="SpectatorScreen" parent="UI" instance=ExtResource("6_w4f7k")]
+
+[node name="NetworkClient" type="Node" parent="."]
+script = ExtResource("8_b0ukw")
