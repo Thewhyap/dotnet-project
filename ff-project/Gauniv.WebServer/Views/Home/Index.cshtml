@@ -1,4 +1,6 @@
-﻿@model GameViewModel
+﻿
+
+@model Gauniv.WebServer.Dtos.HomeViewModel
 @using X.PagedList.Mvc.Core;
 @using X.PagedList;
 @{
@@ -97,50 +99,49 @@
 
 <!-- Hero Section -->
 <div class="hero-section text-center text-white p-5 my-4">
-    <h1 class="display-4 fw-bold mb-3">Game Catalog</h1>
-    <p class="lead mb-0">Discover amazing games at great prices</p>
+    <h1 class="display-4 fw-bold mb-3">All Games</h1>
+    <p class="lead mb-0">Discover our game list</p>
 </div>
 
 <!-- Filter Section -->
 <div class="container filter-section">
-    <form asp-action="Index" method="get" class="row g-3 align-items-end">
+    <form asp-action="Index" asp-controller="Home" method="get" class="row g-3 align-items-end">
         <div class="col-md-3">
             <label for="searchTerm" class="form-label fw-semibold">Search</label>
             <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
-                   placeholder="Game name..." value="@ViewBag.SearchTerm">
+                   placeholder="Game name..." value="@Model.SearchTerm">
         </div>
         
         <div class="col-md-2">
             <label for="category" class="form-label fw-semibold">Category</label>
             <select class="form-select" id="category" name="category">
                 <option value="">All Categories</option>
-                <option value="action">Action</option>
-                <option value="adventure">Adventure</option>
-                <option value="rpg">RPG</option>
-                <option value="sports">Sports</option>
-                <option value="strategy">Strategy</option>
+                @foreach (var cat in Model.CategoryDtos)
+                {
+                    <option value="@(cat.Name)" selected="@(Model.Category == cat.Name)">@(cat.Name)</option>   
+                }
             </select>
         </div>
         
         <div class="col-md-2">
             <label for="minPrice" class="form-label fw-semibold">Min Price (€)</label>
             <input type="number" class="form-control" id="minPrice" name="minPrice" 
-                   placeholder="0" step="0.01" value="@ViewBag.MinPrice">
+                   placeholder="0" step="0.01" value="@Model.MinPrice">
         </div>
         
         <div class="col-md-2">
             <label for="maxPrice" class="form-label fw-semibold">Max Price (€)</label>
             <input type="number" class="form-control" id="maxPrice" name="maxPrice" 
-                   placeholder="100" step="0.01" value="@ViewBag.MaxPrice">
+                   placeholder="100" step="0.01" value="@Model.MaxPrice">
         </div>
         
         <div class="col-md-2">
             <label for="sortBy" class="form-label fw-semibold">Sort By</label>
             <select class="form-select" id="sortBy" name="sortBy">
-                <option value="name">Name</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="newest">Newest First</option>
+                <option value="name" selected="@(Model.SortBy == "name")">Name</option>
+                <option value="price-asc" selected="@(Model.SortBy == "price-asc")">Price: Low to High</option>
+                <option value="price-desc" selected="@(Model.SortBy == "price-desc")">Price: High to Low</option>
+                <option value="newest" selected="@(Model.SortBy == "newest")">Newest First</option>
             </select>
         </div>
         
@@ -150,72 +151,66 @@
     </form>
 </div>
 
+
+
 <!-- Game Grid -->
 <div class="container">
-    @* @if (Model != null && Model.Any()) *@
-    @if (true)
-    {
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5 class="text-muted mb-0">
-                Showing @Model.GamesDtos.Count of 50 games
-            </h5>
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="text-muted mb-0">
+            Showing @Model.PagedGames.Count of @Model.PagedGames.TotalItemCount games
+        </h5>
+    </div>
         
-        <div class="row g-4">
-            @if (Model.GamesDtos.Any())
+    <div class="row g-4">
+        @if (Model.PagedGames.Any())
+        {
+            @foreach (var game in Model.PagedGames)
             {
-                @foreach (var game in Model.GamesDtos)
-                {
-                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                        <div class="card game-card">
-                            <div class="img-wrapper">
-                                <img src="@(game.CoverImage)" alt="@(game.CoverImage)" class="card-img-top">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="card game-card">
+                        <div class="img-wrapper">
+                            <img src="@(game.CoverImage)" alt="@(game.CoverImage)" class="card-img-top">
+                        </div>
+                        <div class="card-body card-body-custom">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="game-title">@(game.Name)</h6>
+                                <span class="game-price">@(game.Price) €</span>
                             </div>
-                            <div class="card-body card-body-custom">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h6 class="game-title">@(game.Name)</h6>
-                                    <span class="game-price">@(game.Price) €</span>
-                                </div>
                             
-                                @if (false)
-                                {
-                                    <span class="badge bg-secondary mb-2">game category</span>
-                                }
-                            
-                                <div class="d-flex gap-2 mt-3">
-                                    <a class="btn btn-sm btn-outline-primary flex-grow-1">Details</a>
-                                    <a class="btn btn-sm btn-primary">Add</a>
-                                </div>
+                            <div class="d-flex gap-2 mt-3">
+                                <a class="btn btn-sm btn-outline-primary flex-grow-1">Details</a>
+                                <a class="btn btn-sm btn-primary">Add</a>
                             </div>
                         </div>
                     </div>
-                }
+                </div>
             }
-            else
-            {
-                <p>Aucun jeu disponible pour le moment</p>
-            }
-        </div>
-        
-        <!-- Pagination -->
-        @* <div class="d-flex justify-content-center mt-5 mb-4"> *@
-        @*     @Html.PagedListPager(Model, page => Url.Action("Index",  *@
-        @*         new {  *@
-        @*             page,  *@
-        @*             searchTerm = ViewBag.SearchTerm, *@
-        @*             category = ViewBag.Category, *@
-        @*             minPrice = ViewBag.MinPrice, *@
-        @*             maxPrice = ViewBag.MaxPrice, *@
-        @*             sortBy = ViewBag.SortBy *@
-        @*         })) *@
-        @* </div> *@
-    }
-    else
-    {
-        <div class="alert alert-info text-center py-5" role="alert">
-            <h4>No games found</h4>
-            <p class="mb-0">Try adjusting your filters or search terms</p>
-        </div>
-    }
+        }
+        else
+        {
+            <p>Aucun jeu disponible pour le moment</p>
+        }
+    </div>
+    
+    <div class="pagination-container mt-4">
+        @Html.PagedListPager(Model.PagedGames, page => Url.Action("Index", new
+        {
+            page,
+            searchTerm = Model.SearchTerm,
+            category = Model.Category,
+            minPrice = Model.MinPrice,
+            maxPrice = Model.MaxPrice,
+            sortBy = Model.SortBy
+        }), new PagedListRenderOptions
+        {
+            DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+            DisplayLinkToLastPage = PagedListDisplayMode.Always,
+            DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+            DisplayLinkToNextPage = PagedListDisplayMode.Always,
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" },
+            UlElementClasses = new[] { "pagination justify-content-center" }
+        })
+    </div>
+    
 </div>
-

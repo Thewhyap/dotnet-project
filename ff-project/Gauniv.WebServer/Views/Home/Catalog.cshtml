@@ -1,0 +1,125 @@
+﻿@model List<Gauniv.WebServer.Dtos.Category.CategoryDto>
+
+@{
+    ViewData["Title"] = "Catalog";
+}
+
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    
+    .game-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        height: 100%;
+    }
+    
+    .game-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    }
+    
+    .game-card img {
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+        width: 100%;
+    }
+    
+    .game-card:hover img {
+        transform: scale(1.05);
+    }
+    
+    .game-title {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 1rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-bottom: 0.5rem;
+    }
+    
+    .game-price {
+        color: #667eea;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    .filter-btn {
+        transition: all 0.3s ease;
+    }
+    
+    .filter-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .badge-new {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #48bb78;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 1;
+    }
+    
+    .card-body-custom {
+        padding: 15px;
+    }
+    
+    .img-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+</style>
+
+
+<!-- Hero Section -->
+<div class="hero-section text-center text-white p-5 my-4">
+    <h1 class="display-4 fw-bold mb-3">Game Catalog</h1>
+    <p class="lead mb-0">Discover amazing games at great prices</p>
+</div>
+
+
+<!-- Game Grid -->
+<div class="container">
+    <div class="row g-4">
+        @if (Model.Any())
+        {
+            @foreach (var categoryDto in Model)
+            {
+                <div class="col-12 col-sm-3 col-md-6">
+                    <div class="card game-card">
+                        <div class="card-body card-body-custom">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="game-title">@(categoryDto.Name)</h6>
+                            </div>
+                            
+                            <div class="d-flex gap-2 mt-3">
+                                <a class="btn btn-sm btn-outline-primary">Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p>Aucun jeu disponible pour le moment</p>
+        }
+    </div>
+</div>
+
+
+

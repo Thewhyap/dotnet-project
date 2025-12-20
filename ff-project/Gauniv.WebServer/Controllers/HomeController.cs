@@ -31,6 +31,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using CommunityToolkit.HighPerformance;
 using Gauniv.WebServer.Data;
+using Gauniv.WebServer.Dtos;
+using Gauniv.WebServer.Dtos.Category;
 using Gauniv.WebServer.Dtos.Game;
 using Gauniv.WebServer.Models;
 using Mapster;
@@ -49,18 +51,84 @@ namespace Gauniv.WebServer.Controllers
         private readonly ApplicationDbContext applicationDbContext = applicationDbContext;
         private readonly UserManager<User> userManager = userManager;
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+            string searchTerm,
+            string category,
+            double? minPrice,
+            double? maxPrice,
+            string sortBy = "name",
+            int? page = 1)
         {
-            var games = await applicationDbContext.Games.ToListAsync();
+            var local_query = applicationDbContext.Games.AsQueryable();
+
+            // Filtrer par nom
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                local_query = local_query.Where(g => g.Name.Contains(searchTerm));
+            }
+
+            // Filtrer par catégorie
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                local_query = local_query.Where(g => g.GameCategories.Any(q => q.Name.Contains(category)));
+            }
+
+            // Filtrer par prix minimum
+            if (minPrice.HasValue)
+            {
+                local_query = local_query.Where(g => g.Price >= minPrice.Value);
+            }
+
+            // Filtrer par prix maximum
+            if (maxPrice.HasValue)
+            {
+                local_query = local_query.Where(g => g.Price <= maxPrice.Value);
+            }
+
+            // Trier
+            local_query = sortBy switch
+            {
+                "price-asc" => local_query.OrderBy(g => g.Price),
+                "price-desc" => local_query.OrderByDescending(g => g.Price),
+                "newest" => local_query.OrderByDescending(g => g.CreatedAt),
+                _ => local_query.OrderBy(g => g.Name)
+            };
+
+            var local_categories =  await applicationDbContext.Categories.ToListAsync();
             
-            return View(new GameViewModel() { GamesDtos = games.Adapt<List<GameDto>>()});
+            var local_games = await local_query.ToListAsync();
+
+            
+            const int pageSize = 1;
+            var local_pagedGames = local_games.Adapt<List<GameDto>>().ToPagedList(page ?? 1, pageSize);
+            
+            var local_viewModel = new HomeViewModel
+            {
+                PagedGames =  local_pagedGames,
+                CategoryDtos = local_categories.Adapt<List<CategoryDto>>(),
+                SearchTerm = searchTerm,
+                Category = category,
+                MinPrice = minPrice,
+                MaxPrice = maxPrice,
+                SortBy = sortBy
+            };
+
+            return View(local_viewModel);
         }
 
 
+        public async Task<IActionResult> Catalog()
+        {
+            var categories =  await applicationDbContext.Categories.ToListAsync();
+            
+            return View(categories.Adapt<List<CategoryDto>>());
+        }
+        
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        
     }
 }

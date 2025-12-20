@@ -46,4 +46,9 @@
   <ItemGroup>
     <None Include="D:\Université\2025-26\TP2.NET\Gauniv.WebServer\.editorconfig" />
   </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Dtos\Home\Catalog.cshtml" />
+    <_ContentIncludedByDefault Remove="Dtos\Home\Index.cshtml" />
+  </ItemGroup>
 </Project>
