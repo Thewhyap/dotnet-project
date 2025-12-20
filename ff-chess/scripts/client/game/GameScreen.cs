@@ -247,50 +247,35 @@ public partial class GameScreen : Control
 	
 	private void UpdateTurnStatusDisplay()
 	{
-		var message = "MESSAGE_NOT_HANDLED_PROPERLY";
-		switch (_turnStatus)
+		var message = GetTurnStatusMessage();
+		_turnStatusLabel.Text = message;
+	}
+
+	private string GetTurnStatusMessage()
+	{
+		return _turnStatus switch
 		{
-			case TurnStatus.WaitingMove:
-			{
-				if (_gameState.CurrentTurn == _playerColor)
-				{
-					message = "Waiting for your move ...";
-				}
-				else
-				{
-					message = "Waiting for the opponent's move ...";
-				}
-				break;
-			}
-			case TurnStatus.WaitingPromotion: 
-			{
-				if (_gameState.CurrentTurn == _playerColor)
-				{
-					message = "Waiting for you to promote a pawn...";	
-				}
-				else
-				{
-					message = "Waiting for the opponent to promote a pawn...";
-				}
-				break;
-			}
-			case TurnStatus.Draw:
-			{
-				message = "Draw!";
-				break;
-			}
-			case TurnStatus.WinBlack:
-			{
-				message = "Black won!";
-				break;
-			}
-			case TurnStatus.WinWhite:
-			{
-				message = "White won!";
-				break;
-			}
-		}
-		_turnStatusLabel.Text = message; 
+			TurnStatus.WaitingMove => GetWaitingMoveMessage(),
+			TurnStatus.WaitingPromotion => GetWaitingPromotionMessage(),
+			TurnStatus.Draw => "Draw!",
+			TurnStatus.WinBlack => "Black won!",
+			TurnStatus.WinWhite => "White won!",
+			_ => "Unknown game status"
+		};
+	}
+
+	private string GetWaitingMoveMessage()
+	{
+		return _gameState.CurrentTurn == _playerColor
+			? "Waiting for your move..."
+			: "Waiting for the opponent's move...";
+	}
+
+	private string GetWaitingPromotionMessage()
+	{
+		return _gameState.CurrentTurn == _playerColor
+			? "Waiting for you to promote a pawn..."
+			: "Waiting for the opponent to promote a pawn...";
 	}
 
 	private GameUpdaterServer getGameUpdaterServer()
