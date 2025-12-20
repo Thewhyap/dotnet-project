@@ -114,4 +114,10 @@ public partial class PieceView : Node2D
 		}
 		return texture;
 	}
+	
+	
+	public PieceData GetPieceData()
+	{
+		return _piece;
+	}
 }

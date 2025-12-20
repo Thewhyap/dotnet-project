@@ -12,7 +12,7 @@ public partial class GameScreen : Control
 	private GameState _gameState;
 	private GameInfo _gameInfo;
 	private TurnStatus _turnStatus;
-	private PieceColor _playerColor;
+	private PieceColor ?_playerColor; // An observer has no color
 	private string _playerName;
 	private string _playerRole;
 	
@@ -116,6 +116,12 @@ public partial class GameScreen : Control
 	
 	private void OnPieceClicked(int x, int y)
 	{
+		if (_playerColor == null)
+		{
+			GD.Print("Obeserver can't play.");
+			return;
+		}
+		
 		// Unselect previous piece if any
 		if (_currentSelectedPieceView != null)
 		{
@@ -130,6 +136,12 @@ public partial class GameScreen : Control
 		Vector2 key = new Vector2(x, y);
 		if (_pieceViewMap.TryGetValue(key, out var pieceView))
 		{
+			if (pieceView.GetPieceData().Color != _playerColor)
+			{
+				GD.Print("Illegal move : You can't move a pawn which is not yours");
+				return;
+			}
+			
 			_currentSelectedPieceView = pieceView;
 			_currentSelectedPieceView.SetSelected(true);
 		}
