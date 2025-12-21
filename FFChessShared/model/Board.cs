@@ -3,9 +3,9 @@ using MessagePack;
 namespace FFChessShared;
 
 [MessagePackObject]
-public class Board
+public partial class Board
 {
-    [Key(0)] public PieceData?[,] Cells { get; } = null!;
+    [Key(0)] public PieceData?[,] Cells { get; private set; } = null!;
 
     [IgnoreMember] public int Size { get; set; }
 

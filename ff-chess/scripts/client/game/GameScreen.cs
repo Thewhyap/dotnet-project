@@ -54,7 +54,8 @@ public partial class GameScreen : Control
 		_gameResultModal.OkPressed += OnGameResultModalOkPressed;
 		_pawnPromotionModal.PieceSelected += OnPawnPromotionPieceSelected;
 		
-		RenderBoard();
+		// Don't render board in _Ready - wait for game state to be set
+		// RenderBoard();
 		
 		GetViewportRect();
 		GetViewport().SizeChanged += OnViewportSizeChanged;
@@ -103,7 +104,8 @@ public partial class GameScreen : Control
 	public void SetGameInfo(GameInfo gameInfo)
 	{
 		_gameInfo = gameInfo;
-		RenderBoard();
+		// Don't render here - wait for SetGameState to be called with actual game state
+		// RenderBoard();
 	}
 	
 	private void OnViewportSizeChanged()
@@ -169,6 +171,19 @@ public partial class GameScreen : Control
 	
 	private void RenderBoard()
 	{
+		// Don't render if game state is not initialized yet
+		if (_gameState == null || _gameState.Board == null || _gameState.Board.Cells == null)
+		{
+			GD.Print("GameState not initialized yet, skipping render");
+			return;
+		}
+		
+		// Don't render if board view is not initialized yet (before _Ready())
+		if (_boardView == null)
+		{
+			GD.Print("BoardView not initialized yet, skipping render");
+			return;
+		}
 		
 		// Update UI 
 		UpdateRoleDisplay();
@@ -236,6 +251,9 @@ public partial class GameScreen : Control
 
 	private void UpdateRoleDisplay()
 	{
+		if (_roleLabel == null)
+			return;
+			
 		var role = "Observer";
 		if (_playerColor != null)
 		{
@@ -247,6 +265,9 @@ public partial class GameScreen : Control
 	
 	private void UpdateTurnStatusDisplay()
 	{
+		if (_turnStatusLabel == null)
+			return;
+			
 		var message = GetTurnStatusMessage();
 		_turnStatusLabel.Text = message;
 	}
@@ -266,6 +287,9 @@ public partial class GameScreen : Control
 
 	private string GetWaitingMoveMessage()
 	{
+		if (_gameState == null)
+			return "Waiting for game state...";
+			
 		return _gameState.CurrentTurn == _playerColor
 			? "Waiting for your move..."
 			: "Waiting for the opponent's move...";
