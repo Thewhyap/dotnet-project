@@ -193,8 +193,8 @@ public partial class GameScreen : Control
 		UpdateRoleDisplay();
 		UpdateTurnStatusDisplay();
 		
-		// Remove existing pieces
-		_boardView.ClearPieces();
+		// Remove existing pieces AND squares (clear everything)
+		_boardView.ClearBoard();
 		_pieceViewMap.Clear();
 		_currentSelectedPieceView = null;
 		_hasPieceSelected = false;
