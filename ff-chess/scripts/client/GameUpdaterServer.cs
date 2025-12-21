@@ -6,6 +6,7 @@ using MessagePack;
 public partial class GameUpdaterServer : Node
 {
     private NetworkClient _networkClient;
+    private Guid _playerId = Guid.Empty;
 
     public override async void _Ready()
     {
@@ -23,6 +24,15 @@ public partial class GameUpdaterServer : Node
     {
         try
         {
+            // PlayerInfo message (sent first by server)
+            try
+            {
+                var playerInfo = MessagePackSerializer.Deserialize<PlayerInfo>(data);
+                HandlePlayerInfo(playerInfo);
+                return;
+            }
+            catch { }
+
             // GameUpdate
             try
             {
@@ -74,6 +84,12 @@ public partial class GameUpdaterServer : Node
         GetSceneRouterNode().UpdateGame(gameUpdate);
     }
 
+    private void HandlePlayerInfo(PlayerInfo playerInfo)
+    {
+        _playerId = playerInfo.PlayerId;
+        GD.Print($"Received player info. PlayerId: {_playerId}, Name: {playerInfo.PlayerName}");
+    }
+
     private void HandleGameInfo(GameInfo info)
     {
         GD.Print($"Game info received: {info.GameName}");
@@ -95,14 +111,21 @@ public partial class GameUpdaterServer : Node
 
     public void SendJoinGameRequest(Guid gameId)
     {
-        var payload = new ClientJoinGame() { GameId = gameId };
+        var payload = new ClientJoinGame() 
+        { 
+            PlayerId = _playerId,
+            GameId = gameId 
+        };
         _networkClient.SendMessage(payload);
     }
     
     public void SendCreateGameRequest()
     {
         GD.Print("Sending create game request...");
-        var payload = new ClientCreateGame();
+        var payload = new ClientCreateGame()
+        {
+            PlayerId = _playerId
+        };
         _networkClient.SendMessage(payload);
         GD.Print("Sent.");
     }
@@ -111,6 +134,7 @@ public partial class GameUpdaterServer : Node
     {
         ClientMove moveMessage = new ClientMove
         {
+            PlayerId = _playerId,
             Move = move
         };
         _networkClient.SendMessage(moveMessage);
@@ -120,6 +144,7 @@ public partial class GameUpdaterServer : Node
     {
         var message = new ClientQuitGame
         {
+            PlayerId = _playerId,
             GameId = gameId
         };
         _networkClient.SendMessage(message);
@@ -129,6 +154,7 @@ public partial class GameUpdaterServer : Node
     {
         ClientPromotion message = new ClientPromotion
         {
+            PlayerId = _playerId,
             GameId =  gameId,
             PromotionChoice = promotionChoice
         };

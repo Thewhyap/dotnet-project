@@ -4,29 +4,70 @@ namespace Server.Network;
 
 public static class MessageReader
 {
-    public static async Task<byte[]> ReceiveAsync(TcpClient client)
+    public static async Task<byte[]> ReceiveAsync(TcpClient client, CancellationToken ct = default)
     {
         var stream = client.GetStream();
+        stream.ReadTimeout = 5000; // 5s to surface stalled reads
 
-        byte[] lengthBytes = new byte[4];
-        await ReadExactAsync(stream, lengthBytes, 4);
-        int length = BitConverter.ToInt32(lengthBytes, 0);
+        // Example: first read a 4-byte length prefix (MessagePack often uses framing externally).
+        var lenBuf = new byte[4];
+        var read = await ReadExactAsync(stream, lenBuf, 0, 4, ct);
+        if (read == 0)
+        {
+            Console.WriteLine($"[MessageReader] Remote {client.Client.RemoteEndPoint} closed before length prefix");
+            return Array.Empty<byte>();
+        }
 
-        byte[] buffer = new byte[length];
-        await ReadExactAsync(stream, buffer, length);
+        // Convertir en little-endian si nécessaire
+        if (!BitConverter.IsLittleEndian)
+            Array.Reverse(lenBuf);
+            
+        var length = BitConverter.ToInt32(lenBuf, 0);
+        if (length <= 0 || length > 10_000_000)
+        {
+            Console.WriteLine($"[MessageReader] Invalid length {length} from {client.Client.RemoteEndPoint}");
+            return Array.Empty<byte>();
+        }
 
-        return buffer;
+        var payload = new byte[length];
+         await ReadExactAsync(stream, payload,0, length,ct);
+        
+
+        Console.WriteLine($"[MessageReader] Read {length} bytes from {client.Client.RemoteEndPoint}");
+        return payload;
     }
 
-    private static async Task ReadExactAsync(NetworkStream stream, byte[] buffer, int size)
+    private static async Task<int> ReadExactAsync(NetworkStream stream, byte[] buffer, int offset, int count, CancellationToken ct)
     {
-        int read = 0;
-        while (read < size)
+        var total = 0;
+        while (total < count)
         {
-            int r = await stream.ReadAsync(buffer, read, size - read);
-            if (r == 0)
-                throw new Exception("Disconnected");
-            read += r;
+            int n;
+            try
+            {
+                n = await stream.ReadAsync(buffer.AsMemory(offset + total, count - total), ct);
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"[MessageReader] IO exception during read: {ex.Message}");
+                return 0;
+            }
+            catch (ObjectDisposedException)
+            {
+                Console.WriteLine("[MessageReader] Stream disposed during read");
+                return 0;
+            }
+
+            if (n == 0)
+            {
+                // Remote closed.
+                return 0;
+            }
+
+            total += n;
+            Console.WriteLine($"[MessageReader] Progress {total}/{count}");
         }
+
+        return total;
     }
 }

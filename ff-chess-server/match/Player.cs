@@ -19,9 +19,16 @@ public class Player(string name, TcpClient tcpClient)
 
         byte[] data = MessagePackSerializer.Serialize(message);
         byte[] lengthPrefix = BitConverter.GetBytes(data.Length);
+        
+        // Ensure little-endian byte order
+        if (!BitConverter.IsLittleEndian)
+            Array.Reverse(lengthPrefix);
 
         await stream.WriteAsync(lengthPrefix, 0, lengthPrefix.Length);
         await stream.WriteAsync(data, 0, data.Length);
+        await stream.FlushAsync();
+        
+        Console.WriteLine($"[Player] Sent message to {PlayerInfo.PlayerName}: length={data.Length}");
     }
 
     public Task SendPlayerInfo()

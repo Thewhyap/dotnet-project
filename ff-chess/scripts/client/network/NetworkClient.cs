@@ -33,22 +33,46 @@ public partial class NetworkClient : Node
 
 	private async Task ListenForMessages()
 	{
-		byte[] buffer = new byte[4096];
 		try
 		{
 			while (_isConnected)
 			{
-				int bytesRead = await _networkStream.ReadAsync(buffer, 0, buffer.Length);
-				if (bytesRead == 0)
+				// Lire les 4 bytes de longueur
+				var lengthBuffer = new byte[4];
+				var bytesRead = await ReadExactAsync(_networkStream, lengthBuffer, 0, 4);
+				
+				if (bytesRead != 4)
 				{
 					_isConnected = false;
 					GD.Print("Connection to server closed");
 					break;
 				}
 
-				byte[] data = new byte[bytesRead];
-				Array.Copy(buffer, data, bytesRead);
-				EmitSignal(SignalName.OnMessageReceived, data);
+				if (!BitConverter.IsLittleEndian)
+					Array.Reverse(lengthBuffer);
+
+				var length = BitConverter.ToInt32(lengthBuffer, 0);
+				
+				if (length <= 0 || length > 10_000_000)
+				{
+					GD.PrintErr($"Invalid message length: {length}");
+					_isConnected = false;
+					break;
+				}
+
+				// Lire le message complet
+				var messageBuffer = new byte[length];
+				bytesRead = await ReadExactAsync(_networkStream, messageBuffer, 0, length);
+				
+				if (bytesRead != length)
+				{
+					GD.PrintErr($"Failed to read complete message. Expected {length}, got {bytesRead}");
+					_isConnected = false;
+					break;
+				}
+
+				GD.Print($"[NETWORK] Received message: length={length}");
+				EmitSignal(SignalName.OnMessageReceived, messageBuffer);
 			}
 		}
 		catch (Exception e)
@@ -58,26 +82,56 @@ public partial class NetworkClient : Node
 		}
 	}
 
-	public async void SendMessage<T>(T payload) where T : class
+	private async Task<int> ReadExactAsync(NetworkStream stream, byte[] buffer, int offset, int count)
 	{
-		if (!_isConnected)
+		var total = 0;
+		while (total < count)
 		{
-			GD.Print("Not connected to server, cannot send message");
+			var n = await stream.ReadAsync(buffer, offset + total, count - total);
+			if (n == 0)
+				return total; // Connection closed
+			total += n;
+		}
+		return total;
+	}
+
+	public async Task SendMessageAsync<T>(T message)
+	{
+		if (!_isConnected || _networkStream == null)
+		{
+			GD.PrintErr("[NETWORK] Cannot send message: not connected");
 			return;
 		}
 
 		try
 		{
-			byte[] data = MessagePackSerializer.Serialize(payload);
-			GD.Print("Sending message ..");
-			await _networkStream.WriteAsync(data, 0, data.Length);
+			var messageBytes = MessagePackSerializer.Serialize(message);
+			var length = messageBytes.Length;
+		
+			// Envoyer d'abord la longueur (4 bytes)
+			var lengthBytes = BitConverter.GetBytes(length);
+			if (!BitConverter.IsLittleEndian)
+				Array.Reverse(lengthBytes);
+		
+			await _networkStream.WriteAsync(lengthBytes, 0, 4);
+			await _networkStream.WriteAsync(messageBytes, 0, messageBytes.Length);
 			await _networkStream.FlushAsync();
+		
+			GD.Print($"[NETWORK] Sent message: length={length}");
 		}
 		catch (Exception e)
 		{
-			GD.PrintErr($"Error sending message: {e.Message}");
+			GD.PrintErr($"[NETWORK] Error sending message: {e.Message}");
+			_isConnected = false;
 		}
 	}
+
+	public void SendMessage<T>(T message)
+	{
+		// Wrapper synchrone pour la compatibilité
+		_ = SendMessageAsync(message);
+	}
+
 
 	public override void _ExitTree()
 	{
