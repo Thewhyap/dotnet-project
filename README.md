@@ -20,27 +20,28 @@ Jeu (Godot, UNITY, Winform, Console, …)
 Le jeu doit mettre en place les IHM permettant aux joueurs de jouer
 
 ### Rendu
-#### FFChess
-- Un serveur jeu (Ou l'on peut connecter plusieurs clients)
-- Un client jeu (Ou l'on peut jouer / regarder une partie)
-- 2+n clients peuvent se connecter au serveur 
-- Un lobby pour choisir une partie ou en créer une
-
-
-1. On lance le jeu
-2. On arrive sur le lobby
-3. On attend que quelqu'un d'autre se connecte
-4. La partie commence
-5. On joue
-6. Les personnes suivantes sont des spectateurs (Observer)
-7. La partie se termine
+#### Jeu 
+Certains problèmes sont connus, notamment : 
+- Impossible de manger des pions
+- Impossible de quitter une partie (en clickant sur quitter)
 
 ### Marketplace (Steam)
 - TODO
 
 
 ## Lancer une partie : 
+Server :
 ```bash
 cd FFChessServer
 dotnet build FFChessServer.csproj
+dotnet run --project FFChessServer.csproj
 ```
+ou le script LaunchServer.sh qui permet de lancer directement le serveur tout en tuant le serveur déjà en cours d'exécution.
+
+Client :
+```bash
+cd FFChessClient
+dotnet build FFChessClient.csproj
+dotnet run --project FFChessClient.csproj
+```
+ou le script LaunchClient.sh qui permet de lancer directement plusieurs clients.
