@@ -4,17 +4,15 @@ namespace Server.Chess;
 
 public static class PieceRuleRegistry
 {
-    private static readonly Dictionary<PieceType, PieceBase> _rules =
-        new()
+    public static PieceBase GetRule(PieceType type, PieceColor color)
+        => type switch
         {
-            { PieceType.Pawn, new Pawn() },
-            { PieceType.Knight, new Knight() },
-            { PieceType.Bishop, new Bishop() },
-            { PieceType.Rook, new Rook() },
-            { PieceType.Queen, new Queen() },
-            { PieceType.King, new King() }
+            PieceType.Pawn => new Pawn(color),
+            PieceType.Knight => new Knight(color),
+            PieceType.Bishop => new Bishop(color),
+            PieceType.Rook => new Rook(color),
+            PieceType.Queen => new Queen(color),
+            PieceType.King => new King(color),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
-
-    public static PieceBase GetRule(PieceType type)
-        => _rules[type];
 }

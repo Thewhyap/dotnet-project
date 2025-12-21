@@ -6,21 +6,21 @@ public static class RuleHelper
 {
     public static PieceBase? GetPieceRuleFromSquare(Board board, ChessSquare square)
     {
-        PieceBase? piece = board.Cells[square.X, square.Y];
-        if (!piece.HasValue)
+        PieceData? piece = board.Cells[square.X, square.Y];
+        if (piece == null)
             return null;
-        return PieceRuleRegistry.GetRule(piece.Value);
+        return PieceRuleRegistry.GetRule(piece.Type, piece.Color);
     }
 
     public static TurnStatus MoveAction(GameState state, ChessMove move)
     {
         Board board = state.Board;
 
-        PieceBase piece = GetPieceRuleFromSquare(board, move).Value; // We know that its not null because MoveAction is called after a move has been validated
-        PieceBase? targetPiece = GetPieceRuleFromSquare(board, move);
+        PieceBase piece = GetPieceRuleFromSquare(board, move.From)!; // We know that its not null because MoveAction is called after a move has been validated
+        PieceBase? targetPiece = GetPieceRuleFromSquare(board, move.To);
 
 
-        if (piece.PieceData.Type == PieceType.Pawn || targetPiece.HasValue)
+        if (piece.PieceData.Type == PieceType.Pawn || targetPiece != null)
         {
             state.DrawMoveClock = 0;
         }
@@ -82,7 +82,7 @@ public static class RuleHelper
 
             if(state.CurrentTurn == PieceColor.White)
             {
-                if (move.To.Y == board.Size - 1)
+                if (move.To.Y == board.BlackBackRow)
                 {
                     return TurnStatus.WaitingPromotion;
                 }
@@ -90,7 +90,7 @@ public static class RuleHelper
 
             if(state.CurrentTurn == PieceColor.Black)
             {
-                if (move.To.Y == 0)
+                if (move.To.Y == board.WhiteBackRow)
                 {
                     return TurnStatus.WaitingPromotion;
                 }
@@ -126,8 +126,8 @@ public static class RuleHelper
         var opponentPiecesPosition = GameHelper.GetOpponentPiecesPosition(state);
         var playerPiecesPosition = GameHelper.GetPiecesPosition(state);
 
-        var opponentPieces = GetPiecesFromPosition(opponentPiecesPosition);
-        var playerPieces = GetPiecesFromPosition(playerPiecesPosition);
+        var opponentPieces = GetPiecesFromPosition(state.Board, opponentPiecesPosition);
+        var playerPieces = GetPiecesFromPosition(state.Board, playerPiecesPosition);
 
         // Insufficient material
         if (IsInsufficientMaterial(playerPieces) || IsInsufficientMaterial(opponentPieces))
@@ -139,15 +139,16 @@ public static class RuleHelper
     private static bool OpponentHasLegalMove(GameState state)
     {
         var opponentPiecesPosition = GameHelper.GetOpponentPiecesPosition(state);
-        var opponentPieces = GetPiecesFromPosition(opponentPiecesPosition);
 
-        foreach (var piece in opponentPieces)
+        foreach (var piecePos in opponentPiecesPosition)
         {
-            for (int x = 0; x < board.Size; x++)
+            var piece = PieceRuleRegistry.GetRule(state.Board.Cells[piecePos.X, piecePos.Y]!.Type, state.Board.Cells[piecePos.X, piecePos.Y]!.Color);
+
+            for (int x = 0; x < state.Board.Size; x++)
             {
-                for (int y = 0; y < board.Size; y++)
+                for (int y = 0; y < state.Board.Size; y++)
                 {
-                    if(piece.IsMoveLegal(state, new ChessMove(x, y)))
+                    if(piece.IsMoveLegal(state, new ChessMove(piecePos, new ChessSquare(x, y))))
                         return true;
                 }
             }
@@ -155,7 +156,7 @@ public static class RuleHelper
         return false;
     }
 
-    private static bool IsKingAttacked(GameState state, bool isOpponentKing = false)
+    public static bool IsKingAttacked(GameState state, bool isOpponentKing = false)
     {
         PieceColor kingColor = isOpponentKing ? state.CurrentTurn == PieceColor.White ? PieceColor.Black : PieceColor.White : state.CurrentTurn;
         PieceColor attackersColor = kingColor == PieceColor.White ? PieceColor.Black : PieceColor.White;
@@ -165,7 +166,7 @@ public static class RuleHelper
         foreach (var opponentPos in opponentPiecesPosition)
         {
             var kingAttack = new ChessMove(opponentPos, kingPosition);
-            PieceBase piece = GetPieceRuleFromSquare(state.Board, opponentPos).Value;
+            PieceBase piece = GetPieceRuleFromSquare(state.Board, opponentPos)!;
             if (piece.IsSpecificMoveLegal(state, kingAttack))
                 return true;
         }
@@ -180,8 +181,8 @@ public static class RuleHelper
         foreach (var pos in piecePositions)
         {
             var piece = GetPieceRuleFromSquare(board, pos);
-            if (piece.HasValue)
-                pieces.Add(piece.Value);
+            if (piece != null)
+                pieces.Add(piece);
         }
 
         return pieces;
@@ -197,7 +198,7 @@ public static class RuleHelper
         if (pieces.Count == 2)
         {
             bool hasMinor =
-                pieces.Any(p => p.PieceData.Type == PieceType.Bishop || p.Type == PieceType.Knight);
+                pieces.Any(p => p.PieceData.Type == PieceType.Bishop || p.PieceData.Type == PieceType.Knight);
 
             return hasMinor;
         }
@@ -211,5 +212,10 @@ public static class RuleHelper
         }
 
         return false;
+    }
+
+    public static bool IsGameOver(Game game)
+    {
+        return game.TurnStatus == TurnStatus.WinWhite || game.TurnStatus == TurnStatus.WinBlack || game.TurnStatus == TurnStatus.Draw;
     }
 }

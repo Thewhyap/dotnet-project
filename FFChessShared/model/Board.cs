@@ -5,6 +5,23 @@ namespace FFChessShared;
 [MessagePackObject]
 public class Board
 {
+    [Key(0)] public PieceData?[,] Cells { get; } = null!;
+
+    [IgnoreMember] public int Size { get; set; }
+
+    [IgnoreMember] public readonly int WhiteBackRow;
+    [IgnoreMember] public readonly int WhitePawnRow;
+    [IgnoreMember] public readonly int BlackBackRow;
+    [IgnoreMember] public readonly int BlackPawnRow;
+    [IgnoreMember] public readonly int RookKingSideColumn;
+    [IgnoreMember] public readonly int RookQueenSideColumn;
+    [IgnoreMember] public readonly int KnightKingSideColumn;
+    [IgnoreMember] public readonly int KnightQueenSideColumn;
+    [IgnoreMember] public readonly int BishopKingSideColumn;
+    [IgnoreMember] public readonly int BishopQueenSideColumn;
+    [IgnoreMember] public readonly int KingColumn;
+    [IgnoreMember] public readonly int QueenColumn;
+
     public Board() { }
 
     public Board(int size)
@@ -26,26 +43,34 @@ public class Board
         QueenColumn = size - 4;
     }
 
-    [Key(0)] public PieceData?[,] Cells { get; } = null!;
-
-    [IgnoreMember] public int Size { get; set; }
-
-    [IgnoreMember] public readonly int WhiteBackRow;
-    [IgnoreMember] public readonly int WhitePawnRow;
-    [IgnoreMember] public readonly int BlackBackRow;
-    [IgnoreMember] public readonly int BlackPawnRow;
-    [IgnoreMember] public readonly int RookKingSideColumn;
-    [IgnoreMember] public readonly int RookQueenSideColumn;
-    [IgnoreMember] public readonly int KnightKingSideColumn;
-    [IgnoreMember] public readonly int KnightQueenSideColumn;
-    [IgnoreMember] public readonly int BishopKingSideColumn;
-    [IgnoreMember] public readonly int BishopQueenSideColumn;
-    [IgnoreMember] public readonly int KingColumn;
-    [IgnoreMember] public readonly int QueenColumn;
-
     public void MovePiece(ChessSquare from, ChessSquare to)
     {
         Cells[to.X, to.Y] = Cells[from.X, from.Y];
         Cells[from.X, from.Y] = null;
+    }
+
+    public void ChangePiece(ChessSquare square, PieceType newType)
+    {
+        PieceColor color = Cells[square.X, square.Y]!.Color;
+        Cells[square.X, square.Y] = new PieceData(newType, color);
+    }
+
+    public Board Clone()
+    {
+        var clone = new Board(Size);
+
+        for (int x = 0; x < Size; x++)
+        {
+            for (int y = 0; y < Size; y++)
+            {
+                var piece = Cells[x, y];
+                if (piece != null)
+                {
+                    clone.Cells[x, y] = new PieceData(piece.Type, piece.Color);
+                }
+            }
+        }
+
+        return clone;
     }
 }

@@ -11,7 +11,7 @@ public abstract class PieceBase(PieceType type, PieceColor color)
         // Check that you don't attack your own piece
 
         var targetPiece = state.Board.Cells[move.To.X, move.To.Y];
-        if (targetPiece.HasValue && targetPiece.Value.Color == state.CurrentTurn)
+        if (targetPiece != null && targetPiece.Color == state.CurrentTurn)
             return false;
 
         // Check if your king is not attacked at the end of your turn

@@ -8,7 +8,7 @@ namespace FFChessShared;
 [Union(2, typeof(ClientJoinGame))]
 [Union(3, typeof(ClientCreateGame))]
 [Union(4, typeof(ClientQuitGame))]
-public abstract class ClientMessage
+public class ClientMessage
 {
     [Key(0)] public Guid PlayerId { get; set; }
 }

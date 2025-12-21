@@ -17,15 +17,15 @@ public class Pawn(PieceColor color) : PieceBase(PieceType.Pawn, color)
 
 		// Moving straight
 		if (deltaX == 0 && deltaY == direction)
-			return !state.Board.Cells[to.X, to.Y].HasValue;
+			return state.Board.Cells[to.X, to.Y] == null;
 
 		// Moving straight (first time)
 		if (deltaX == 0 && deltaY == 2 * direction && (from.Y == startRow))
-			return !state.Board.Cells[to.X, to.Y].HasValue && !state.Board.Cells[to.X, from.Y + direction].HasValue;
+			return state.Board.Cells[to.X, to.Y] == null && state.Board.Cells[to.X, from.Y + direction] == null;
 
         // Taking piece (and en-passant)
         if (Math.Abs(deltaX) == 1 && deltaY == direction)
-			return state.Board.Cells[to.X, to.Y].HasValue || move.To == state.EnPassantTarget || inRoque;
+			return state.Board.Cells[to.X, to.Y] != null || move.To == state.EnPassantTarget || inRoque;
 		
         return false;
 	}

@@ -1,47 +1,146 @@
 using FFChessShared;
+using System.Collections.Concurrent;
 
 namespace Server.Match;
 
 public class MatchService
 {
-    private readonly Dictionary<Guid, MatchSession> _sessions = new();
-    private readonly Dictionary<string, Player> _connectedPlayersByIP = new();
+    public static MatchService Instance { get; } = new();
 
-    public MatchSession CreateGame(Player creator)
+    private readonly ConcurrentDictionary<Guid, MatchSession> _sessions = new();
+    private readonly ConcurrentDictionary<Guid, CancellationTokenSource> _pendingDisconnects = new();
+
+    private static readonly TimeSpan DisconnectTimeout = TimeSpan.FromSeconds(15);
+
+    public async Task<MatchSession> CreateAndJoinGame(Player creator)
     {
-        var initialState = GameInitializer.CreateInitialState();
-        var match = new MatchSession(creator, initialState);
-        _sessions.Add(match.Id, match);
-        creator.AssignedColor = PieceColor.White;
-        return match;
+        var session = new MatchSession();
+        _sessions[session.GameManager.Game.GameId] = session;
+
+        await session.AddPlayer(creator);
+        await BroadcastGamesList();
+
+        return session;
     }
 
-    public bool JoinGame(Guid matchId, Player player)
+    public async Task<bool> JoinGame(Player player, Guid gameId)
     {
-        if (!_sessions.TryGetValue(matchId, out var match)) return false;
+        if (!_sessions.TryGetValue(gameId, out var session))
+            return false;
 
-        if (!match.CanJoinAsPlayer())
-        {
-            match.AddViewer(player);
-            return true; // joined as viewer
-        }
+        await session.AddPlayer(player);
+        await BroadcastGamesList();
 
-        var assignedColor = match.AssignColorToPlayer(player);
-        player.AssignedColor = assignedColor;
-
-        match.StartGameIfReady();
         return true;
     }
 
-    public void PlayerDisconnects(Player player)
+    public async Task<bool> QuitGame(Player player, Guid gameId)
     {
-        var match = _sessions.Values.FirstOrDefault(m => m.WhitePlayer == player || m.BlackPlayer == player);
-        if (match != null)
-        {
-            match.RemovePlayer(player);
-        }
-        // Gérer suppression joueur, notify etc.
+        if (!_sessions.TryGetValue(gameId, out var session))
+            return false;
+
+        if (!session.ContainsPlayer(player))
+            return false;
+
+        await session.RemovePlayer(player);
+        _sessions.TryRemove(gameId, out _);
+
+        await BroadcastGamesList();
+        return true;
     }
 
-    public IEnumerable<MatchSession> ListMatches() => _sessions.Values;
+    public async Task<bool> TryMove(Player player, Guid gameId, ChessMove move)
+    {
+        if (!_sessions.TryGetValue(gameId, out var session))
+            return false;
+
+        if (!session.ContainsPlayer(player))
+            return false;
+
+        bool result = await session.TryMakeMove(player, move);
+
+        if (IsSessionOver(session))
+        {
+            _sessions.TryRemove(gameId, out _);
+            await BroadcastGamesList();
+        }
+
+        return result;
+    }
+
+    public async Task<bool> TryPromote(Player player, Guid gameId, PieceType promotion)
+    {
+        if (!_sessions.TryGetValue(gameId, out var session))
+            return false;
+
+        if (!session.ContainsPlayer(player))
+            return false;
+
+        bool result = await session.TryPromote(player, promotion);
+
+        if (IsSessionOver(session))
+        {
+            _sessions.TryRemove(gameId, out _);
+            await BroadcastGamesList();
+        }
+
+        return result;
+    }
+
+    public MatchSession? GetGame(Guid gameId)
+        => _sessions.TryGetValue(gameId, out var session) ? session : null;
+
+    public IEnumerable<GameInfo> GetGameInfos()
+        => _sessions.Values.Select(s => s.ToGameInfo());
+
+    public async Task BroadcastGamesList()
+    {
+        var update = new GamesListUpdate(GetGameInfos().ToList());
+
+        var tasks = PlayerRegistry
+            .GetAllPlayers()
+            .Select(p => p.Send(update));
+
+        await Task.WhenAll(tasks);
+    }
+
+    public bool IsSessionOver(MatchSession session)
+        => session.GameManager.Game.Status == MatchStatus.Closed;
+
+    public void HandleDisconnect(Player player)
+    {
+        var cts = new CancellationTokenSource();
+        _pendingDisconnects[player.PlayerInfo.PlayerId] = cts;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(DisconnectTimeout, cts.Token);
+                await FinalizeDisconnect(player);
+            }
+            catch (TaskCanceledException) { }
+        });
+    }
+
+    public void CancelDisconnect(Player player)
+    {
+        if (_pendingDisconnects.TryRemove(player.PlayerInfo.PlayerId, out var cts))
+            cts.Cancel();
+    }
+
+    private async Task FinalizeDisconnect(Player player)
+    {
+        foreach (var session in _sessions.Values)
+        {
+            if (!session.ContainsPlayer(player))
+                continue;
+
+            await QuitGame(player, session.GameManager.Game.GameId);
+            break;
+        }
+
+        PlayerRegistry.Unregister(player.PlayerInfo.PlayerId);
+    }
 }
+
