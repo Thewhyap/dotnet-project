@@ -53,9 +53,17 @@ namespace Gauniv.WebServer.Controllers
             double? minPrice,
             double? maxPrice,
             string sortBy = "name",
+            bool? owned = null,
+            long? minSize = null,
+            long? maxSize = null,
             int? page = 1)
         {
-            var local_query = applicationDbContext.Games.AsQueryable();
+            var local_user = await userManager.GetUserAsync(User);
+            var local_isClient = User.IsInRole("CLIENT");
+            
+            var local_query = applicationDbContext.Games
+                .Include(g => g.GameUsers)
+                .AsQueryable();
 
             // Filtrer par nom
             if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -80,6 +88,35 @@ namespace Gauniv.WebServer.Controllers
             {
                 local_query = local_query.Where(g => g.Price <= maxPrice.Value);
             }
+            
+            // Filtrer par taille minimum (en Mo)
+            if (minSize.HasValue)
+            {
+                var local_minSizeBytes = minSize.Value * 1024 * 1024; // Convertir Mo en octets
+                local_query = local_query.Where(g => g.Size >= local_minSizeBytes);
+            }
+            
+            // Filtrer par taille maximum (en Mo)
+            if (maxSize.HasValue)
+            {
+                var local_maxSizeBytes = maxSize.Value * 1024 * 1024; // Convertir Mo en octets
+                local_query = local_query.Where(g => g.Size <= local_maxSizeBytes);
+            }
+            
+            // Filtrer par possession (uniquement pour les clients connectés)
+            if (owned.HasValue && local_isClient && local_user != null)
+            {
+                if (owned.Value)
+                {
+                    // Afficher uniquement les jeux possédés
+                    local_query = local_query.Where(g => g.GameUsers.Any(u => u.Id == local_user.Id));
+                }
+                else
+                {
+                    // Afficher uniquement les jeux non possédés
+                    local_query = local_query.Where(g => !g.GameUsers.Any(u => u.Id == local_user.Id));
+                }
+            }
 
             // Trier
             local_query = sortBy switch
@@ -87,6 +124,8 @@ namespace Gauniv.WebServer.Controllers
                 "price-asc" => local_query.OrderBy(g => g.Price),
                 "price-desc" => local_query.OrderByDescending(g => g.Price),
                 "newest" => local_query.OrderByDescending(g => g.CreatedAt),
+                "size-asc" => local_query.OrderBy(g => g.Size),
+                "size-desc" => local_query.OrderByDescending(g => g.Size),
                 _ => local_query.OrderBy(g => g.Name)
             };
 
@@ -95,7 +134,7 @@ namespace Gauniv.WebServer.Controllers
             var local_games = await local_query.ToListAsync();
 
             
-            const int pageSize = 1;
+            const int pageSize = 12;
             var local_pagedGames = local_games.Adapt<List<GameDto>>().ToPagedList(page ?? 1, pageSize);
             
             var local_viewModel = new HomeViewModel
@@ -106,7 +145,10 @@ namespace Gauniv.WebServer.Controllers
                 Category = category,
                 MinPrice = minPrice,
                 MaxPrice = maxPrice,
-                SortBy = sortBy
+                SortBy = sortBy,
+                Owned = owned,
+                MinSize = minSize,
+                MaxSize = maxSize
             };
 
             return View(local_viewModel);

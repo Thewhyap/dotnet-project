@@ -33,6 +33,7 @@ namespace Gauniv.WebServer.Controllers.Admin
         [Route("Admin/Games/Create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [DisableRequestSizeLimit] // Désactive toute limite de taille
         public async Task<IActionResult> CreateGame(GameCreateViewModel gameViewModel)
         {
             if (!ModelState.IsValid)
@@ -56,7 +57,9 @@ namespace Gauniv.WebServer.Controllers.Admin
                 _applicationDbContext.Games.Add(game);
                 await _applicationDbContext.SaveChangesAsync();
                 
-                game.Payload = await _fileStorageService.SaveGameFileAsync(gameViewModel.GameCreateDto.Payload, game.Id);
+                var (payloadPath, payloadSize) = await _fileStorageService.SaveGameFileAsync(gameViewModel.GameCreateDto.Payload, game.Id);
+                game.Payload = payloadPath;
+                game.Size = payloadSize;
                 
                 game.CoverImage = await _fileStorageService.SaveCoverImageAsync(gameViewModel.GameCreateDto.CoverImage, game.Id);
                 
@@ -126,6 +129,7 @@ namespace Gauniv.WebServer.Controllers.Admin
         [Route("Admin/Games/Update/{id}")]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [DisableRequestSizeLimit] // Désactive toute limite de taille
         public async Task<IActionResult> UpdateGame(int id, GameUpdateViewModel gameUpdateViewModel)
         {
             // Ensure the ID from route matches the DTO
@@ -187,8 +191,10 @@ namespace Gauniv.WebServer.Controllers.Admin
                         await _fileStorageService.DeleteFileAsync(local_game.Payload);
                     }
                     
-                    // Save new game file
-                    local_game.Payload = await _fileStorageService.SaveGameFileAsync(gameUpdateViewModel.UpdateGameDto.Payload, local_game.Id);
+                    // Save new game file and update size
+                    var (payloadPath, payloadSize) = await _fileStorageService.SaveGameFileAsync(gameUpdateViewModel.UpdateGameDto.Payload, local_game.Id);
+                    local_game.Payload = payloadPath;
+                    local_game.Size = payloadSize;
                 }
 
                 // Update categories

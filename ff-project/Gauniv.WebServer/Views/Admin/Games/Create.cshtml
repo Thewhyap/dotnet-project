@@ -94,7 +94,7 @@ ViewData["Title"] = "Admin - Create Game";
                                 <div class="mb-3">
                                     <label asp-for="@Model.GameCreateDto.Payload" class="form-label">Game File (.zip) <span class="text-danger">*</span></label>
                                     <input type="file" asp-for="@Model.GameCreateDto.Payload" class="form-control" id="Payload" accept=".zip" />
-                                    <div class="form-text">Upload the game content as a ZIP file (Max 500MB)</div>
+                                    <div class="form-text">Upload the game content as a ZIP file (No size limit - limited only by available disk space)</div>
                                     <span class="text-danger" asp-validation-for="@Model.GameCreateDto.Payload"></span>
                                 </div>
 
@@ -156,20 +156,21 @@ ViewData["Title"] = "Admin - Create Game";
             }
         });
 
-        // File size validation
-        $('#Payload').on('change', function() {
-            const file = this.files[0];
-            if (file && file.size > 500 * 1024 * 1024) { // 500MB
-                alert('Game file is too large. Maximum size is 500MB.');
-                this.value = '';
-            }
-        });
-
+        // Validation uniquement pour l'image de couverture (5MB est raisonnable)
         $('#coverImage').on('change', function() {
             const file = this.files[0];
             if (file && file.size > 5 * 1024 * 1024) { // 5MB
                 alert('Cover image is too large. Maximum size is 5MB.');
                 this.value = '';
+            }
+        });
+
+        // Info pour l'upload du jeu (pas de validation côté client)
+        $('#Payload').on('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                console.log(`Game file selected: ${file.name} (${sizeMB} MB)`);
             }
         });
     });

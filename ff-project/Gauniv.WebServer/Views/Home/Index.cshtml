@@ -16,12 +16,33 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
     
-    .filter-section {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    .accordion {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .accordion-button {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .accordion-button:not(.collapsed) .text-primary {
+        color: white !important;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: transparent;
+    }
+    
+    .accordion-body {
+        padding: 1.5rem;
     }
     
     .game-card {
@@ -122,51 +143,112 @@
 </div>
 
 <!-- Filter Section -->
-<div class="container filter-section">
-    <form asp-action="Index" asp-controller="Home" method="get" class="row g-3 align-items-end">
-        <div class="col-md-3">
-            <label for="searchTerm" class="form-label fw-semibold">Search</label>
-            <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
-                   placeholder="Game name..." value="@Model.SearchTerm">
+<div class="container mb-4">
+    <div class="accordion shadow-sm" id="filterAccordion">
+        <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+                <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
+                    <i class="bi bi-funnel-fill me-2 text-primary"></i>
+                    <span class="fs-5">Advanced Filters</span>
+                    <span class="badge bg-primary ms-2">@((Model.SearchTerm != null || Model.Category != null || Model.MinPrice != null || Model.MaxPrice != null || Model.Owned != null) ? "Active" : "")</span>
+                </button>
+            </h2>
+            <div id="collapseFilter" class="accordion-collapse collapse show" data-bs-parent="#filterAccordion">
+                <div class="accordion-body bg-light">
+                    <form asp-action="Index" asp-controller="Home" method="get" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label for="searchTerm" class="form-label fw-semibold">
+                                <i class="bi bi-search me-1"></i>Search
+                            </label>
+                            <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
+                                   placeholder="Game name..." value="@Model.SearchTerm">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="category" class="form-label fw-semibold">
+                                <i class="bi bi-tags me-1"></i>Category
+                            </label>
+                            <select class="form-select" id="category" name="category">
+                                <option value="">All Categories</option>
+                                @foreach (var cat in Model.CategoryDtos)
+                                {
+                                    <option value="@(cat.Name)" selected="@(Model.Category == cat.Name)">@(cat.Name)</option>   
+                                }
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="minPrice" class="form-label fw-semibold">
+                                <i class="bi bi-currency-euro me-1"></i>Min Price (€)
+                            </label>
+                            <input type="number" class="form-control" id="minPrice" name="minPrice" 
+                                   placeholder="0" step="0.01" value="@Model.MinPrice">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="maxPrice" class="form-label fw-semibold">
+                                <i class="bi bi-currency-euro me-1"></i>Max Price (€)
+                            </label>
+                            <input type="number" class="form-control" id="maxPrice" name="maxPrice" 
+                                   placeholder="100" step="0.01" value="@Model.MaxPrice">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="minSize" class="form-label fw-semibold">
+                                <i class="bi bi-hdd me-1"></i>Min Size (MB)
+                            </label>
+                            <input type="number" class="form-control" id="minSize" name="minSize" 
+                                   placeholder="0" step="1" value="@Model.MinSize">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="maxSize" class="form-label fw-semibold">
+                                <i class="bi bi-hdd me-1"></i>Max Size (MB)
+                            </label>
+                            <input type="number" class="form-control" id="maxSize" name="maxSize" 
+                                   placeholder="50000" step="1" value="@Model.MaxSize">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="owned" class="form-label fw-semibold">
+                                <i class="bi bi-bookmark-check me-1"></i>Status
+                            </label>
+                            <select class="form-select" id="owned" name="owned" disabled="@(!User.IsInRole("CLIENT"))">
+                                <option value="">All Games</option>
+                                <option value="true" selected="@(Model.Owned == true)">Owned</option>
+                                <option value="false" selected="@(Model.Owned == false || Model.Owned == null)">Not Owned</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="sortBy" class="form-label fw-semibold">
+                                <i class="bi bi-sort-down me-1"></i>Sort By
+                            </label>
+                            <select class="form-select" id="sortBy" name="sortBy">
+                                <option value="name" selected="@(Model.SortBy == "name")">Name</option>
+                                <option value="price-asc" selected="@(Model.SortBy == "price-asc")">Price: Low to High</option>
+                                <option value="price-desc" selected="@(Model.SortBy == "price-desc")">Price: High to Low</option>
+                                <option value="size-asc" selected="@(Model.SortBy == "size-asc")">Size: Small to Large</option>
+                                <option value="size-desc" selected="@(Model.SortBy == "size-desc")">Size: Large to Small</option>
+                                <option value="newest" selected="@(Model.SortBy == "newest")">Newest First</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button type="submit" class="btn btn-primary filter-btn px-4">
+                                    <i class="bi bi-funnel me-1"></i>Apply Filters
+                                </button>
+                                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary px-4">
+                                    <i class="bi bi-x-circle me-1"></i>Clear All
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        
-        <div class="col-md-2">
-            <label for="category" class="form-label fw-semibold">Category</label>
-            <select class="form-select" id="category" name="category">
-                <option value="">All Categories</option>
-                @foreach (var cat in Model.CategoryDtos)
-                {
-                    <option value="@(cat.Name)" selected="@(Model.Category == cat.Name)">@(cat.Name)</option>   
-                }
-            </select>
-        </div>
-        
-        <div class="col-md-2">
-            <label for="minPrice" class="form-label fw-semibold">Min Price (€)</label>
-            <input type="number" class="form-control" id="minPrice" name="minPrice" 
-                   placeholder="0" step="0.01" value="@Model.MinPrice">
-        </div>
-        
-        <div class="col-md-2">
-            <label for="maxPrice" class="form-label fw-semibold">Max Price (€)</label>
-            <input type="number" class="form-control" id="maxPrice" name="maxPrice" 
-                   placeholder="100" step="0.01" value="@Model.MaxPrice">
-        </div>
-        
-        <div class="col-md-2">
-            <label for="sortBy" class="form-label fw-semibold">Sort By</label>
-            <select class="form-select" id="sortBy" name="sortBy">
-                <option value="name" selected="@(Model.SortBy == "name")">Name</option>
-                <option value="price-asc" selected="@(Model.SortBy == "price-asc")">Price: Low to High</option>
-                <option value="price-desc" selected="@(Model.SortBy == "price-desc")">Price: High to Low</option>
-                <option value="newest" selected="@(Model.SortBy == "newest")">Newest First</option>
-            </select>
-        </div>
-        
-        <div class="col-md-1">
-            <button type="submit" class="btn btn-primary w-100 filter-btn">Filter</button>
-        </div>
-    </form>
+    </div>
 </div>
 
 
@@ -230,6 +312,9 @@
             category = Model.Category,
             minPrice = Model.MinPrice,
             maxPrice = Model.MaxPrice,
+            minSize = Model.MinSize,
+            maxSize = Model.MaxSize,
+            owned = Model.Owned,
             sortBy = Model.SortBy
         }), new PagedListRenderOptions
         {

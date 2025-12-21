@@ -2,7 +2,7 @@
 {
     public interface IFileStorageService
     {
-        Task<string> SaveGameFileAsync(IFormFile file, int gameId);
+        Task<(string filePath, long size)> SaveGameFileAsync(IFormFile file, int gameId);
         Task<string> SaveCoverImageAsync(IFormFile file, int gameId);
         Task DeleteFileAsync(string filePath);
     }
@@ -12,7 +12,7 @@
         private const string GameFilesFolder = "uploads/games/files";
         private const string CoverImagesFolder = "uploads/games/covers";
 
-        public async Task<string> SaveGameFileAsync(IFormFile file, int gameId)
+        public async Task<(string filePath, long size)> SaveGameFileAsync(IFormFile file, int gameId)
         {
             var folderPath = Path.Combine(environment.WebRootPath, GameFilesFolder);
             Directory.CreateDirectory(folderPath);
@@ -26,7 +26,11 @@
                 await file.CopyToAsync(stream);
             }
 
-            return $"/{GameFilesFolder}/{fileName}".Replace("\\", "/");
+            // Récupérer la taille du fichier
+            var fileInfo = new FileInfo(filePath);
+            var fileSize = fileInfo.Length;
+
+            return ($"/{GameFilesFolder}/{fileName}".Replace("\\", "/"), fileSize);
         }
 
         public async Task<string> SaveCoverImageAsync(IFormFile file, int gameId)

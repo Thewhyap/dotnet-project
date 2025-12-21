@@ -47,7 +47,12 @@ namespace Gauniv.WebServer.Api
 {
     [Route("api/1.0.0/[controller]/[action]")]
     [ApiController]
-    public class GamesController(ApplicationDbContext appDbContext, IMapper mapper, UserManager<User> userManager, MappingProfile mp) : ControllerBase
+    public class GamesController(
+        ApplicationDbContext appDbContext, 
+        IMapper mapper, 
+        UserManager<User> userManager, 
+        MappingProfile mp,
+        IWebHostEnvironment environment) : ControllerBase
     {
         
         [HttpGet("categories")]
@@ -64,7 +69,7 @@ namespace Gauniv.WebServer.Api
         
         [HttpGet("game")]
         [AllowAnonymous]
-        public async Task<ActionResult<PagedResultDto<GameDto>>> GetGames(
+        public async Task<ActionResult<PagedResultDto<GameDto>>> Games(
             [FromQuery] int offset = 0,
             [FromQuery] int limit = 10,
             [FromQuery] int[]? category = null)
@@ -101,6 +106,8 @@ namespace Gauniv.WebServer.Api
                     Id = g.Id,
                     Name = g.Name,
                     Description = g.Description,
+                    Price = g.Price,
+                    CoverImage = g.CoverImage,
                     CategoryIds = g.GameCategories.Select(c => c.Id).ToList()
                 })
                 .ToListAsync();
@@ -131,23 +138,29 @@ namespace Gauniv.WebServer.Api
             if (local_game == null)
                 return Forbid("You don't own this game");
 
+            // Construire le chemin absolu du fichier
+            var local_relativePath = local_game.Payload?.TrimStart('/') ?? "";
+            var local_absolutePath = Path.Combine(environment.WebRootPath, local_relativePath);
+
             // Vérifier que le fichier existe
-            if (string.IsNullOrEmpty(local_game.Payload) || !System.IO.File.Exists(local_game.Payload))
+            if (string.IsNullOrEmpty(local_game.Payload) || !System.IO.File.Exists(local_absolutePath))
                 return NotFound("Game binary not found");
 
             // Streamer le fichier directement depuis le disque
+            // STREAMING EFFICACE : Seulement 80 KB en mémoire à la fois
             var local_stream = new FileStream(
-                local_game.Payload, 
+                local_absolutePath, 
                 FileMode.Open, 
                 FileAccess.Read, 
                 FileShare.Read,
-                bufferSize: 81920, // 80 KB buffer
+                bufferSize: 81920, // 80 KB buffer - optimisé pour les gros fichiers
                 useAsync: true
             );
             
             var local_fileExtension = Path.GetExtension(local_game.Payload);
             var local_fileName = $"{local_game.Name}{local_fileExtension}";
 
+            // enableRangeProcessing: permet les téléchargements partiels/reprise
             return File(
                 local_stream, 
                 "application/octet-stream", 

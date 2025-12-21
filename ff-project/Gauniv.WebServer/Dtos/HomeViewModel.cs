@@ -15,5 +15,8 @@ namespace Gauniv.WebServer.Dtos
         public double? MinPrice { get; set; }
         public double? MaxPrice { get; set; }
         public string SortBy { get; set; } = "name";
+        public bool? Owned { get; set; }
+        public long? MinSize { get; set; }
+        public long? MaxSize { get; set; }
     }
 }

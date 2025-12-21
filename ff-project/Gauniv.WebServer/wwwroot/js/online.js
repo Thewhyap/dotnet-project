@@ -10,21 +10,21 @@ var connection = new signalR.HubConnectionBuilder()
 // Start the connection
 connection.start()
     .then(function () {
-        console.log("✅ SignalR Connected - User is now online");
+        console.log("SignalR Connected - User is now online");
     })
     .catch(function (err) {
-        console.error("❌ SignalR Connection Error:", err.toString());
+        console.error("SignalR Connection Error:", err.toString());
     });
 
 // Handle reconnection
 connection.onreconnecting(function() {
-    console.log("🔄 SignalR Reconnecting...");
+    console.log("SignalR Reconnecting...");
 });
 
 connection.onreconnected(function() {
-    console.log("✅ SignalR Reconnected");
+    console.log("SignalR Reconnected");
 });
 
 connection.onclose(function() {
-    console.log("❌ SignalR Connection Closed");
+    console.log("SignalR Connection Closed");
 });

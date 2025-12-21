@@ -54,6 +54,8 @@ namespace Gauniv.WebServer.Data
         [Required]
         public double Price { get; set; }
         
+        public long Size { get; set; }
+        
         public IEnumerable<Category> GameCategories { get; set; }
         
         public IEnumerable<User> GameUsers { get; set; }
