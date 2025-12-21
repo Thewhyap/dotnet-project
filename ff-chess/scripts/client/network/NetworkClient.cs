@@ -37,7 +37,6 @@ public partial class NetworkClient : Node
 		{
 			while (_isConnected)
 			{
-				// Lire les 4 bytes de longueur
 				var lengthBuffer = new byte[4];
 				var bytesRead = await ReadExactAsync(_networkStream, lengthBuffer, 0, 4);
 				
@@ -60,7 +59,7 @@ public partial class NetworkClient : Node
 					break;
 				}
 
-				// Lire le message complet
+				// Read the actual message
 				var messageBuffer = new byte[length];
 				bytesRead = await ReadExactAsync(_networkStream, messageBuffer, 0, length);
 				

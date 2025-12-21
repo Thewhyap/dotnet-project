@@ -14,6 +14,7 @@ public class MatchService
 
     public async Task<MatchSession> CreateAndJoinGame(Player creator)
     {
+        Console.WriteLine($"Creating game, by {creator}");
         var session = new MatchSession();
         _sessions[session.GameManager.Game.GameId] = session;
 
@@ -25,6 +26,7 @@ public class MatchService
 
     public async Task<bool> JoinGame(Player player, Guid gameId)
     {
+        Console.WriteLine($"Joining game, by {gameId}");
         if (!_sessions.TryGetValue(gameId, out var session))
             return false;
 
@@ -36,6 +38,7 @@ public class MatchService
 
     public async Task<bool> QuitGame(Player player, Guid gameId)
     {
+        Console.WriteLine($"Quitting game, by {gameId}");
         if (!_sessions.TryGetValue(gameId, out var session))
             return false;
 
@@ -51,6 +54,7 @@ public class MatchService
 
     public async Task<bool> TryMove(Player player, Guid gameId, ChessMove move)
     {
+        Console.WriteLine($"Trying move, by {move}");
         if (!_sessions.TryGetValue(gameId, out var session))
             return false;
 
@@ -70,6 +74,7 @@ public class MatchService
 
     public async Task<bool> TryPromote(Player player, Guid gameId, PieceType promotion)
     {
+        Console.WriteLine($"Trying promote, by {promotion}");
         if (!_sessions.TryGetValue(gameId, out var session))
             return false;
 
