@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using FFChess.scripts.client.game;
 using FFChessShared;
 using MessagePack;
 using MessagePack.Resolvers;
@@ -74,13 +75,23 @@ public partial class GameUpdaterServer : Node
             
             // ServerGameQuit - Player has quit the game
             // IMPORTANT: Test BEFORE GameInfo because they both have GameId
+            // ServerGameQuit has 2 keys, GameInfo has 5 keys
             try
             {
-                var gameQuit = MessagePackSerializer.Deserialize<ServerGameQuit>(data, Options);
-                if (gameQuit.GameId != Guid.Empty && !string.IsNullOrEmpty(gameQuit.Reason))
+                // Check if it's a 2-element array (ServerGameQuit structure)
+                // Use ReadOnlySequence to avoid consuming the buffer
+                var sequence = new System.Buffers.ReadOnlySequence<byte>(data);
+                var reader = new MessagePack.MessagePackReader(sequence);
+                var arrayLength = reader.ReadArrayHeader();
+                
+                if (arrayLength == 2) // ServerGameQuit has exactly 2 properties
                 {
-                    HandleGameQuit(gameQuit);
-                    return;
+                    var gameQuit = MessagePackSerializer.Deserialize<ServerGameQuit>(data, Options);
+                    if (gameQuit.GameId != Guid.Empty && !string.IsNullOrEmpty(gameQuit.Reason))
+                    {
+                        HandleGameQuit(gameQuit);
+                        return;
+                    }
                 }
             }
             catch { }

@@ -45,6 +45,9 @@ public class MatchService
         if (!session.ContainsPlayer(player))
             return false;
 
+        // Notify the player that they quit successfully
+        await player.SendGameQuit(gameId, "You left the game");
+        
         await session.RemovePlayer(player);
         _sessions.TryRemove(gameId, out _);
 
@@ -55,12 +58,16 @@ public class MatchService
     {
         Console.WriteLine($"Trying move, by {move}");
         if (!_sessions.TryGetValue(gameId, out var session))
+        {
             Console.WriteLine("Unable to move, no session found");
             return false;
+        }
 
         if (!session.ContainsPlayer(player))
+        {
             Console.WriteLine("Unable to move, player not in session");
             return false;
+        }
 
         bool result = await session.TryMakeMove(player, move);
 

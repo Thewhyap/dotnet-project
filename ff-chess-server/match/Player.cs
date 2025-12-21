@@ -52,6 +52,9 @@ public class Player(string name, TcpClient tcpClient)
             InitialGameState = new GameUpdate(game.GameState, game.TurnStatus)
         });
 
+    public Task SendGameQuit(Guid gameId, string reason)
+        => Send(new ServerGameQuit(gameId, reason));
+
     public void SetTcpClient(TcpClient tcpClient)
     {
         _tcpClient = tcpClient;

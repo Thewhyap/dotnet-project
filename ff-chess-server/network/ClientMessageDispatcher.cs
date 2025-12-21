@@ -88,6 +88,23 @@ public static class ClientMessageDispatcher
                     catch { }
                 }
                 
+                // ClientQuitGame: array de 3 éléments (PlayerId + GameId + MessageType=1)
+                // MUST be tested BEFORE ClientJoinGame to avoid confusion
+                if (data.Length >= 75 && data.Length <= 85 && data[0] == 0x93) // 0x93 = array de 3
+                {
+                    try
+                    {
+                        var quit = MessagePackSerializer.Deserialize<ClientQuitGame>(data, Options);
+                        if (quit.GameId != Guid.Empty && quit.MessageType == 1)
+                        {
+                            Console.WriteLine($"[Dispatcher] Detected ClientQuitGame for game {quit.GameId}");
+                            await MatchService.Instance.QuitGame(sender, quit.GameId);
+                            return;
+                        }
+                    }
+                    catch { }
+                }
+                
                 // ClientJoinGame: array de 2 éléments (PlayerId + GameId), pas de discriminator
                 if (data.Length >= 70 && data.Length <= 80 && data[0] == 0x92) // 0x92 = array de 2
                 {
