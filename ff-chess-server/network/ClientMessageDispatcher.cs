@@ -32,6 +32,22 @@ public static class ClientMessageDispatcher
             // Détection manuelle des types de messages si la désérialisation retourne le type de base
             if (message.GetType() == typeof(ClientMessage))
             {
+                // ClientRequestGamesList: array de 1 élément (PlayerId uniquement), longueur ~39
+                if (data.Length >= 38 && data.Length <= 42 && data[0] == 0x91) // 0x91 = array de 1
+                {
+                    try
+                    {
+                        var request = MessagePackSerializer.Deserialize<ClientRequestGamesList>(data, Options);
+                        if (request.PlayerId != Guid.Empty)
+                        {
+                            Console.WriteLine($"[Dispatcher] Detected ClientRequestGamesList");
+                            await MatchService.Instance.SendGamesList(sender);
+                            return;
+                        }
+                    }
+                    catch { }
+                }
+                
                 // ClientCreateGame: array de 2 éléments (PlayerId + discriminator=0), longueur ~40
                 if (data.Length == 40 && data[data.Length - 1] == 0)
                 {
@@ -117,6 +133,11 @@ public static class ClientMessageDispatcher
                 case ClientQuitGame quit:
                     Console.WriteLine($"[Dispatcher] Dispatching ClientQuitGame for game {quit.GameId}");
                     await MatchService.Instance.QuitGame(sender, quit.GameId);
+                    break;
+
+                case ClientRequestGamesList:
+                    Console.WriteLine($"[Dispatcher] Dispatching ClientRequestGamesList");
+                    await MatchService.Instance.SendGamesList(sender);
                     break;
 
                 default:

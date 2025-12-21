@@ -197,6 +197,22 @@ public partial class GameUpdaterServer : Node
         _networkClient.SendMessage(payload);
     }
     
+    public void SendRequestGamesList()
+    {
+        if (_playerId == Guid.Empty)
+        {
+            GD.PrintErr("[GameUpdater] Cannot request games list: not authenticated yet");
+            return;
+        }
+        
+        GD.Print("Requesting games list from server...");
+        var payload = new ClientRequestGamesList()
+        {
+            PlayerId = _playerId
+        };
+        _networkClient.SendMessage(payload);
+    }
+    
     public void SendCreateGameRequest()
     {
         if (_playerId == Guid.Empty)

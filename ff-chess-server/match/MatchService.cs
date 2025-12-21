@@ -20,9 +20,7 @@ public class MatchService
         Console.WriteLine($"[MatchService] Game created with GameId: {session.GameManager.Game.GameId}");
 
         await session.AddPlayer(creator);
-        Console.WriteLine($"[MatchService] Player added to game. Broadcasting games list...");
-        await BroadcastGamesList();
-        Console.WriteLine($"[MatchService] Games list broadcasted. Total games: {_sessions.Count}");
+        Console.WriteLine($"[MatchService] Player added to game.");
 
         return session;
     }
@@ -34,7 +32,6 @@ public class MatchService
             return false;
 
         await session.AddPlayer(player);
-        await BroadcastGamesList();
 
         return true;
     }
@@ -51,7 +48,6 @@ public class MatchService
         await session.RemovePlayer(player);
         _sessions.TryRemove(gameId, out _);
 
-        await BroadcastGamesList();
         return true;
     }
 
@@ -69,7 +65,6 @@ public class MatchService
         if (IsSessionOver(session))
         {
             _sessions.TryRemove(gameId, out _);
-            await BroadcastGamesList();
         }
 
         return result;
@@ -89,7 +84,6 @@ public class MatchService
         if (IsSessionOver(session))
         {
             _sessions.TryRemove(gameId, out _);
-            await BroadcastGamesList();
         }
 
         return result;
@@ -101,6 +95,13 @@ public class MatchService
     public IEnumerable<GameInfo> GetGameInfos()
         => _sessions.Values.Select(s => s.ToGameInfo());
 
+    public async Task SendGamesList(Player player)
+    {
+        Console.WriteLine($"[MatchService] Sending games list to {player.PlayerInfo.PlayerName}. Total games: {_sessions.Count}");
+        var update = new GamesListUpdate(GetGameInfos().ToList());
+        await player.Send(update);
+    }
+
     public async Task BroadcastGamesList()
     {
         var update = new GamesListUpdate(GetGameInfos().ToList());
@@ -110,6 +111,8 @@ public class MatchService
             .Select(p => p.Send(update));
 
         await Task.WhenAll(tasks);
+        
+        Console.WriteLine($"[MatchService] Games list broadcasted. Total games: {_sessions.Count}");
     }
 
     public bool IsSessionOver(MatchSession session)
