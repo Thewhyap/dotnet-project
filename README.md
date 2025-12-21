@@ -69,4 +69,4 @@
 
 Certains problèmes sont connus, notamment :
 - Impossible de manger des pions
-- Impossible de quitter une partie (en clickant sur quitter)
+- Impossible de quitter une partie (en cliquant sur quitter)
