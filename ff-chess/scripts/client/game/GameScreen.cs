@@ -97,6 +97,7 @@ public partial class GameScreen : Control
 	public void SetPlayerColor(PieceColor pieceColor)
 	{
 		_playerColor = pieceColor;
+		UpdateRoleDisplay();
 	}
 	
 	public void SetPlayerName(string playerName)
@@ -163,7 +164,7 @@ public partial class GameScreen : Control
 			ChessSquare from = new ChessSquare((int) _selectedPiecePosition.X, (int) _selectedPiecePosition.Y);
 			ChessSquare to = new ChessSquare(x, y);
 			ChessMove move = new ChessMove(from, to);
-			gameUpdater.SendMovePieceRequest(move);
+			gameUpdater.SendMovePieceRequest(_gameInfo.GameId, move);
 			_hasPieceSelected = false;
 		}
 		else
