@@ -64,7 +64,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "role : "
 
-[node name="ViewerCountLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
+[node name="TurnStatusLabel" type="Label" parent="HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
