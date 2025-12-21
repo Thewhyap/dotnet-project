@@ -76,14 +76,14 @@ namespace Gauniv.WebServer.Services
 
                 var adminUser = new User()
                 {
-                    UserName = "test@test.com",
-                    Email = "test@test.com",
-                    FirstName = "Test",
-                    LastName = "Test",
+                    UserName = "admin@admin.com",
+                    Email = "admin@admin.com",
+                    FirstName = "Administrator",
+                    LastName = "ADMIN",
                     EmailConfirmed = true
                 };
                 
-                var createAdminUser = await userManager.CreateAsync(adminUser, "123456");
+                var createAdminUser = await userManager.CreateAsync(adminUser, "123456@");
 
                 // ....
                 if (createAdminUser.Succeeded) {
@@ -94,12 +94,12 @@ namespace Gauniv.WebServer.Services
                 {
                     UserName = "client@client.com",
                     Email = "client@client.com",
-                    FirstName = "Test",
-                    LastName = "Test",
+                    FirstName = "Client",
+                    LastName = "USER",
                     EmailConfirmed = true
                 };
                 
-                var createClientUser = await userManager.CreateAsync(clientUser, "123456");
+                var createClientUser = await userManager.CreateAsync(clientUser, "123456_");
 
                 // ....
                 if (createClientUser.Succeeded) {
