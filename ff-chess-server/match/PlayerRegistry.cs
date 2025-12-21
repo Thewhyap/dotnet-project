@@ -8,12 +8,12 @@ public class PlayerRegistry
 
     public static void Register(Player player)
     {
-        _players[player.Id] = player;
+        _players[player.PlayerInfo.PlayerId] = player;
     }
 
     public static bool TryGetPlayer(Guid playerId, out Player player)
     {
-        return _players.TryGetValue(playerId, out player);
+        return _players.TryGetValue(playerId, out player!);
     }
 
     public static void Unregister(Guid playerId)

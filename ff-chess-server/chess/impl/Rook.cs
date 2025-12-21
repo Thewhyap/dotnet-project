@@ -6,8 +6,8 @@ public class Rook(PieceColor color) : PieceBase(PieceType.Rook, color)
 {
     public override bool IsSpecificMoveLegal(GameState state, ChessMove move, bool ignored)
     {
-        int deltaX = to.X - from.X;
-        int deltaY = to.Y - from.Y;
+        int deltaX = move.To.X - move.From.X;
+        int deltaY = move.To.Y - move.From.Y;
 
         // Check if the move is either horizontal or vertical
         if (deltaY != 0 && deltaX != 0)
@@ -16,13 +16,13 @@ public class Rook(PieceColor color) : PieceBase(PieceType.Rook, color)
         int stepX = deltaX == 0 ? 0 : (deltaX > 0 ? 1 : -1);
         int stepY = deltaY == 0 ? 0 : (deltaY > 0 ? 1 : -1);
 
-        int x = from.X + stepX;
-        int y = from.Y + stepY;
+        int x = move.From.X + stepX;
+        int y = move.From.Y + stepY;
 
         // Check if a piece blocks the path
-        while (x != to.X || y != to.Y)
+        while (x != move.To.X || y != move.To.Y)
         {
-            if (state.Board[x, y] != null)
+            if (state.Board.Cells[x, y] != null)
                 return false;
 
             x += stepX;

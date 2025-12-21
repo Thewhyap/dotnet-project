@@ -21,7 +21,7 @@ public static class GameHelper
             for (int y = 0; y < board.Size; y++)
             {
                 PieceData? piece = board.Cells[x, y];
-                if (piece.HasValue && piece.Value.Type == PieceType.King && piece.Value.Color == color)
+                if (piece != null && piece.Type == PieceType.King && piece.Color == color)
                     return new ChessSquare(x, y);
             }
         }
@@ -31,7 +31,7 @@ public static class GameHelper
 
     public static List<ChessSquare> GetOpponentPiecesPosition(GameState state)
     {
-        return GetPiecesPosition(state.Board, state.CurrentTurn == PiecePosition.White ? PiecePosition.Black : PiecePosition.White);
+        return GetPiecesPosition(state.Board, state.CurrentTurn == PieceColor.White ? PieceColor.Black : PieceColor.White);
     }
 
     public static List<ChessSquare> GetPiecesPosition(GameState state)
@@ -48,9 +48,9 @@ public static class GameHelper
             for (int y = 0; y < board.Size; y++)
             {
                 PieceData? piece = board.Cells[x, y];
-                if (piece.HasValue)
+                if (piece != null)
                 {
-                    if (piece.Value.Color == color)
+                    if (piece.Color == color)
                         opponentPiecesPosition.Add(new ChessSquare(x, y));
                 }
             }
@@ -67,7 +67,7 @@ public static class GameHelper
         for (int x = 0; x < 8; x++)
         {
             board.Cells[x, board.WhitePawnRow] = new PieceData(PieceType.Pawn, PieceColor.White);
-            board.Cells[x, board.BlackPawnRow] = new Pawn(PieceType.Pawn, PieceColor.Black);
+            board.Cells[x, board.BlackPawnRow] = new PieceData(PieceType.Pawn, PieceColor.Black);
         }
 
         // Rooks
@@ -99,7 +99,7 @@ public static class GameHelper
         return board;
     }
 
-    private static bool IsOffBoard(Board board, ChessSquare chessSquare)
+    public static bool IsOffBoard(Board board, ChessSquare chessSquare)
     {
         return (chessSquare.X < 0 || chessSquare.X > board.Size) && (chessSquare.Y < 0 || chessSquare.Y > board.Size);
     }

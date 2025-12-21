@@ -3,7 +3,7 @@ using Server.Chess;
 
 namespace Server.Match;
 
-public class MatchSession(GameManager gameManager)
+public class MatchSession()
 {
     private static readonly Random _rand = new();
 
@@ -11,63 +11,77 @@ public class MatchSession(GameManager gameManager)
     public Player? BlackPlayer { get; private set; }
     private readonly HashSet<Player> _viewers = new();
 
-    public GameManager GameManager { get; private set; } = gameManager;
+    public GameManager GameManager { get; private set; } = new();
 
-    public void AddPlayer(Player player)
+    public async Task AddPlayer(Player player)
     {
-        if (!WhitePlayer.HasValue && !BlackPlayer == null)
+        if (WhitePlayer == null && BlackPlayer == null)
         {
             if (_rand.Next(2) == 0)
             {
-                WhitePlayer.Value = player;
-                player.SendGameJoined(gameManager.Game, PieceColor.White);
+                WhitePlayer = player;
+                await player.SendGameJoined(GameManager.Game, PieceColor.White);
             }
             else
             {
-                BlackPlayer.Value = player;
-                player.SendGameJoined(gameManager.Game, PieceColor.Black);
+                BlackPlayer = player;
+                await player.SendGameJoined(GameManager.Game, PieceColor.Black);
             }
         }
-        else if (!WhitePlayer.HasValue)
+        else if (WhitePlayer == null)
         {
-            WhitePlayer.Value = player;
-            player.SendGameJoined(gameManager.Game, PieceColor.White);
+            WhitePlayer = player;
+            await player.SendGameJoined(GameManager.Game, PieceColor.White);
         }
-        else if (!BlackPlayer.HasValue)
+        else if (BlackPlayer == null)
         {
-            BlackPlayer.Value = player;
-            player.SendGameJoined(gameManager.Game, PieceColor.Black);
+            BlackPlayer = player;
+            await player.SendGameJoined(GameManager.Game, PieceColor.Black);
         }
         else
         {
             _viewers.Add(player);
-            player.SendGameJoined(gameManager.Game, null);
+            await player.SendGameJoined(GameManager.Game, null);
         }
 
-        await player.SendPlayerInfo();
+        await BroadcastGameInfo();
     }
 
-    public void RemovePlayer(Player player)
+    public async Task RemovePlayer(Player player)
     {
         if (player == WhitePlayer)
         {
             WhitePlayer = null;
             if (GameManager.Game.Status == MatchStatus.InGame)
+            {
                 GameManager.EndGameWithWin(PieceColor.Black);
+            }
+            else
+            {
+                GameManager.EndGameWithWin(null);
+            }
         }
         else if (player == BlackPlayer)
         {
             BlackPlayer = null;
             if (GameManager.Game.Status == MatchStatus.InGame)
+            {
                 GameManager.EndGameWithWin(PieceColor.White);
+            }
+            else
+            {
+                GameManager.EndGameWithWin(null);
+            }
         }
         else
         {
             _viewers.Remove(player);
         }
+
+        await BroadcastGameState();
     }
 
-    public bool TryPromote(Player player, PieceType promotionChoice)
+    public async Task<bool> TryPromote(Player player, PieceType promotionChoice)
     {
         if (!IsPlayerTurn(player))
             return false;
@@ -75,14 +89,17 @@ public class MatchSession(GameManager gameManager)
         if (GameManager.Game.TurnStatus != TurnStatus.WaitingPromotion)
             return false;
 
+        if (GameManager.Game.TurnStatus != TurnStatus.WaitingPromotion)
+            return false;
+
         var result = GameManager.Promote(promotionChoice);
 
-        BroadcastGameState();
+        await BroadcastGameState();
 
         return result;
     }
 
-    public bool TryMakeMove(Player player, ChessMove move)
+    public async Task<bool> TryMakeMove(Player player, ChessMove move)
     {
         if (!IsPlayerTurn(player))
             return false;
@@ -90,9 +107,12 @@ public class MatchSession(GameManager gameManager)
         if (GameManager.Game.TurnStatus != TurnStatus.WaitingMove)
             return false;
 
+        if (GameManager.Game.TurnStatus != TurnStatus.WaitingMove)
+            return false;
+
         var result = GameManager.Move(move);
 
-        BroadcastGameState();
+        await BroadcastGameState();
 
         return result;
     }
@@ -106,21 +126,49 @@ public class MatchSession(GameManager gameManager)
         return player == BlackPlayer;
     }
 
-    private void BroadcastGameState()
+    private async Task BroadcastGameState()
     {
-        WhitePlayer?.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus);
-        BlackPlayer?.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus);
+        var tasks = new List<Task>();
+
+        if (WhitePlayer != null)
+            tasks.Add(WhitePlayer.SendGameUpdate(GameManager.Game.GameState, GameManager.Game.TurnStatus));
+        if (BlackPlayer != null)
+            tasks.Add(BlackPlayer.SendGameUpdate(GameManager.Game.GameState, GameManager.Game.TurnStatus));
+
         foreach (var viewer in _viewers)
-            viewer.SendGameState(GameManager.Game.GameState, GameManager.Game.TurnStatus);
+            tasks.Add(viewer.SendGameUpdate(GameManager.Game.GameState, GameManager.Game.TurnStatus));
+
+        await Task.WhenAll(tasks);
     }
 
-    private void BroadcastGameInfo()
+    private async Task BroadcastGameInfo()
     {
-        GameInfo gameInfo = GameManager.Game.GameInfo;
+        GameInfo gameInfo = ToGameInfo();
 
-        WhitePlayer?.SendGameInfo(GameManager.Game.GameState, GameManager.Game.TurnStatus);
-        BlackPlayer?.SendGameInfo(GameManager.Game.GameState, GameManager.Game.TurnStatus);
+        var tasks = new List<Task>();
+
+        if (WhitePlayer != null)
+            tasks.Add(WhitePlayer.SendGameInfo(gameInfo));
+        if (BlackPlayer != null)
+            tasks.Add(BlackPlayer.SendGameInfo(gameInfo));
+
         foreach (var viewer in _viewers)
-            viewer.SendGameInfo(GameManager.Game.GameState, GameManager.Game.TurnStatus);
+            tasks.Add(viewer.SendGameInfo(gameInfo));
+
+        await Task.WhenAll(tasks);
+    }
+
+    public GameInfo ToGameInfo()
+    {
+        string whitePlayerName = WhitePlayer != null ? WhitePlayer.PlayerInfo.PlayerName : "Waiting for opponent";
+        string blackPlayerName = BlackPlayer != null ? BlackPlayer.PlayerInfo.PlayerName : "Waiting for opponent";
+        return new(GameManager.Game.GameId, GameManager.Game.Name, GameManager.Game.Status, whitePlayerName, blackPlayerName);
+    }
+
+    public bool ContainsPlayer(Player player)
+    {
+        return WhitePlayer == player
+            || BlackPlayer == player
+            || _viewers.Contains(player);
     }
 }

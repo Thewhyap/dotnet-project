@@ -6,10 +6,10 @@ namespace FFChessShared;
 public class PlayerInfo
 {
     [Key(0)]
-    public required Guid PlayerId { get; set; }
+    public Guid PlayerId { get; set; }
 
     [Key(1)]
-    public required string PlayerName { get; set; }
+    public string PlayerName { get; set; }
 
     public PlayerInfo(string playerName)
     {

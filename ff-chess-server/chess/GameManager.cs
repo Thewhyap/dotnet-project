@@ -14,37 +14,28 @@ public class GameManager
         state = Game.GameState;
     }
 
-    public void SendGame()
-    {
-        //TODO
-    }
-
-    public void Move(ChessMove move)
+    public bool Move(ChessMove move)
 	{
         if (GameHelper.IsOffBoard(state.Board, move.From) || GameHelper.IsOffBoard(state.Board, move.To))
         {
-            SendGame();
-            return;
+            return false;
         }
         
 		var piece = state.Board.Cells[move.From.X, move.From.Y];
 
-        if (!piece.HasValue)
+        if (piece == null)
         {
-            SendGame();
-            return;
+            return false;
         }
 
-        if(piece.Value.Color != state.CurrentTurn)
+        if(piece.Color != state.CurrentTurn)
         {
-            SendGame();
-            return;
+            return false;
         }
 
-        if(!piece.Value.IsMoveLegal(state, move))
+        if(!PieceRuleRegistry.GetRule(piece.Type, piece.Color).IsMoveLegal(state, move))
         {
-            SendGame();
-            return;
+            return false;
         }
 
         Game.TurnStatus = RuleHelper.MoveAction(state, move);
@@ -53,13 +44,12 @@ public class GameManager
 
         if (Game.TurnStatus == TurnStatus.WaitingPromotion)
         {
-            SendGame();
-            return;
+            return true;
         }
 
         Game.TurnStatus = RuleHelper.CheckWinCondition(state);
 
-        if (Game.TurnStatus == TurnStatus.WinWhite || Game.TurnStatus == TurnStatus.WinBlack || Game.TurnStatus == TurnStatus.Draw)
+        if (RuleHelper.IsGameOver(Game))
         {
             EndGame();
         }
@@ -67,24 +57,52 @@ public class GameManager
         {
             NextTurn();
         }
+
+        return true;
+    }
+
+    public bool Promote(PieceType promotionPiece)
+    {
+        var result = false;
+        var piecesPosition = GameHelper.GetPiecesPosition(state);
+        int promotionRow = state.CurrentTurn == PieceColor.White ? state.Board.BlackBackRow : state.Board.WhiteBackRow;
+        foreach (var piecePos in piecesPosition)
+        {
+            PieceData? piece = state.Board.Cells[piecePos.X, piecePos.Y];
+            if (piece != null && piece.Type == PieceType.Pawn && piecePos.Y == promotionRow)
+            {
+                state.Board.ChangePiece(piecePos, promotionPiece);
+                result = true;
+            }
+        }
+
+        Game.TurnStatus = RuleHelper.CheckWinCondition(state);
+
+        if (RuleHelper.IsGameOver(Game))
+        {
+            EndGame();
+        }
+        else
+        {
+            NextTurn();
+        }
+
+        return result;
     }
 
     private void NextTurn()
     {
         state.CurrentTurn = state.CurrentTurn == PieceColor.White ? PieceColor.Black : PieceColor.White;
-        SendGame();
     }
 
     private void EndGame()
     {
         Game.Status = MatchStatus.Closed;
-        SendGame();
     }
 
-    public void EndGameWithWin(PieceColor winningColor)
+    public void EndGameWithWin(PieceColor? winningColor)
     {
         Game.Status = MatchStatus.Closed;
-        Game.TurnStatus = winningColor == PieceColor.White ? TurnStatus.WinWhite : TurnStatus.WinBlack;
-        SendGame();
+        Game.TurnStatus = winningColor != null ? winningColor == PieceColor.White ? TurnStatus.WinWhite : TurnStatus.WinBlack : TurnStatus.Draw;
     }
 }

@@ -11,64 +11,38 @@ public class Player(string name, TcpClient tcpClient)
 {
     public PlayerInfo PlayerInfo { get; set; } = new PlayerInfo(name);
 
-    private readonly TcpClient _tcpClient = tcpClient;
+    private TcpClient _tcpClient = tcpClient;
 
-    public async Task SendPlayerInfo()
+    public async Task Send<T>(T message)
     {
         var stream = _tcpClient.GetStream();
-        byte[] data = MessagePackSerializer.Serialize(PlayerInfo);
+
+        byte[] data = MessagePackSerializer.Serialize(message);
         byte[] lengthPrefix = BitConverter.GetBytes(data.Length);
 
         await stream.WriteAsync(lengthPrefix, 0, lengthPrefix.Length);
         await stream.WriteAsync(data, 0, data.Length);
     }
 
-    public async Task SendGameJoined(Game game, PieceColor? color)
-    {
-        var update = new GameUpdate
-        {
-            State = game.GameState,
-            TurnStatus = game.TurnStatus
-        };
+    public Task SendPlayerInfo()
+    => Send(PlayerInfo);
 
-        var join = new GameJoined
+    public Task SendGameInfo(GameInfo gameInfo)
+        => Send(gameInfo);
+
+    public Task SendGameUpdate(GameState gameState, TurnStatus turnStatus)
+        => Send(new GameUpdate(gameState, turnStatus));
+
+    public Task SendGameJoined(Game game, PieceColor? color)
+        => Send(new GameJoined
         {
             GameId = game.GameId,
             AssignedColor = color,
-            InitialGameState = update
-        };
+            InitialGameState = new GameUpdate(game.GameState, game.TurnStatus)
+        });
 
-        var stream = _tcpClient.GetStream();
-        byte[] data = MessagePackSerializer.Serialize(join);
-        byte[] lengthPrefix = BitConverter.GetBytes(data.Length);
-
-        await stream.WriteAsync(lengthPrefix, 0, lengthPrefix.Length);
-        await stream.WriteAsync(data, 0, data.Length);
-    }
-
-    public async Task SendGameUpdate(GameState gameState, TurnStatus turnStatus)
+    public void SetTcpClient(TcpClient tcpClient)
     {
-        var update = new GameUpdate
-        {
-            State = gameState,
-            CurrentTurnStatus = turnStatus
-        };
-
-        var stream = _tcpClient.GetStream();
-        byte[] data = MessagePackSerializer.Serialize(update);
-        byte[] lengthPrefix = BitConverter.GetBytes(data.Length);
-
-        await stream.WriteAsync(lengthPrefix, 0, lengthPrefix.Length);
-        await stream.WriteAsync(data, 0, data.Length);
-    }
-
-    public async Task SendGameInfo(GameInfo gameInfo)
-    {
-        var stream = _tcpClient.GetStream();
-        byte[] data = MessagePackSerializer.Serialize(gameInfo);
-        byte[] lengthPrefix = BitConverter.GetBytes(data.Length);
-
-        await stream.WriteAsync(lengthPrefix, 0, lengthPrefix.Length);
-        await stream.WriteAsync(data, 0, data.Length);
+        _tcpClient = tcpClient;
     }
 }
