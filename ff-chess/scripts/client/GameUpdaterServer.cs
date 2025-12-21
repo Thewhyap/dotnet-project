@@ -214,7 +214,7 @@ public partial class GameUpdaterServer : Node
         GD.Print("Sent.");
     }
     
-    public void SendMovePieceRequest(ChessMove move)
+    public void SendMovePieceRequest(Guid gameId, ChessMove move)
     {
         if (_playerId == Guid.Empty)
         {
@@ -222,9 +222,16 @@ public partial class GameUpdaterServer : Node
             return;
         }
         
+        if (gameId == Guid.Empty)
+        {
+            GD.PrintErr("[GameUpdater] Cannot send Move: invalid GameId");
+            return;
+        }
+        
         ClientMove moveMessage = new ClientMove
         {
             PlayerId = _playerId,
+            GameId = gameId,
             Move = move
         };
         _networkClient.SendMessage(moveMessage);
