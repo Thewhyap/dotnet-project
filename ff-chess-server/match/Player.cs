@@ -3,12 +3,16 @@ using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using MessagePack;
+using MessagePack.Resolvers;
 using Server.Chess;
 
 namespace Server.Match;
 
 public class Player(string name, TcpClient tcpClient)
 {
+    private static readonly MessagePackSerializerOptions Options = 
+        MessagePackSerializerOptions.Standard.WithResolver(ContractlessStandardResolver.Instance);
+
     public PlayerInfo PlayerInfo { get; set; } = new PlayerInfo(name);
 
     private TcpClient _tcpClient = tcpClient;
@@ -17,7 +21,7 @@ public class Player(string name, TcpClient tcpClient)
     {
         var stream = _tcpClient.GetStream();
 
-        byte[] data = MessagePackSerializer.Serialize(message);
+        byte[] data = MessagePackSerializer.Serialize(message, Options);
         byte[] lengthPrefix = BitConverter.GetBytes(data.Length);
         
         // Ensure little-endian byte order

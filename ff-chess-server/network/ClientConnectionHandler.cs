@@ -18,28 +18,13 @@ public static class ClientConnectionHandler
 
             try
             {
-                var initialBytes = await MessageReader.ReceiveAsync(tcpClient);
-                if (initialBytes.Length == 0)
-                {
-                    Console.WriteLine($"Client {tcpClient.Client.RemoteEndPoint} disconnected before auth");
-                    tcpClient.Close();
-                    return;
-                }
-
-                var auth = MessagePackSerializer.Deserialize<ClientMessage>(initialBytes);
-                if (auth.PlayerId != Guid.Empty && PlayerRegistry.TryGetPlayer(auth.PlayerId, out var existingPlayer))
-                {
-                    player = existingPlayer;
-                    MatchService.Instance.CancelDisconnect(player);
-                }
-                else
-                {
-                    player = new Player(NicknameGenerator.GenerateNickname(), tcpClient);
-                    PlayerRegistry.Register(player);
-                }
-
+                // Créer immédiatement le joueur sans attendre de message d'auth
+                player = new Player(NicknameGenerator.GenerateNickname(), tcpClient);
+                PlayerRegistry.Register(player);
+                
                 player.SetTcpClient(tcpClient);
                 await player.SendPlayerInfo();
+                Console.WriteLine($"[ClientHandler] Sent PlayerInfo to {player.PlayerInfo.PlayerName}");
 
                 while (true)
                 {

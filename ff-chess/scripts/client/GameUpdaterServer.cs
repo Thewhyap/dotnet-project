@@ -2,11 +2,15 @@ using Godot;
 using System;
 using FFChessShared;
 using MessagePack;
+using MessagePack.Resolvers;
 
 public partial class GameUpdaterServer : Node
 {
     private NetworkClient _networkClient;
     private Guid _playerId = Guid.Empty;
+    
+    private static readonly MessagePackSerializerOptions Options = 
+        MessagePackSerializerOptions.Standard.WithResolver(ContractlessStandardResolver.Instance);
 
     public override async void _Ready()
     {
@@ -27,7 +31,7 @@ public partial class GameUpdaterServer : Node
             // PlayerInfo message (sent first by server)
             try
             {
-                var playerInfo = MessagePackSerializer.Deserialize<PlayerInfo>(data);
+                var playerInfo = MessagePackSerializer.Deserialize<PlayerInfo>(data, Options);
                 HandlePlayerInfo(playerInfo);
                 return;
             }
@@ -36,7 +40,7 @@ public partial class GameUpdaterServer : Node
             // GameUpdate
             try
             {
-                var gameUpdate = MessagePackSerializer.Deserialize<GameUpdate>(data);
+                var gameUpdate = MessagePackSerializer.Deserialize<GameUpdate>(data, Options);
                 HandleGameStateUpdate(gameUpdate);
                 return;
             }
@@ -44,7 +48,7 @@ public partial class GameUpdaterServer : Node
 
             try
             {
-                var gameJoined = MessagePackSerializer.Deserialize<GameJoined>(data);
+                var gameJoined = MessagePackSerializer.Deserialize<GameJoined>(data, Options);
                 HandleGameJoined(gameJoined);
                 return;
             }
@@ -53,7 +57,7 @@ public partial class GameUpdaterServer : Node
             // GameInfo message
             try
             {
-                var gameInfo = MessagePackSerializer.Deserialize<GameInfo>(data);
+                var gameInfo = MessagePackSerializer.Deserialize<GameInfo>(data, Options);
                 HandleGameInfo(gameInfo);
                 return;
             }
@@ -62,7 +66,7 @@ public partial class GameUpdaterServer : Node
             // GameInfo[] message (list of games)
             try
             {
-                var gameList = MessagePackSerializer.Deserialize<GameInfo[]>(data);
+                var gameList = MessagePackSerializer.Deserialize<GameInfo[]>(data, Options);
                 HandleGameList(gameList);
                 return;
             }
@@ -111,6 +115,12 @@ public partial class GameUpdaterServer : Node
 
     public void SendJoinGameRequest(Guid gameId)
     {
+        if (_playerId == Guid.Empty)
+        {
+            GD.PrintErr("[GameUpdater] Cannot send JoinGame: not authenticated yet");
+            return;
+        }
+        
         var payload = new ClientJoinGame() 
         { 
             PlayerId = _playerId,
@@ -121,6 +131,12 @@ public partial class GameUpdaterServer : Node
     
     public void SendCreateGameRequest()
     {
+        if (_playerId == Guid.Empty)
+        {
+            GD.PrintErr("[GameUpdater] Cannot send CreateGame: not authenticated yet. Please wait...");
+            return;
+        }
+        
         GD.Print("Sending create game request...");
         var payload = new ClientCreateGame()
         {
@@ -132,6 +148,12 @@ public partial class GameUpdaterServer : Node
     
     public void SendMovePieceRequest(ChessMove move)
     {
+        if (_playerId == Guid.Empty)
+        {
+            GD.PrintErr("[GameUpdater] Cannot send Move: not authenticated yet");
+            return;
+        }
+        
         ClientMove moveMessage = new ClientMove
         {
             PlayerId = _playerId,
@@ -142,6 +164,12 @@ public partial class GameUpdaterServer : Node
 
     public void SendQuitGameRequest(Guid gameId)
     {
+        if (_playerId == Guid.Empty)
+        {
+            GD.PrintErr("[GameUpdater] Cannot send QuitGame: not authenticated yet");
+            return;
+        }
+        
         var message = new ClientQuitGame
         {
             PlayerId = _playerId,
@@ -152,6 +180,12 @@ public partial class GameUpdaterServer : Node
     
     public void SendPromoteRequest(Guid gameId, PieceType promotionChoice)
     {
+        if (_playerId == Guid.Empty)
+        {
+            GD.PrintErr("[GameUpdater] Cannot send Promote: not authenticated yet");
+            return;
+        }
+        
         ClientPromotion message = new ClientPromotion
         {
             PlayerId = _playerId,

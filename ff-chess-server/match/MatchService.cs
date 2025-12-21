@@ -14,12 +14,15 @@ public class MatchService
 
     public async Task<MatchSession> CreateAndJoinGame(Player creator)
     {
-        Console.WriteLine($"Creating game, by {creator}");
+        Console.WriteLine($"[MatchService] Creating game for player: {creator.PlayerInfo.PlayerName} (PlayerId: {creator.PlayerInfo.PlayerId})");
         var session = new MatchSession();
         _sessions[session.GameManager.Game.GameId] = session;
+        Console.WriteLine($"[MatchService] Game created with GameId: {session.GameManager.Game.GameId}");
 
         await session.AddPlayer(creator);
+        Console.WriteLine($"[MatchService] Player added to game. Broadcasting games list...");
         await BroadcastGamesList();
+        Console.WriteLine($"[MatchService] Games list broadcasted. Total games: {_sessions.Count}");
 
         return session;
     }

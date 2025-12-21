@@ -3,12 +3,16 @@ using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using MessagePack;
+using MessagePack.Resolvers;
 
 public partial class NetworkClient : Node
 {
 	private TcpClient _tcpClient;
 	private NetworkStream _networkStream;
 	private bool _isConnected = false;
+	
+	private static readonly MessagePackSerializerOptions Options = 
+		MessagePackSerializerOptions.Standard.WithResolver(ContractlessStandardResolver.Instance);
 
 	[Signal]
 	public delegate void OnMessageReceivedEventHandler(byte[] data);
@@ -104,7 +108,7 @@ public partial class NetworkClient : Node
 
 		try
 		{
-			var messageBytes = MessagePackSerializer.Serialize(message);
+			var messageBytes = MessagePackSerializer.Serialize(message, Options);
 			var length = messageBytes.Length;
 		
 			// Envoyer d'abord la longueur (4 bytes)

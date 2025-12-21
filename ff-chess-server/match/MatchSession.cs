@@ -15,35 +15,43 @@ public class MatchSession()
 
     public async Task AddPlayer(Player player)
     {
+        Console.WriteLine($"[MatchSession] Adding player {player.PlayerInfo.PlayerName} to game {GameManager.Game.GameId}");
+        
         if (WhitePlayer == null && BlackPlayer == null)
         {
             if (_rand.Next(2) == 0)
             {
                 WhitePlayer = player;
+                Console.WriteLine($"[MatchSession] Player assigned as White");
                 await player.SendGameJoined(GameManager.Game, PieceColor.White);
             }
             else
             {
                 BlackPlayer = player;
+                Console.WriteLine($"[MatchSession] Player assigned as Black");
                 await player.SendGameJoined(GameManager.Game, PieceColor.Black);
             }
         }
         else if (WhitePlayer == null)
         {
             WhitePlayer = player;
+            Console.WriteLine($"[MatchSession] Player assigned as White");
             await player.SendGameJoined(GameManager.Game, PieceColor.White);
         }
         else if (BlackPlayer == null)
         {
             BlackPlayer = player;
+            Console.WriteLine($"[MatchSession] Player assigned as Black");
             await player.SendGameJoined(GameManager.Game, PieceColor.Black);
         }
         else
         {
             _viewers.Add(player);
+            Console.WriteLine($"[MatchSession] Player assigned as Viewer");
             await player.SendGameJoined(GameManager.Game, null);
         }
 
+        Console.WriteLine($"[MatchSession] Broadcasting game info...");
         await BroadcastGameInfo();
     }
 
