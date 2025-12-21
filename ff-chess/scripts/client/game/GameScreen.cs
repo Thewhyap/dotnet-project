@@ -267,8 +267,8 @@ public partial class GameScreen : Control
 	
 	private void OnGameResultModalOkPressed()
 	{
-		GD.Print("Game result modal closed - TODO EG implement what happens after game ends");
-		// TODO EG: Return to lobby, restart game, etc.
+		GD.Print("Game result modal closed");
+		GetSceneRouterNode().LoadMainMenu();
 	}
 
 	private void UpdateRoleDisplay()
