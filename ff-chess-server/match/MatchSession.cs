@@ -68,8 +68,12 @@ public class MatchSession()
             await player.SendGameJoined(GameManager.Game, null);
         }
 
-        Console.WriteLine($"[MatchSession] Broadcasting game info...");
+        Console.WriteLine($"[MatchSession] Broadcasting game info and state to all players...");
         await BroadcastGameInfo();
+        
+        // Broadcast current game state to ALL players 
+        // This ensures existing players see updates when new players join
+        await BroadcastGameState();
     }
 
     public async Task RemovePlayer(Player player)

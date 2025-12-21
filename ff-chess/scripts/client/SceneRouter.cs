@@ -113,28 +113,47 @@ public partial class SceneRouter : Node
   public void UpdateGame(GameUpdate gameUpdate)
   {
 	  GD.Print("Updating Game Screen");
-	  if (_screenRoot == null || _screenRoot.GetChildCount() == 0) return;
+	  if (_screenRoot == null || _screenRoot.GetChildCount() == 0) 
+	  {
+		  GD.Print("Game screen not found. Aborting update.");
+		  return;
+	  }
 
 	  var gameScreen = GetGameScreenNode();
+	  if (gameScreen != null)
 	  {
 		  gameScreen.SetGameState(gameUpdate.State);
 		  gameScreen.SetTurnStatus(gameUpdate.TurnStatus);
+	  }
+	  else
+	  {
+		  GD.Print("Game screen not loaded yet. Skipping update.");
 	  }
   }
 
   public void InitGame(GameJoined gameJoined)
   {
 	  var gameScreen = GetGameScreenNode();
-	  var intialGameUpdate = gameJoined.InitialGameState;
-	  UpdateGame(intialGameUpdate);
-
-	  if (gameJoined.AssignedColor == null)
+	  if (gameScreen == null)
 	  {
-		  GD.PrintErr("Assigned Color is null. Aborting initial load.");
+		  GD.PrintErr("Game screen not found. Cannot initialize game.");
 		  return;
 	  }
 	  
-	  gameScreen.SetPlayerColor((PieceColor) gameJoined.AssignedColor);
+	  var intialGameUpdate = gameJoined.InitialGameState;
+	  UpdateGame(intialGameUpdate);
+
+	  // Set player color if assigned (null for viewers/spectators)
+	  if (gameJoined.AssignedColor != null)
+	  {
+		  gameScreen.SetPlayerColor((PieceColor) gameJoined.AssignedColor);
+	  }
+	  else
+	  {
+		  GD.Print("Player is a viewer/spectator (no color assigned)");
+		  // Set a default color for display purposes (viewers see from white's perspective)
+		  gameScreen.SetPlayerColor(PieceColor.White);
+	  }
   }
 
   public void LoadInitialScene()
