@@ -67,12 +67,15 @@ public partial class GameScreen : Control
 		// Handle the game result modal display
 		if (_turnStatus == TurnStatus.Draw || _turnStatus == TurnStatus.WinBlack || _turnStatus == TurnStatus.WinWhite)
 		{
-			_gameResultModal.ShowResult(_turnStatus);
-			_resultModalShown = true;
+			if (!_resultModalShown)
+			{
+				_gameResultModal.ShowResult(_turnStatus);
+				_resultModalShown = true;
+			}
 		}
 		
-		// Handle the pawn promotion modal display
-		if (_turnStatus == TurnStatus.WaitingPromotion || _gameState.CurrentTurn == _playerColor)
+		// Handle the pawn promotion modal display - only when waiting for promotion
+		if (_turnStatus == TurnStatus.WaitingPromotion && !ShowPawnPromotionModal)
 		{
 			_pawnPromotionModal.ShowPromotionModal();
 			ShowPawnPromotionModal = true;
