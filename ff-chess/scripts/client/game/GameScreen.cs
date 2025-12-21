@@ -273,6 +273,9 @@ public partial class GameScreen : Control
 
 	private string GetWaitingPromotionMessage()
 	{
+		if (_gameState == null)
+			return "Waiting for game state...";
+			
 		return _gameState.CurrentTurn == _playerColor
 			? "Waiting for you to promote a pawn..."
 			: "Waiting for the opponent to promote a pawn...";

@@ -8,6 +8,7 @@ public partial class GameUpdaterServer : Node
 {
     private NetworkClient _networkClient;
     private Guid _playerId = Guid.Empty;
+    private GameJoined _pendingGameJoined; // For deferred initialization
     
     private static readonly MessagePackSerializerOptions Options = 
         MessagePackSerializerOptions.Standard.WithResolver(ContractlessStandardResolver.Instance);
@@ -28,12 +29,33 @@ public partial class GameUpdaterServer : Node
     {
         try
         {
-            // PlayerInfo message (sent first by server)
+            // If not authenticated yet, the first message MUST be PlayerInfo
+            if (_playerId == Guid.Empty)
+            {
+                try
+                {
+                    var playerInfo = MessagePackSerializer.Deserialize<PlayerInfo>(data, Options);
+                    if (playerInfo.PlayerId != Guid.Empty)
+                    {
+                        HandlePlayerInfo(playerInfo);
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    GD.PrintErr($"Failed to deserialize initial PlayerInfo: {ex.Message}");
+                }
+            }
+
+            // Try GameJoined first (most specific)
             try
             {
-                var playerInfo = MessagePackSerializer.Deserialize<PlayerInfo>(data, Options);
-                HandlePlayerInfo(playerInfo);
-                return;
+                var gameJoined = MessagePackSerializer.Deserialize<GameJoined>(data, Options);
+                if (gameJoined.GameId != Guid.Empty) // Validation
+                {
+                    HandleGameJoined(gameJoined);
+                    return;
+                }
             }
             catch { }
 
@@ -41,25 +63,23 @@ public partial class GameUpdaterServer : Node
             try
             {
                 var gameUpdate = MessagePackSerializer.Deserialize<GameUpdate>(data, Options);
-                HandleGameStateUpdate(gameUpdate);
-                return;
-            }
-            catch { }
-
-            try
-            {
-                var gameJoined = MessagePackSerializer.Deserialize<GameJoined>(data, Options);
-                HandleGameJoined(gameJoined);
-                return;
+                if (gameUpdate.State != null) // Validation
+                {
+                    HandleGameStateUpdate(gameUpdate);
+                    return;
+                }
             }
             catch { }
             
-            // GameInfo message
+            // GamesListUpdate message
             try
             {
-                var gameInfo = MessagePackSerializer.Deserialize<GameInfo>(data, Options);
-                HandleGameInfo(gameInfo);
-                return;
+                var gamesListUpdate = MessagePackSerializer.Deserialize<GamesListUpdate>(data, Options);
+                if (gamesListUpdate.Games != null) // Validation
+                {
+                    HandleGameList(gamesListUpdate.Games.ToArray());
+                    return;
+                }
             }
             catch { }
             
@@ -67,8 +87,24 @@ public partial class GameUpdaterServer : Node
             try
             {
                 var gameList = MessagePackSerializer.Deserialize<GameInfo[]>(data, Options);
-                HandleGameList(gameList);
-                return;
+                if (gameList != null && gameList.Length > 0) // Validation
+                {
+                    HandleGameList(gameList);
+                    return;
+                }
+            }
+            catch { }
+            
+            // GameInfo message - check it's not PlayerInfo by verifying it has more than 2 fields
+            try
+            {
+                var gameInfo = MessagePackSerializer.Deserialize<GameInfo>(data, Options);
+                // GameInfo has GameName which PlayerInfo doesn't have
+                if (gameInfo.GameId != Guid.Empty && !string.IsNullOrEmpty(gameInfo.GameName))
+                {
+                    HandleGameInfo(gameInfo);
+                    return;
+                }
             }
             catch { }
             
@@ -101,16 +137,48 @@ public partial class GameUpdaterServer : Node
 
     private void HandleGameJoined(GameJoined gameJoined)
     {
-        GetSceneRouterNode().InitGame(gameJoined);
+        GD.Print($"Game joined! GameId: {gameJoined.GameId}, AssignedColor: {gameJoined.AssignedColor}");
+        
+        // Load the game screen first
+        var gameInfo = new GameInfo 
+        { 
+            GameId = gameJoined.GameId,
+            GameName = "Chess Game",
+            WhitePlayerName = gameJoined.AssignedColor == PieceColor.White ? "You" : "Opponent",
+            BlackPlayerName = gameJoined.AssignedColor == PieceColor.Black ? "You" : "Opponent",
+            Status = MatchStatus.InGame
+        };
+        
+        GetSceneRouterNode().LoadGame(gameInfo);
+        
+        // Store for deferred initialization
+        _pendingGameJoined = gameJoined;
+        CallDeferred(nameof(InitGameDeferred));
+    }
+    
+    private void InitGameDeferred()
+    {
+        if (_pendingGameJoined != null)
+        {
+            GetSceneRouterNode().InitGame(_pendingGameJoined);
+            _pendingGameJoined = null;
+        }
     }
     
     private void HandleGameList(GameInfo[] games)
     {
         GD.Print($"Received list of {games.Length} games from server.");
-        // Here you would typically update the lobby UI with the received game list
         
-        var lobbyScreen = GetNode<LobbyScreen>("/root/ClientRoot/GameUpdaterServer/LobbyScreen");
-        lobbyScreen.DisplayGamesLobbies(games);
+        // Only update lobby screen if it exists (we're on the lobby screen)
+        var lobbyScreen = GetNodeOrNull<LobbyScreen>("/root/ClientRoot/UI/LobbyScreen");
+        if (lobbyScreen != null)
+        {
+            lobbyScreen.DisplayGamesLobbies(games);
+        }
+        else
+        {
+            GD.Print("Not on lobby screen, skipping lobby update");
+        }
     }
 
     public void SendJoinGameRequest(Guid gameId)
