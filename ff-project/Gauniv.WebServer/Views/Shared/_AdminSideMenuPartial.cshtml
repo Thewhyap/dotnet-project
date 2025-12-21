@@ -1,0 +1,36 @@
+﻿
+<nav class="col-md-4 col-lg-3 d-md-block bg-light sidebar border-end rounded-3">
+    <div class="position-sticky pt-3">
+        <h5 class="sidebar-heading px-3 mt-2 mb-3 text-muted">
+            <span>Admin Panel</span>
+        </h5>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")"
+                   asp-controller="Admin"
+                   asp-action="Index"
+                >
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Games" ? "active" : "")" 
+                   asp-controller="Admin" 
+                   asp-action="Games"
+                >
+                    <i class="bi bi-controller me-2"></i>
+                    Game Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Categories" ? "active" : "")" asp-controller="Admin" asp-action="Categories">
+                    <i class="bi bi-tags me-2"></i>
+                    Category Management
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+

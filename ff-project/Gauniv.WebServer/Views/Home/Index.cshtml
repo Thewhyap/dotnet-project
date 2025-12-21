@@ -1,0 +1,417 @@
+﻿
+
+@model Gauniv.WebServer.Dtos.HomeViewModel
+@using X.PagedList.Mvc.Core;
+@using X.PagedList;
+@{
+    ViewData["Title"] = "View";
+}
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .accordion {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .accordion-button {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .accordion-button:not(.collapsed) .text-primary {
+        color: white !important;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: transparent;
+    }
+    
+    .accordion-body {
+        padding: 1.5rem;
+    }
+    
+    .game-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        height: 100%;
+    }
+    
+    .game-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    }
+    
+    .game-card img {
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+        width: 100%;
+    }
+    
+    .game-card:hover img {
+        transform: scale(1.05);
+    }
+    
+    .game-title {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 1rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-bottom: 0.5rem;
+    }
+    
+    .game-price {
+        color: #667eea;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    .filter-btn {
+        transition: all 0.3s ease;
+    }
+    
+    .filter-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .badge-new {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #48bb78;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        z-index: 1;
+    }
+    
+    .card-body-custom {
+        padding: 15px;
+    }
+    
+    .img-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+</style>
+
+
+<!-- Hero Section -->
+<div class="hero-section text-center text-white p-5 my-4">
+    <h1 class="display-4 fw-bold mb-3">All Games</h1>
+    <p class="lead mb-0">Discover our game list</p>
+</div>
+
+<div class="container">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+</div>
+
+<!-- Filter Section -->
+<div class="container mb-4">
+    <div class="accordion shadow-sm" id="filterAccordion">
+        <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+                <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
+                    <i class="bi bi-funnel-fill me-2 text-primary"></i>
+                    <span class="fs-5">Advanced Filters</span>
+                    <span class="badge bg-primary ms-2">@((Model.SearchTerm != null || Model.Category != null || Model.MinPrice != null || Model.MaxPrice != null || Model.Owned != null) ? "Active" : "")</span>
+                </button>
+            </h2>
+            <div id="collapseFilter" class="accordion-collapse collapse show" data-bs-parent="#filterAccordion">
+                <div class="accordion-body bg-light">
+                    <form asp-action="Index" asp-controller="Home" method="get" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label for="searchTerm" class="form-label fw-semibold">
+                                <i class="bi bi-search me-1"></i>Search
+                            </label>
+                            <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
+                                   placeholder="Game name..." value="@Model.SearchTerm">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="category" class="form-label fw-semibold">
+                                <i class="bi bi-tags me-1"></i>Category
+                            </label>
+                            <select class="form-select" id="category" name="category">
+                                <option value="">All Categories</option>
+                                @foreach (var cat in Model.CategoryDtos)
+                                {
+                                    <option value="@(cat.Name)" selected="@(Model.Category == cat.Name)">@(cat.Name)</option>   
+                                }
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="minPrice" class="form-label fw-semibold">
+                                <i class="bi bi-currency-euro me-1"></i>Min Price (€)
+                            </label>
+                            <input type="number" class="form-control" id="minPrice" name="minPrice" 
+                                   placeholder="0" step="0.01" value="@Model.MinPrice">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="maxPrice" class="form-label fw-semibold">
+                                <i class="bi bi-currency-euro me-1"></i>Max Price (€)
+                            </label>
+                            <input type="number" class="form-control" id="maxPrice" name="maxPrice" 
+                                   placeholder="100" step="0.01" value="@Model.MaxPrice">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="minSize" class="form-label fw-semibold">
+                                <i class="bi bi-hdd me-1"></i>Min Size (MB)
+                            </label>
+                            <input type="number" class="form-control" id="minSize" name="minSize" 
+                                   placeholder="0" step="1" value="@Model.MinSize">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="maxSize" class="form-label fw-semibold">
+                                <i class="bi bi-hdd me-1"></i>Max Size (MB)
+                            </label>
+                            <input type="number" class="form-control" id="maxSize" name="maxSize" 
+                                   placeholder="50000" step="1" value="@Model.MaxSize">
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="owned" class="form-label fw-semibold">
+                                <i class="bi bi-bookmark-check me-1"></i>Status
+                            </label>
+                            <select class="form-select" id="owned" name="owned" disabled="@(!User.IsInRole("CLIENT"))">
+                                <option value="">All Games</option>
+                                <option value="true" selected="@(Model.Owned == true)">Owned</option>
+                                <option value="false" selected="@(Model.Owned == false || Model.Owned == null)">Not Owned</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="sortBy" class="form-label fw-semibold">
+                                <i class="bi bi-sort-down me-1"></i>Sort By
+                            </label>
+                            <select class="form-select" id="sortBy" name="sortBy">
+                                <option value="name" selected="@(Model.SortBy == "name")">Name</option>
+                                <option value="price-asc" selected="@(Model.SortBy == "price-asc")">Price: Low to High</option>
+                                <option value="price-desc" selected="@(Model.SortBy == "price-desc")">Price: High to Low</option>
+                                <option value="size-asc" selected="@(Model.SortBy == "size-asc")">Size: Small to Large</option>
+                                <option value="size-desc" selected="@(Model.SortBy == "size-desc")">Size: Large to Small</option>
+                                <option value="newest" selected="@(Model.SortBy == "newest")">Newest First</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button type="submit" class="btn btn-primary filter-btn px-4">
+                                    <i class="bi bi-funnel me-1"></i>Apply Filters
+                                </button>
+                                <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary px-4">
+                                    <i class="bi bi-x-circle me-1"></i>Clear All
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Game Grid -->
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="text-muted mb-0">
+            Showing @Model.PagedGames.Count of @Model.PagedGames.TotalItemCount games
+        </h5>
+    </div>
+        
+    <div class="row g-4">
+        @if (Model.PagedGames.Any())
+        {
+            @foreach (var game in Model.PagedGames)
+            {
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="card game-card">
+                        <div class="img-wrapper">
+                            <img src="@(game.CoverImage)" alt="@(game.CoverImage)" class="card-img-top">
+                        </div>
+                        <div class="card-body card-body-custom">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="game-title">@(game.Name)</h6>
+                                <span class="game-price">@(game.Price) €</span>
+                            </div>
+                            
+                            <div class="d-flex gap-2 mt-3">
+                                <button type="button" class="btn btn-sm btn-outline-primary flex-grow-1"
+                                        data-bs-toggle="modal" data-bs-target="#gameDetailsModal@(game.Id)">
+                                    <i class="bi bi-info-circle"></i> Details
+                                </button>
+                                @if (User.IsInRole("CLIENT"))
+                                {
+                                    <form asp-action="AddToCart" asp-controller="Home" method="post" class="d-inline">
+                                        <input type="hidden" name="gameId" value="@game.Id" />
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-cart-plus"></i> Add
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-primary" title="Connectez-vous en tant que client" disabled>Add</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Details Modal -->
+                <div class="modal fade" id="gameDetailsModal@(game.Id)" tabindex="-1" aria-labelledby="gameDetailsModalLabel@(game.Id)" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="gameDetailsModalLabel@(game.Id)">
+                                    <i class="bi bi-controller"></i> @game.Name
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <img src="@game.CoverImage" alt="@game.Name" class="img-fluid rounded shadow">
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="mb-3">
+                                            <h6 class="text-muted">Description</h6>
+                                            <p class="text-secondary">@(game.Description ?? "No description available.")</p>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body py-2">
+                                                        <small class="text-muted d-block">Price</small>
+                                                        <h4 class="mb-0 text-primary">
+                                                            <i class="bi bi-currency-euro"></i> @game.Price €
+                                                        </h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body py-2">
+                                                        <small class="text-muted d-block">Size</small>
+                                                        <h4 class="mb-0 text-info">
+                                                            <i class="bi bi-hdd"></i>
+                                                            @if (game.Size > 0)
+                                                            {
+                                                                if (game.Size < 1024 * 1024)
+                                                                {
+                                                                    @($"{(game.Size / 1024.0):F2} KB")
+                                                                }
+                                                                else if (game.Size < 1024 * 1024 * 1024)
+                                                                {
+                                                                    @($"{(game.Size / (1024.0 * 1024.0)):F2} MB")
+                                                                }
+                                                                else
+                                                                {
+                                                                    @($"{(game.Size / (1024.0 * 1024.0 * 1024.0)):F2} GB")
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                <small class="text-warning">N/A</small>
+                                                            }
+                                                        </h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-circle"></i> Close
+                                </button>
+                                @if (User.IsInRole("CLIENT"))
+                                {
+                                    <form asp-action="AddToCart" asp-controller="Home" method="post" class="d-inline">
+                                        <input type="hidden" name="gameId" value="@game.Id" />
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-cart-plus"></i> Add to Cart
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p>Aucun jeu disponible pour le moment</p>
+        }
+    </div>
+    
+    <div class="pagination-container mt-4">
+        @Html.PagedListPager(Model.PagedGames, page => Url.Action("Index", new
+        {
+            page,
+            searchTerm = Model.SearchTerm,
+            category = Model.Category,
+            minPrice = Model.MinPrice,
+            maxPrice = Model.MaxPrice,
+            minSize = Model.MinSize,
+            maxSize = Model.MaxSize,
+            owned = Model.Owned,
+            sortBy = Model.SortBy
+        }), new PagedListRenderOptions
+        {
+            DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+            DisplayLinkToLastPage = PagedListDisplayMode.Always,
+            DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+            DisplayLinkToNextPage = PagedListDisplayMode.Always,
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" },
+            UlElementClasses = new[] { "pagination justify-content-center" }
+        })
+    </div>
+    
+</div>

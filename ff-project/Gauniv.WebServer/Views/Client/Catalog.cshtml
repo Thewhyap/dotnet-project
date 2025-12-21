@@ -1,0 +1,113 @@
+﻿@model List<Gauniv.WebServer.Dtos.Game.GameDto>
+
+@{
+    ViewData["Title"] = "Dashboard - Mes jeux";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        
+        <partial name="_ClientSideMenuPartial" />
+        
+        <!-- Main Content -->
+        <main class="col-md-8 ms-sm-auto col-lg-9 px-md-4">
+            <div class="py-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Catalog" asp-action="Index">Client</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Catalog</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-collection me-2"></i>My Games
+                </h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a class="btn btn-success" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-cart-plus me-1"></i>
+                        Buy New Game
+                    </a>
+                </div>
+            </div>
+
+            <!-- Games Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Image</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Prix</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Any())
+                                {
+                                    @foreach (var game in Model)
+                                    {
+                                        <tr>
+                                            <th scope="row">@game.Id</th>
+                                            <td>
+                                                <img src="@(game.CoverImage)" width="50" height="50" alt="@(game.CoverImage)">
+                                            </td>
+                                            <td>@(game.Name)</td>
+                                            <td>@(game.Description)</td>
+                                            <td>@(game.Price)&nbsp;(€)</td>
+                                        </tr>
+                                    }
+                                }else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">
+                                            No games found. Create a game !
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+
+<style>
+    .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+    
+    .sidebar .nav-link {
+        color: #333;
+        padding: 0.75rem 1rem;
+        border-radius: 0.25rem;
+        transition: all 0.3s;
+    }
+    
+    .sidebar .nav-link:hover {
+        background-color: #e9ecef;
+    }
+    
+    .sidebar .nav-link.active {
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    .sidebar-heading {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+</style>
