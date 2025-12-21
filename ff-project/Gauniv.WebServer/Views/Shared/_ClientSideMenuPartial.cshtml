@@ -1,0 +1,28 @@
+﻿<nav class="col-md-4 col-lg-3 d-md-block bg-light sidebar border-end rounded-3">
+    <div class="position-sticky pt-3">
+        <h5 class="sidebar-heading px-3 mt-2 mb-3 text-muted">
+            <span>Client Dashboard</span>
+        </h5>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "active" : "")"
+                   asp-controller="Catalog"
+                   asp-action="Index"
+                >
+                    <i class="bi bi-collection me-2"></i>
+                    Catalog
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Users" ? "active" : "")" 
+                   asp-controller="Users" 
+                   asp-action="Index"
+                >
+                    <i class="bi bi-people me-2"></i>
+                    Users Online
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+

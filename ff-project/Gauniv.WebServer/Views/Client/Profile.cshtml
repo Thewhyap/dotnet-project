@@ -1,0 +1,64 @@
+﻿@model GameViewModel
+
+@{
+    ViewData["Title"] = "Dashboard - Mon Profil";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        
+        <partial name="_ClientSideMenuPartial" />
+
+        <!-- Main Content -->
+        <main class="col-md-8 ms-sm-auto col-lg-9 px-md-4">
+            
+            Profile client
+            
+        </main>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#filterCategory').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Select categories',
+                allowClear: true,
+                closeOnSelect: false
+            });
+        });
+    </script>
+}
+
+<style>
+    .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+    
+    .sidebar .nav-link {
+        color: #333;
+        padding: 0.75rem 1rem;
+        border-radius: 0.25rem;
+        transition: all 0.3s;
+    }
+    
+    .sidebar .nav-link:hover {
+        background-color: #e9ecef;
+    }
+    
+    .sidebar .nav-link.active {
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    .sidebar-heading {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+</style>
