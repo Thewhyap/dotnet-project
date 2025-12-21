@@ -109,13 +109,14 @@ public class MatchSession()
     public async Task<bool> TryPromote(Player player, PieceType promotionChoice)
     {
         if (!IsPlayerTurn(player))
+        {
             return false;
+        }
 
         if (GameManager.Game.TurnStatus != TurnStatus.WaitingPromotion)
+        {
             return false;
-
-        if (GameManager.Game.TurnStatus != TurnStatus.WaitingPromotion)
-            return false;
+        }
 
         var result = GameManager.Promote(promotionChoice);
 
@@ -127,16 +128,16 @@ public class MatchSession()
     public async Task<bool> TryMakeMove(Player player, ChessMove move)
     {
         if (!IsPlayerTurn(player))
+        {
             Console.WriteLine("Unable to move, not player's turn");
             return false;
+        }
 
         if (GameManager.Game.TurnStatus != TurnStatus.WaitingMove)
+        {
             Console.WriteLine("Unable to move, not waiting for move");
             return false;
-
-        if (GameManager.Game.TurnStatus != TurnStatus.WaitingMove)
-            Console.WriteLine("Unable to move, game not waiting for move");
-            return false;
+        }
 
         var result = GameManager.Move(move);
 
