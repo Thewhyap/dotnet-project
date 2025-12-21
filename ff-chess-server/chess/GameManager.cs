@@ -16,9 +16,11 @@ public class GameManager
 
     public bool Move(ChessMove move)
 	{
+        Console.WriteLine($"[GameManager] Attempting move from ({move.From.X}, {move.From.Y}) to ({move.To.X}, {move.To.Y})");
+        
         if (GameHelper.IsOffBoard(state.Board, move.From) || GameHelper.IsOffBoard(state.Board, move.To))
         {
-            Console.WriteLine("Unable to move, move is off board");
+            Console.WriteLine("[GameManager] Move rejected: off board");
             return false;
         }
         
@@ -26,23 +28,35 @@ public class GameManager
 
         if (piece == null)
         {
-            Console.WriteLine("Unable to move, no piece found at position");
+            Console.WriteLine("[GameManager] Move rejected: no piece at source");
             return false;
         }
 
+        Console.WriteLine($"[GameManager] Piece: {piece.Type} {piece.Color}, Current turn: {state.CurrentTurn}");
+
         if(piece.Color != state.CurrentTurn)
         {
+            Console.WriteLine("[GameManager] Move rejected: wrong color");
             return false;
+        }
+
+        var targetPiece = state.Board.Cells[move.To.X, move.To.Y];
+        if (targetPiece != null)
+        {
+            Console.WriteLine($"[GameManager] Target square has piece: {targetPiece.Type} {targetPiece.Color}");
         }
 
         if(!PieceRuleRegistry.GetRule(piece.Type, piece.Color).IsMoveLegal(state, move))
         {
+            Console.WriteLine("[GameManager] Move rejected: illegal move");
             return false;
         }
 
+        Console.WriteLine("[GameManager] Move is legal, executing...");
         Game.TurnStatus = RuleHelper.MoveAction(state, move);
 
         state.Board.MovePiece(move.From, move.To);
+        Console.WriteLine($"[GameManager] Move completed successfully");
 
         if (Game.TurnStatus == TurnStatus.WaitingPromotion)
         {
