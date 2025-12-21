@@ -215,7 +215,7 @@ public partial class GameScreen : Control
 			_boardView.AddChild(squareView);
 				
 				// Handle the piece on the square
-				var maybePiece = _gameState.Board.Cells[y, x];
+				var maybePiece = _gameState.Board.Cells[x, y];
 				if (maybePiece != null)
 				{
 					PieceData piece = (PieceData) maybePiece;
