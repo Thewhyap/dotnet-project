@@ -252,6 +252,8 @@ public partial class GameScreen : Control
 		GD.Print("Quit button pressed");
 		var gameUpdater = getGameUpdaterServer();
 		gameUpdater.SendQuitGameRequest(_gameInfo.GameId);
+		GetSceneRouterNode().LoadMainMenu();
+		ClearGameData();
 	}
 	
 	private void OnPawnPromotionPieceSelected(PieceType pieceType)
@@ -363,9 +365,30 @@ public partial class GameScreen : Control
 			return $"Waiting for {currentColorName} (Opponent) to promote a pawn...";
 		}
 	}
+	
+	public void clearGameData()
+	{
+		_gameState = null;
+		_gameInfo = null;
+		_turnStatus = TurnStatus.WaitingMove;
+		_playerColor = null;
+		_playerName = string.Empty;
+		_playerRole = string.Empty;
+		_boardView.ClearBoard();
+		_pieceViewMap.Clear();
+		_currentSelectedPieceView = null;
+		_hasPieceSelected = false;
+		_resultModalShown = false;
+		ShowPawnPromotionModal = false;
+	}
 
 	private GameUpdaterServer getGameUpdaterServer()
 	{
 		return GetNode<GameUpdaterServer>("/root/ClientRoot/GameUpdaterServer");
+	}
+	
+	private SceneRouter GetSceneRouterNode()
+	{
+		return GetNode<SceneRouter>("/root/ClientRoot/GameUpdaterServer/SceneRouter");
 	}
 }
