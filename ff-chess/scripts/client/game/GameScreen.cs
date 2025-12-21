@@ -282,31 +282,72 @@ public partial class GameScreen : Control
 		{
 			TurnStatus.WaitingMove => GetWaitingMoveMessage(),
 			TurnStatus.WaitingPromotion => GetWaitingPromotionMessage(),
-			TurnStatus.Draw => "Draw!",
-			TurnStatus.WinBlack => "Black won!",
-			TurnStatus.WinWhite => "White won!",
+			TurnStatus.Draw => "Draw! - Game ended in a draw",
+			TurnStatus.WinBlack => GetVictoryMessage(PieceColor.Black),
+			TurnStatus.WinWhite => GetVictoryMessage(PieceColor.White),
 			_ => "Unknown game status"
 		};
+	}
+	
+	private string GetVictoryMessage(PieceColor winnerColor)
+	{
+		string colorName = winnerColor == PieceColor.White ? "White" : "Black";
+		
+		if (_playerColor == null)
+		{
+			return $"{colorName} won!";
+		}
+		
+		if (winnerColor == _playerColor)
+		{
+			return $"🎉 {colorName} (You) won! Congratulations!";
+		}
+		else
+		{
+			return $"{colorName} (Opponent) won! Better luck next time!";
+		}
 	}
 
 	private string GetWaitingMoveMessage()
 	{
 		if (_gameState == null)
 			return "Waiting for game state...";
-			
-		return _gameState.CurrentTurn == _playerColor
-			? "Waiting for your move..."
-			: "Waiting for the opponent's move...";
+		
+		// Obtenir le nom de la couleur actuelle
+		string currentColorName = _gameState.CurrentTurn == PieceColor.White ? "White" : "Black";
+		
+		// Vérifier si c'est notre tour
+		bool isMyTurn = _gameState.CurrentTurn == _playerColor;
+		
+		if (isMyTurn)
+		{
+			return $"Waiting for {currentColorName} (You) to move...";
+		}
+		else
+		{
+			return $"Waiting for {currentColorName} (Opponent) to move...";
+		}
 	}
 
 	private string GetWaitingPromotionMessage()
 	{
 		if (_gameState == null)
 			return "Waiting for game state...";
-			
-		return _gameState.CurrentTurn == _playerColor
-			? "Waiting for you to promote a pawn..."
-			: "Waiting for the opponent to promote a pawn...";
+		
+		// Obtenir le nom de la couleur actuelle
+		string currentColorName = _gameState.CurrentTurn == PieceColor.White ? "White" : "Black";
+		
+		// Vérifier si c'est notre tour
+		bool isMyTurn = _gameState.CurrentTurn == _playerColor;
+		
+		if (isMyTurn)
+		{
+			return $"Waiting for {currentColorName} (You) to promote a pawn...";
+		}
+		else
+		{
+			return $"Waiting for {currentColorName} (Opponent) to promote a pawn...";
+		}
 	}
 
 	private GameUpdaterServer getGameUpdaterServer()
