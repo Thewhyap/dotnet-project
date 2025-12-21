@@ -5,10 +5,6 @@
 - AYIVI Marie-diégo Crédo
 - GRUAU Elyan
 
-## Repertoire de travail
-
-[./ff-project/](ff-project)
-
 ## Sujets choisi 
 
 - Serveur ASP
