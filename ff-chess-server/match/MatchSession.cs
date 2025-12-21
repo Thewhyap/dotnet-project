@@ -17,6 +17,23 @@ public class MatchSession()
     {
         Console.WriteLine($"[MatchSession] Adding player {player.PlayerInfo.PlayerName} to game {GameManager.Game.GameId}");
         
+        // ✅ Check if player is already in this game (by PlayerId, not by reference)
+        if (WhitePlayer?.PlayerInfo.PlayerId == player.PlayerInfo.PlayerId)
+        {
+            Console.WriteLine($"[MatchSession] Player {player.PlayerInfo.PlayerName} (ID: {player.PlayerInfo.PlayerId}) is already White in this game - ignoring duplicate add");
+            return;
+        }
+        if (BlackPlayer?.PlayerInfo.PlayerId == player.PlayerInfo.PlayerId)
+        {
+            Console.WriteLine($"[MatchSession] Player {player.PlayerInfo.PlayerName} (ID: {player.PlayerInfo.PlayerId}) is already Black in this game - ignoring duplicate add");
+            return;
+        }
+        if (_viewers.Any(v => v.PlayerInfo.PlayerId == player.PlayerInfo.PlayerId))
+        {
+            Console.WriteLine($"[MatchSession] Player {player.PlayerInfo.PlayerName} (ID: {player.PlayerInfo.PlayerId}) is already a Viewer in this game - ignoring duplicate add");
+            return;
+        }
+        
         if (WhitePlayer == null && BlackPlayer == null)
         {
             if (_rand.Next(2) == 0)

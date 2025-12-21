@@ -249,11 +249,13 @@ public partial class GameScreen : Control
 
 	private void HandleQuitButtonPressed()
 	{
-		GD.Print("Quit button pressed");
+		GD.Print("[GameScreen] Quit button pressed - Leaving game");
 		var gameUpdater = getGameUpdaterServer();
 		gameUpdater.SendQuitGameRequest(_gameInfo.GameId);
-		GetSceneRouterNode().LoadMainMenu();
-		ClearGameData();
+		GD.Print("[GameScreen] Quit request sent to server, waiting for confirmation...");
+		
+		// Don't load main menu immediately - wait for server confirmation
+		// The HandleGameQuit() in GameUpdaterServer will handle the transition
 	}
 	
 	private void OnPawnPromotionPieceSelected(PieceType pieceType)

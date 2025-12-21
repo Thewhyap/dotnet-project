@@ -9,6 +9,7 @@ public partial class GameUpdaterServer : Node
     private NetworkClient _networkClient;
     private Guid _playerId = Guid.Empty;
     private GameJoined _pendingGameJoined; // For deferred initialization
+    private bool _isQuitting = false; // Flag to prevent rejoining after quit
     
     private static readonly MessagePackSerializerOptions Options = 
         MessagePackSerializerOptions.Standard.WithResolver(ContractlessStandardResolver.Instance);
@@ -66,6 +67,19 @@ public partial class GameUpdaterServer : Node
                 if (gameUpdate.State != null) // Validation
                 {
                     HandleGameStateUpdate(gameUpdate);
+                    return;
+                }
+            }
+            catch { }
+            
+            // ServerGameQuit - Player has quit the game
+            // IMPORTANT: Test BEFORE GameInfo because they both have GameId
+            try
+            {
+                var gameQuit = MessagePackSerializer.Deserialize<ServerGameQuit>(data, Options);
+                if (gameQuit.GameId != Guid.Empty && !string.IsNullOrEmpty(gameQuit.Reason))
+                {
+                    HandleGameQuit(gameQuit);
                     return;
                 }
             }
@@ -132,12 +146,26 @@ public partial class GameUpdaterServer : Node
 
     private void HandleGameInfo(GameInfo info)
     {
-        GD.Print($"Game info received: {info.GameName}");
+        GD.Print($"[GameUpdater] GameInfo received: {info.GameName}, GameId: {info.GameId}, Status: {info.Status}");
+        GD.Print($"[GameUpdater] White: {info.WhitePlayerName}, Black: {info.BlackPlayerName}");
+        
+        // Check if we should auto-join this game
+        // NEVER auto-join - only manual join from lobby!
+        GD.Print("[GameUpdater] GameInfo processed - NOT auto-joining");
     }
 
     private void HandleGameJoined(GameJoined gameJoined)
     {
-        GD.Print($"Game joined! GameId: {gameJoined.GameId}, AssignedColor: {gameJoined.AssignedColor}");
+        // Ignore GameJoined if we're quitting - prevents rejoining after quit
+        if (_isQuitting)
+        {
+            GD.Print($"[GameUpdater] Ignoring GameJoined (quitting in progress): {gameJoined.GameId}");
+            return;
+        }
+        
+        GD.Print($"[GameUpdater] ========== GAME JOINED ==========");
+        GD.Print($"[GameUpdater] GameId: {gameJoined.GameId}, AssignedColor: {gameJoined.AssignedColor}");
+        GD.Print($"[GameUpdater] CurrentScene: {GetTree().CurrentScene?.Name}");
         
         // Load the game screen first
         var gameInfo = new GameInfo 
@@ -180,6 +208,38 @@ public partial class GameUpdaterServer : Node
             GD.Print("Not on lobby screen, skipping lobby update");
         }
     }
+    
+    private void HandleGameQuit(ServerGameQuit gameQuit)
+    {
+        GD.Print($"[GameUpdater] Game quit confirmed. GameId: {gameQuit.GameId}, Reason: {gameQuit.Reason}");
+        
+        // Clear any pending game joined data to prevent rejoining
+        _pendingGameJoined = null;
+        
+        // Clear game data from GameScreen if it exists
+        var gameScreen = GetNodeOrNull<GameScreen>("/root/ClientRoot/UI/GameScreen");
+        if (gameScreen != null)
+        {
+            GD.Print("[GameUpdater] Clearing game data from GameScreen");
+            gameScreen.clearGameData();
+        }
+        
+        // Return to main menu - SceneRouter is a child of this node
+        var sceneRouter = GetNode<SceneRouter>("SceneRouter");
+        if (sceneRouter != null)
+        {
+            GD.Print("[GameUpdater] Returning to main menu...");
+            sceneRouter.LoadMainMenu();
+        }
+        else
+        {
+            GD.PrintErr("[GameUpdater] SceneRouter not found, cannot return to main menu");
+        }
+        
+        // Reset quitting flag - we're now at main menu and can join games again
+        _isQuitting = false;
+        GD.Print("[GameUpdater] Quit complete - ready for new games");
+    }
 
     public void SendJoinGameRequest(Guid gameId)
     {
@@ -189,12 +249,14 @@ public partial class GameUpdaterServer : Node
             return;
         }
         
+        GD.Print($"[GameUpdater] Sending JOIN request for game {gameId}");  // ← Ajouté
         var payload = new ClientJoinGame() 
         { 
             PlayerId = _playerId,
             GameId = gameId 
         };
         _networkClient.SendMessage(payload);
+        GD.Print($"[GameUpdater] JOIN request sent for game {gameId}");  // ← Ajouté
     }
     
     public void SendRequestGamesList()
@@ -260,6 +322,10 @@ public partial class GameUpdaterServer : Node
             GD.PrintErr("[GameUpdater] Cannot send QuitGame: not authenticated yet");
             return;
         }
+        
+        // Set flag to prevent rejoining the game while quitting
+        _isQuitting = true;
+        GD.Print("[GameUpdater] Quitting game - ignoring further GameJoined messages");
         
         var message = new ClientQuitGame
         {
