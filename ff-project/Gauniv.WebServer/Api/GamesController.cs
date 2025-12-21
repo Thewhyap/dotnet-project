@@ -55,9 +55,8 @@ namespace Gauniv.WebServer.Api
         IWebHostEnvironment environment) : ControllerBase
     {
         
-        [HttpGet("categories")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<CategoryDto>>> GetCategories()
+        public async Task<ActionResult<List<CategoryDto>>> Categories()
         {
             
             var local_categories = await appDbContext.Categories.ToListAsync();
@@ -67,27 +66,43 @@ namespace Gauniv.WebServer.Api
         }
         
         
-        [HttpGet("game")]
+        [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<PagedResultDto<GameDto>>> Games(
+        public async Task<ActionResult<PagedResultDto<GameDto>>> Game(
             [FromQuery] int offset = 0,
             [FromQuery] int limit = 10,
             [FromQuery] int[]? category = null)
         {
-            var local_query = appDbContext.Games
-                .Include(g => g.GameCategories)
-                .AsQueryable();
+            IQueryable<Game> local_query;
 
-            // Si l'utilisateur est connecté, retourner uniquement ses jeux
+            // Si l'utilisateur est connecté, retourner uniquement ses jeux (comme CatalogController)
             if (User.Identity?.IsAuthenticated == true)
             {
                 var local_user = await userManager.GetUserAsync(User);
                 if (local_user != null)
                 {
-                    local_query = local_query
-                        .Include(g => g.GameUsers)
-                        .Where(g => g.GameUsers.Any(gu => gu.Id == local_user.Id));
+                    // Exactement la même logique que CatalogController
+                    var local_userGames = await appDbContext.Users
+                        .Where(u => u.Id == local_user.Id)
+                        .SelectMany(u => u.UserGames)
+                        .Include(g => g.GameCategories)
+                        .ToListAsync();
+                    
+                    local_query = local_userGames.AsQueryable();
                 }
+                else
+                {
+                    local_query = appDbContext.Games
+                        .Include(g => g.GameCategories)
+                        .AsQueryable();
+                }
+            }
+            else
+            {
+                // Utilisateur non connecté : tous les jeux
+                local_query = appDbContext.Games
+                    .Include(g => g.GameCategories)
+                    .AsQueryable();
             }
 
             // Filtre par catégories
@@ -96,9 +111,9 @@ namespace Gauniv.WebServer.Api
                 local_query = local_query.Where(g => g.GameCategories.Any(c => category.Contains(c.Id)));
             }
 
-            var local_total = await local_query.CountAsync();
+            var local_total = local_query.Count();
 
-            var local_games = await local_query
+            var local_games = local_query
                 .Skip(offset)
                 .Take(limit)
                 .Select(g => new GameDto
@@ -110,7 +125,7 @@ namespace Gauniv.WebServer.Api
                     CoverImage = g.CoverImage,
                     CategoryIds = g.GameCategories.Select(c => c.Id).ToList()
                 })
-                .ToListAsync();
+                .ToList();
 
             return Ok(new PagedResultDto<GameDto>
             {
@@ -122,9 +137,9 @@ namespace Gauniv.WebServer.Api
         }
         
     
-        [HttpGet("download/{id}")]
+        [HttpGet]
         [Authorize]
-        public async Task<IActionResult> DownloadGame(int id)
+        public async Task<IActionResult> Download([FromQuery] int id)
         {
             var local_user = await userManager.GetUserAsync(User);
             if (local_user == null)

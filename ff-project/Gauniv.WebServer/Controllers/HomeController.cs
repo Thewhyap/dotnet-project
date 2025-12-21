@@ -313,7 +313,7 @@ namespace Gauniv.WebServer.Controllers
                 {
                     local_game.GameUsers = new List<User>();
                 }
-                
+
                 var local_gameUsersList = local_game.GameUsers.ToList();
                 if (!local_gameUsersList.Any(u => u.Id == local_user.Id))
                 {

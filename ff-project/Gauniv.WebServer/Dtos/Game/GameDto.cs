@@ -50,7 +50,8 @@ namespace Gauniv.WebServer.Dtos.Game
         public string CoverImage { get; set; }
         
         public string Payload { get; set; }
-
+        
+        public long Size { get; set; }
      
         public double Price { get; set; }
         

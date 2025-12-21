@@ -46,7 +46,6 @@
                                     <th scope="col">Name</th>
                                     <th scope="col">Description</th>
                                     <th scope="col">Prix</th>
-                                    <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,18 +60,7 @@
                                             </td>
                                             <td>@(game.Name)</td>
                                             <td>@(game.Description)</td>
-                                            <td>@(game.Price)</td>
-                                            <td>
-                                                <a class="btn btn-sm btn-primary me-1">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <button
-                                                    class="btn btn-sm btn-danger"
-                                                    data-bs-toggle="modal" data-bs-target="cd"
-                                                >
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </td>
+                                            <td>@(game.Price)&nbsp;(€)</td>
                                         </tr>
                                     }
                                 }else
@@ -87,41 +75,12 @@
                         </table>
                     </div>
                     
-                    <!-- Pagination -->
-                    <nav aria-label="Game table pagination">
-                        <ul class="pagination justify-content-center mb-0">
-                            <li class="page-item disabled">
-                                <a class="page-link">Previous</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
-                    
                 </div>
             </div>
         </main>
     </div>
 </div>
 
-
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#filterCategory').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Select categories',
-                allowClear: true,
-                closeOnSelect: false
-            });
-        });
-    </script>
-}
 
 <style>
     .sidebar {

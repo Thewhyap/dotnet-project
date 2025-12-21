@@ -278,7 +278,10 @@
                             </div>
                             
                             <div class="d-flex gap-2 mt-3">
-                                <a class="btn btn-sm btn-outline-primary flex-grow-1">Details</a>
+                                <button type="button" class="btn btn-sm btn-outline-primary flex-grow-1"
+                                        data-bs-toggle="modal" data-bs-target="#gameDetailsModal@(game.Id)">
+                                    <i class="bi bi-info-circle"></i> Details
+                                </button>
                                 @if (User.IsInRole("CLIENT"))
                                 {
                                     <form asp-action="AddToCart" asp-controller="Home" method="post" class="d-inline">
@@ -291,6 +294,89 @@
                                 else
                                 {
                                     <button class="btn btn-sm btn-primary" title="Connectez-vous en tant que client" disabled>Add</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Game Details Modal -->
+                <div class="modal fade" id="gameDetailsModal@(game.Id)" tabindex="-1" aria-labelledby="gameDetailsModalLabel@(game.Id)" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="gameDetailsModalLabel@(game.Id)">
+                                    <i class="bi bi-controller"></i> @game.Name
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <img src="@game.CoverImage" alt="@game.Name" class="img-fluid rounded shadow">
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="mb-3">
+                                            <h6 class="text-muted">Description</h6>
+                                            <p class="text-secondary">@(game.Description ?? "No description available.")</p>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body py-2">
+                                                        <small class="text-muted d-block">Price</small>
+                                                        <h4 class="mb-0 text-primary">
+                                                            <i class="bi bi-currency-euro"></i> @game.Price €
+                                                        </h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body py-2">
+                                                        <small class="text-muted d-block">Size</small>
+                                                        <h4 class="mb-0 text-info">
+                                                            <i class="bi bi-hdd"></i>
+                                                            @if (game.Size > 0)
+                                                            {
+                                                                if (game.Size < 1024 * 1024)
+                                                                {
+                                                                    @($"{(game.Size / 1024.0):F2} KB")
+                                                                }
+                                                                else if (game.Size < 1024 * 1024 * 1024)
+                                                                {
+                                                                    @($"{(game.Size / (1024.0 * 1024.0)):F2} MB")
+                                                                }
+                                                                else
+                                                                {
+                                                                    @($"{(game.Size / (1024.0 * 1024.0 * 1024.0)):F2} GB")
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                <small class="text-warning">N/A</small>
+                                                            }
+                                                        </h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-circle"></i> Close
+                                </button>
+                                @if (User.IsInRole("CLIENT"))
+                                {
+                                    <form asp-action="AddToCart" asp-controller="Home" method="post" class="d-inline">
+                                        <input type="hidden" name="gameId" value="@game.Id" />
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-cart-plus"></i> Add to Cart
+                                        </button>
+                                    </form>
                                 }
                             </div>
                         </div>
