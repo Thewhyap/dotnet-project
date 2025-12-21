@@ -10,6 +10,7 @@ public static class ClientConnectionHandler
 {
     public static async Task HandleAsync(TcpClient tcpClient)
     {
+        Console.WriteLine($"Client {tcpClient.Client.RemoteEndPoint} connected");
         var stream = tcpClient.GetStream();
 
         // Initial client auth message (containing PlayerId or empty)
@@ -39,11 +40,13 @@ public static class ClientConnectionHandler
             while (true)
             {
                 var bytes = await MessageReader.ReceiveAsync(tcpClient);
+                Console.WriteLine($"Received {bytes.Length} bytes from {tcpClient.Client.RemoteEndPoint}");
                 await ClientMessageDispatcher.DispatchAsync(player, bytes);
             }
         }
         catch
         {
+            Console.WriteLine($"Client {tcpClient.Client.RemoteEndPoint} disconnected");
             MatchService.Instance.HandleDisconnect(player);
             tcpClient.Close();
         }

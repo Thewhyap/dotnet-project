@@ -16,7 +16,7 @@ public partial class GameUpdaterServer : Node
         }
         _networkClient.OnMessageReceived += OnMessageReceived;
 
-        await _networkClient.ConnectToServer("localhost", 5000);
+        await _networkClient.ConnectToServer("localhost", 8080);
     }
 
     private void OnMessageReceived(byte[] data)
@@ -101,8 +101,10 @@ public partial class GameUpdaterServer : Node
     
     public void SendCreateGameRequest()
     {
+        GD.Print("Sending create game request...");
         var payload = new ClientCreateGame();
         _networkClient.SendMessage(payload);
+        GD.Print("Sent.");
     }
     
     public void SendMovePieceRequest(ChessMove move)

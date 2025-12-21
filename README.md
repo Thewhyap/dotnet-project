@@ -37,3 +37,10 @@ Le jeu doit mettre en place les IHM permettant aux joueurs de jouer
 
 ### Marketplace (Steam)
 - TODO
+
+
+## Lancer une partie : 
+```bash
+cd FFChessServer
+dotnet build FFChessServer.csproj
+```

@@ -42,6 +42,7 @@ public partial class NetworkClient : Node
 				if (bytesRead == 0)
 				{
 					_isConnected = false;
+					GD.Print("Connection to server closed");
 					break;
 				}
 
@@ -59,11 +60,16 @@ public partial class NetworkClient : Node
 
 	public async void SendMessage<T>(T payload) where T : class
 	{
-		if (!_isConnected) return;
+		if (!_isConnected)
+		{
+			GD.Print("Not connected to server, cannot send message");
+			return;
+		}
 
 		try
 		{
 			byte[] data = MessagePackSerializer.Serialize(payload);
+			GD.Print("Sending message ..");
 			await _networkStream.WriteAsync(data, 0, data.Length);
 			await _networkStream.FlushAsync();
 		}

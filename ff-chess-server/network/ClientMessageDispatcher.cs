@@ -8,6 +8,7 @@ public static class ClientMessageDispatcher
 {
     public static async Task DispatchAsync(Player sender, byte[] data)
     {
+        Console.WriteLine("Received client message : "  + BitConverter.ToString(data)+" from" + sender.PlayerInfo.PlayerId);
         var message = MessagePackSerializer.Deserialize<ClientMessage>(data);
 
         if (message.PlayerId != sender.PlayerInfo.PlayerId)
