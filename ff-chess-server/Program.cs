@@ -6,7 +6,9 @@ public static class Program
 {
     public static async Task Main(string[] args)
     {
-        var server = new TcpGameServer(port: 8080);
+        int port = 8080;
+        var server = new TcpGameServer(port: port);
+        Console.WriteLine($"FFChess server running on port {port}...");
         await server.StartAsync();
     }
 }
