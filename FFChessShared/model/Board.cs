@@ -47,6 +47,7 @@ public partial class Board
     {
         Cells[to.X, to.Y] = Cells[from.X, from.Y];
         Cells[from.X, from.Y] = null;
+		Console.WriteLine($"[Board] Moved piece from ({from.X}, {from.Y}) to ({to.X}, {to.Y})");
     }
 
     public void ChangePiece(ChessSquare square, PieceType newType)

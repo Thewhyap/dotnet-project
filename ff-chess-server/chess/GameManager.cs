@@ -18,6 +18,7 @@ public class GameManager
 	{
         if (GameHelper.IsOffBoard(state.Board, move.From) || GameHelper.IsOffBoard(state.Board, move.To))
         {
+            Console.WriteLine("Unable to move, move is off board");
             return false;
         }
         
@@ -25,6 +26,7 @@ public class GameManager
 
         if (piece == null)
         {
+            Console.WriteLine("Unable to move, no piece found at position");
             return false;
         }
 
