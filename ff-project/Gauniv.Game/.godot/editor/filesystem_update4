@@ -1,0 +1,16 @@
+res://scripts/client/GameUpdaterServer.cs
+res://scripts/client/SceneRouter.cs
+res://scripts/client/game/GameScreen.cs
+res://scripts/client/network/NetworkClient.cs
+res://scripts/client/LobbyScreen.cs
+res://scripts/client/game/GameResultModal.cs
+res://scripts/client/lobby/LobbyItemScene.cs
+res://scripts/client/game/PawnPromotionModal.cs
+res://scripts/client/game/PiecesView.cs
+res://scripts/client/QuitButton.cs
+res://scripts/client/PlayButton.cs
+res://views/ChessBoardView.cs
+res://scripts/client/lobby/LobbyItem.cs
+res://scripts/client/game/SquareView.cs
+res://scripts/client/game/PieceView.cs
+res://scripts/client/ClientRoot.cs
