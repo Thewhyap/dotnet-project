@@ -29,13 +29,66 @@ public static class ClientMessageDispatcher
                 return;
             }
 
-            // Si le type de base est retourné mais que c'est un array de 2 éléments avec le dernier = 0
-            // alors c'est probablement un ClientCreateGame
-            if (message.GetType() == typeof(ClientMessage) && data.Length == 40 && data[data.Length - 1] == 0)
+            // Détection manuelle des types de messages si la désérialisation retourne le type de base
+            if (message.GetType() == typeof(ClientMessage))
             {
-                Console.WriteLine($"[Dispatcher] Detected ClientCreateGame based on message structure");
-                Console.WriteLine($"[Dispatcher] Dispatching ClientCreateGame");
-                await MatchService.Instance.CreateAndJoinGame(sender);
+                // ClientCreateGame: array de 2 éléments (PlayerId + discriminator=0), longueur ~40
+                if (data.Length == 40 && data[data.Length - 1] == 0)
+                {
+                    Console.WriteLine($"[Dispatcher] Detected ClientCreateGame based on message structure");
+                    await MatchService.Instance.CreateAndJoinGame(sender);
+                    return;
+                }
+                
+                // ClientPromotion: array de 3 éléments (PlayerId + GameId + PieceType), longueur ~78
+                if (data.Length >= 75 && data.Length <= 85 && data[0] == 0x93) // 0x93 = array de 3
+                {
+                    try
+                    {
+                        var promo = MessagePackSerializer.Deserialize<ClientPromotion>(data, Options);
+                        if (promo.GameId != Guid.Empty)
+                        {
+                            Console.WriteLine($"[Dispatcher] Detected ClientPromotion for game {promo.GameId}, choice: {promo.PromotionChoice}");
+                            await MatchService.Instance.TryPromote(sender, promo.GameId, promo.PromotionChoice);
+                            return;
+                        }
+                    }
+                    catch { }
+                }
+                
+                // ClientMove: array de 3 éléments (PlayerId + GameId + Move), longueur variable
+                if (data.Length >= 80 && data[0] == 0x93) // 0x93 = array de 3
+                {
+                    try
+                    {
+                        var move = MessagePackSerializer.Deserialize<ClientMove>(data, Options);
+                        if (move.GameId != Guid.Empty && move.Move != null)
+                        {
+                            Console.WriteLine($"[Dispatcher] Detected ClientMove for game {move.GameId}");
+                            await MatchService.Instance.TryMove(sender, move.GameId, move.Move);
+                            return;
+                        }
+                    }
+                    catch { }
+                }
+                
+                // ClientJoinGame: array de 2 éléments (PlayerId + GameId), pas de discriminator
+                if (data.Length >= 70 && data.Length <= 80 && data[0] == 0x92) // 0x92 = array de 2
+                {
+                    try
+                    {
+                        var join = MessagePackSerializer.Deserialize<ClientJoinGame>(data, Options);
+                        if (join.GameId != Guid.Empty)
+                        {
+                            Console.WriteLine($"[Dispatcher] Detected ClientJoinGame for game {join.GameId}");
+                            await MatchService.Instance.JoinGame(sender, join.GameId);
+                            return;
+                        }
+                    }
+                    catch { }
+                }
+                
+                Console.WriteLine($"[Dispatcher] ERROR: Unknown message type: ClientMessage (length={data.Length})");
                 return;
             }
 
