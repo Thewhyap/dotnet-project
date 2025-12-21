@@ -128,6 +128,20 @@ public partial class GameScreen : Control
 			return;
 		}
 		
+		// Check if clicking on the same piece that's already selected
+		if (_hasPieceSelected && _selectedPiecePosition.X == x && _selectedPiecePosition.Y == y)
+		{
+			// Unselect the piece
+			if (_currentSelectedPieceView != null)
+			{
+				_currentSelectedPieceView.SetSelected(false);
+			}
+			_hasPieceSelected = false;
+			_currentSelectedPieceView = null;
+			GD.Print($"Unselected pawn : ({x}, {y})");
+			return;
+		}
+		
 		// Unselect previous piece if any
 		if (_currentSelectedPieceView != null)
 		{
