@@ -11,7 +11,7 @@
 - Moteur de Jeu
 - Jeu
 
-> Details partie Web ASP
+## Partie Web ASP
 
 - > Utilisateurs enrégistré dans le système
 
@@ -51,17 +51,18 @@
     - Mise en place du stockage optimal du fichier afin qu'il soit bien téléchargé depuis le swagger
 
 
-> Details du Serveur de jeu et du jeu
+## Serveur de jeu et jeu
 
 ### Rendu
 
-1. On lance le jeu
-2. On arrive sur le lobby
-3. On attend que quelqu'un d'autre se connecte
-4. La partie commence
-5. On joue
-6. Les personnes suivantes sont des spectateurs (Observer)
-7. La partie se termine
+1. On lance le jeu.
+2. On arrive sur le lobby.
+3. On crée une partie, ou on en rejoint une existante.
+4. On attend que quelqu'un d'autre se connecte si besoin.
+5. La partie commence.
+6. On joue. (Mouvement d'une pièce / Promotion d'un pion)
+7. Les personnes suivantes qui se connectent sont des spectateurs. (Observer)
+8. Quand les conditions sont rencontrées, la partie se termine.
 
 Certains problèmes sont connus, notamment :
 - Impossible de manger des pions
